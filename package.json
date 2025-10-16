@@ -1,7 +1,19 @@
 {
-  "name": "zkbob-ui",
+  "name": "zkTelos-wallet",
   "version": "3.5.3",
   "private": true,
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject",
+    "electron:build:prod": "yarn build && electron-builder",
+    "electron:build:mac": "yarn electron:build:prod --mac",
+    "electron:build:win": "yarn electron:build:prod --win",
+    "electron:build:linux": "yarn electron:build:prod --linux"
+  },
   "dependencies": {
     "@dicebear/avatars": "^4.10.2",
     "@dicebear/avatars-bottts-sprites": "^4.10.2",
@@ -56,11 +68,59 @@
     "webpack": "^5.70.0",
     "zkbob-client-js": "6.0.0"
   },
-  "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "@sentry/webpack-plugin": "^1.20.0",
+    "buffer": "^6.0.3",
+    "dotenv": "16.0.0",
+    "electron": "27.0.0",
+    "electron-builder": "24.6.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "react-app-rewired": "^2.2.1",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.0"
+  },
+  "build": {
+    "appId": "com.zktelos.wallet",
+    "productName": "zkTelos Wallet",
+    "extends": null,
+    "asarUnpack": [
+      "electron/assets/**",
+      "build/assets/**",
+      "**/*.wasm",
+      "**/*.bin"
+    ],
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "!**/node_modules/**"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
+    "buildDependenciesFromSource": false,
+    "removePackageScripts": true,
+    "mac": {
+      "identity": null,
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.finance",
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Finance"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -95,17 +155,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@sentry/webpack-plugin": "^1.20.0",
-    "buffer": "^6.0.3",
-    "copy-webpack-plugin": "^11.0.0",
-    "https-browserify": "^1.0.0",
-    "os-browserify": "^0.3.0",
-    "react-app-rewired": "^2.2.1",
-    "stream-http": "^3.2.0",
-    "ts-loader": "^9.2.8",
-    "typescript": "^4.6.2",
-    "url": "^0.11.0"
   }
 }
