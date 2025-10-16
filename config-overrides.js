@@ -2,18 +2,22 @@ const webpack = require('webpack');
 const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 module.exports = {
-  webpack: function(config, env) {
-    config.devtool = 'source-map';
+  webpack: function (config, env) {
+    config.devtool = env === 'production' ? 'source-map' : 'cheap-module-source-map';
+
     config.experiments = {
       asyncWebAssembly: true,
       topLevelAwait: true,
     };
+
+    config.output = {
+      ...config.output,
+      globalObject: 'self',
+      publicPath: 'auto',
+    };
+
     config.module.rules = [
       ...config.module.rules,
-      {
-        test: /\.tsx?$/,
-        use: ['ts-loader'],
-      },
       {
         test: /\.wasm$/,
         type: 'asset/resource',
@@ -22,10 +26,7 @@ module.exports = {
         test: /\.js$/,
         enforce: 'pre',
         use: ['source-map-loader'],
-      },
-      {
-        test: /\.bin/,
-        type: 'asset/resource'
+        exclude: /node_modules/,
       },
       {
         resourceQuery: /asset/,
@@ -43,12 +44,14 @@ module.exports = {
       os: require.resolve('os-browserify/browser'),
       url: require.resolve('url/'),
     };
+
     config.plugins = [
       ...config.plugins,
       new webpack.ProvidePlugin({
-          Buffer: ['buffer', 'Buffer'],
+        Buffer: ['buffer', 'Buffer'],
       }),
     ];
+
     if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT && process.env.SENTRY_AUTH_TOKEN) {
       config.plugins.push(
         new SentryWebpackPlugin({
@@ -59,17 +62,22 @@ module.exports = {
         })
       );
     }
+
     return config;
   },
-  devServer: function(configFunction) {
-    return function(proxy, allowedHost) {
+
+  devServer: function (configFunction) {
+    return function (proxy, allowedHost) {
       const config = configFunction(proxy, allowedHost);
+
       config.headers = {
         ...config.headers,
-        'Cross-Origin-Embedder-Policy': 'credentialless',
         'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'credentialless',
+        // 'Cross-Origin-Embedder-Policy': 'require-corp',
       };
+
       return config;
     };
   },
-}
+};
