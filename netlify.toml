@@ -1,0 +1,16 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "credentialless"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+[[redirects]]
+  from = "/*"
+  to = "index.html"
+  status = 200
+
+[[plugins]]
+  package = "/plugins/netlify/env"
+  [plugins.inputs]
+      source = '_redirects'
+      base = '/opt/build/repo/public'
