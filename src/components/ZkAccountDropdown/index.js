@@ -16,13 +16,13 @@ import { formatNumber } from 'utils';
 
 import { TOKENS_ICONS } from 'constants';
 
-import { ZkAccountContext, ModalContext, PoolContext, WalletContext } from 'contexts';
+import { ZkAccountContext, ModalContext, PoolContext } from 'contexts';
 
 const Content = ({
   balance, generateAddress, getSeed, setPassword,
   removePassword, logout, close, showSeedPhrase,
   isLoadingState, initializeGiftCard, currentPool,
-  generatePaymentLink, isTron,
+  generatePaymentLink,
 }) => {
   const { t } = useTranslation();
   const [privateAddress, setPrivateAddress] = useState(null);
@@ -148,13 +148,11 @@ const Content = ({
           {t('buttonText.getPaymentLink')}
         </OptionButton>
       )}
-      {!isTron && (
-        <QRCodeReader onResult={initGiftCard}>
-          <OptionButton data-ga-id="zkaccount-gift-card">
-            {t('buttonText.redeemGiftCard')}
-          </OptionButton>
-        </QRCodeReader>
-      )}
+      <QRCodeReader onResult={initGiftCard}>
+        <OptionButton data-ga-id="zkaccount-gift-card">
+          {t('buttonText.redeemGiftCard')}
+        </OptionButton>
+      </QRCodeReader>
       <OptionButton onClick={() => setShowSettings(true)} data-ga-id="zkaccount-settings">
         {t('common.settings')}
       </OptionButton>
@@ -176,7 +174,7 @@ export default ({ children }) => {
     isZkAccountDropdownOpen, openZkAccountDropdown, closeZkAccountDropdown,
   } = useContext(ModalContext);
   const { currentPool } = useContext(PoolContext);
-  const { isTron } = useContext(WalletContext);
+
   return (
     <Dropdown
       disabled={isLoadingState}
@@ -199,7 +197,6 @@ export default ({ children }) => {
           currentPool={currentPool}
           close={closeZkAccountDropdown}
           generatePaymentLink={openPaymentLinkModal}
-          isTron={isTron}
         />
       )}
     >

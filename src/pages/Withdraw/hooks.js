@@ -29,18 +29,17 @@ const POOL_CONTRACT_ABI = ['function tokenSeller() pure returns (address)'];
 const SWAP_CONTRACT_ABI = ['function quoteSellForETH(uint256) pure returns (uint256)'];
 
 export const useConvertion = (currentPool) => {
-  const { callContract, isTron } = useContext(WalletContext);
+  const { callContract } = useContext(WalletContext);
   const [price, setPrice] = useState(ethers.constants.Zero);
   const [exist, setExist] = useState(false);
 
   useEffect(() => {
     async function getPrice() {
-      if (isTron) return;
       try {
         let swapContractAddress = ethers.constants.AddressZero;
         try {
           swapContractAddress = await callContract(currentPool.poolAddress, POOL_CONTRACT_ABI, 'tokenSeller');
-        } catch (error) {}
+        } catch (error) { }
         const exist = swapContractAddress !== ethers.constants.AddressZero;
         setExist(exist);
         if (!exist) return;
@@ -58,7 +57,7 @@ export const useConvertion = (currentPool) => {
     getPrice();
     const interval = setInterval(getPrice, 1000 * 60 * 5);
     return () => clearInterval(interval);
-  }, [callContract, currentPool, isTron]);
+  }, [callContract, currentPool]);
 
   return { exist, price, decimals: 18, toTokenSymbol: NATIVE_TOKENS[currentPool.alias] };
 };
