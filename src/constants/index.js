@@ -36,28 +36,20 @@ export const NETWORKS = {
       tx: 'https://polygonscan.com/tx/%s',
     },
   },
-  5: {
-    name: 'Goerli',
-    icon: require('assets/goerli.svg').default,
+  40: {
+    name: 'Telos',
+    icon: require('assets/telos.svg').default,
     blockExplorerUrls: {
-      address: 'https://eth-goerli.blockscout.com/address/%s',
-      tx: 'https://eth-goerli.blockscout.com/tx/%s',
+      address: 'https://teloscan.io/address/%s',
+      tx: 'https://teloscan.io/tx/%s',
     },
   },
-  420: {
-    name: 'Goerli Optimism',
-    icon: require('assets/optimism.svg').default,
+  41: {
+    name: 'Telos Testnet',
+    icon: require('assets/telos.svg').default,
     blockExplorerUrls: {
-      address: 'https://optimism-goerli.blockscout.com/address/%s',
-      tx: 'https://optimism-goerli.blockscout.com/tx/%s',
-    },
-  },
-  10: {
-    name: 'Optimism',
-    icon: require('assets/optimism.svg').default,
-    blockExplorerUrls: {
-      address: 'https://optimism.blockscout.com/address/%s',
-      tx: 'https://optimism.blockscout.com/tx/%s',
+      address: 'https://testnet.teloscan.io/address/%s',
+      tx: 'https://testnet.teloscan.io/tx/%s',
     },
   },
 };
@@ -71,6 +63,10 @@ export const TOKENS_ICONS = {
   'USDC.e': require('assets/usdc.svg').default,
   'USDT': require('assets/usdt.png'),
   'USDT*': require('assets/usdt.png'),
+  'TLOS': require('assets/telos.svg').default,
+  'sTLOS': require('assets/sTLOS.svg').default,
+  'wTLOS': require('assets/wTLOS.svg').default,
+
 };
 
 export const CONNECTORS_ICONS = {

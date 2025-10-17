@@ -49,56 +49,13 @@ const config = {
         parameters: 'prod',
         closingDate: '2025-02-01T00:00:00Z',
       },
-      'BOB2USDC-optimism': {
-        chainId: 10,
-        poolAddress: '0x1CA8C2B9B20E18e86d5b9a72370fC6c91814c97C',
-        tokenAddress: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-        // relayerUrls: ['https://relayer-optimism.zkbob.com/'],
-        proxyUrls: ["https://proxy1.zkbob.com", "https://proxy2.zkbob.com"],
-        delegatedProverUrls: [],
-        coldStorageConfigPath: '',
-        tokenSymbol: 'USDC',
-        tokenDecimals: 6,
-        feeDecimals: 2,
-        depositScheme: 'usdc',
-        minTxAmount: 50000000n, // 0.05 USDC
-        ddSubgraph: 'zkbob-bob-optimism',
-        migrations: [{
-          timestamp: 1696854269,
-          prevTokenSymbol: 'BOB',
-        }],
-        addressPrefix: 'zkbob_optimism',
-        paymentContractAddress: '0x860513FbdC4B6B2B210e1D393BE244F1d0b1Babd',
-        parameters: 'prod'
-      },
-      'WETH-optimism': {
-        chainId: 10,
-        poolAddress: '0x58320A55bbc5F89E5D0c92108F762Ac0172C5992',
-        tokenAddress: '0x4200000000000000000000000000000000000006',
-        relayerUrls: ['https://relayer-eth-opt-mvp.zkbob.com/'],
-        delegatedProverUrls: [],
-        coldStorageConfigPath: '',
-        kycUrls: {
-          status: 'https://api.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
-          homepage: 'https://knowyourcat.id/address/%s/BABTokenBOB/10',
-        },
-        tokenSymbol: 'ETH',
-        tokenDecimals: 18,
-        isNative: true,
-        depositScheme: 'permit2',
-        minTxAmount: 1000000n, // 0.001 ETH
-        ddSubgraph: 'zkbob-eth-optimism',
-        addressPrefix: 'zkbob_optimism_eth',
-        paymentContractAddress: '0x7a8006Ea0Dda93C56E60187Bd55109AbfF486c6F',
-        parameters: 'prod'
-      },
     },
     chains: {
       '137': {
         rpcUrls: ['https://polygon-mainnet.infura.io/v3/be5a139ca13b42609fab98b55dbb5a03'],
       },
-      '10': {
-        rpcUrls: ['https://optimism-mainnet.infura.io/v3/be5a139ca13b42609fab98b55dbb5a03'],
+      '40': {
+        rpcUrls: ['https://rpc.telos.net']
       },
     },
     "snarkParamsSet": {
@@ -143,14 +100,8 @@ const config = {
       '11155111': {
         rpcUrls: ['https://sepolia.infura.io/v3/9a94d181b23846209f01161dcd0f9ad6'],
       },
-      '5': {
-        rpcUrls: ['https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161']
-      },
-      '420': {
-        rpcUrls: ['https://goerli.optimism.io']
-      },
-      '10': {
-        rpcUrls: ["https://virtual.optimism.rpc.tenderly.co/fb1a77c3-e7f5-4622-aee5-85025a99a658"]
+      '41': {
+        rpcUrls: ['https://rpc.testnet.telos.net']
       },
     },
     extraPrefixes: [
