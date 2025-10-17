@@ -149,20 +149,11 @@ const config = {
       '420': {
         rpcUrls: ['https://goerli.optimism.io']
       },
-      '3448148188': {
-        rpcUrls: ['https://nile.trongrid.io'],
-        external: "https://deploy-preview-250--shimmering-douhua-023cc6.netlify.app"
-      },
       '10': {
         rpcUrls: ["https://virtual.optimism.rpc.tenderly.co/fb1a77c3-e7f5-4622-aee5-85025a99a658"]
       },
     },
     extraPrefixes: [
-      {
-        poolId: 16776968,
-        prefix: 'zkbob_nile_g',
-        name: 'USDT on Nile testnet (MPC guard contracts)',
-      },
       {
         poolId: 16776969,
         prefix: 'zkbob_sepolia',

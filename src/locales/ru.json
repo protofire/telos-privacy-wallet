@@ -225,8 +225,7 @@
     "restoreWithWallet": {
       "title": "Вход в ваш zk-Аккаунт",
       "description": "Выберите кошелек, который вы использовали для создания своего zk-Аккаунта",
-      "warning": "Кошелек TronLink будет использоваться только для восстановления доступа к вашему предыдущему аккаунту zkBob",
-      "warning_tron": "Кошельки MetaMask и Wallet Connect будут использоваться только для восстановления доступа к вашему предыдущему аккаунту zkBob"
+      "warning": "Кошельки MetaMask и Wallet Connect будут использоваться только для восстановления доступа к вашему предыдущему аккаунту zkBob"
     },
     "restoreWithSecret": {
       "title": "Восстановить zk-Аккаунт",
@@ -403,8 +402,6 @@
     "noWalletDescription": "Убедитесь, что установлено расширение кошелька {{wallet}}.",
     "noWalletDescriptionWithDeposit": "Убедитесь, что установлено расширение кошелька {{wallet}}. Подключите кошелек Web3, чтобы внести {{symbol}} в ваш zkAccount.",
     "install": "Установить кошелек {{wallet}}",
-    "tronlinkMobileDescription": "Чтобы использовать zkBob с TronLink, вам нужно открыть наше приложение в браузере кошелька TronLink.",
-    "tronlinkMobileDescriptionWithDeposit": "Чтобы использовать zkBob с TronLink, вам нужно открыть наше приложение в браузере кошелька TronLink. Подключите кошелек Web3, чтобы внести {{symbol}} на ваш zkAccount.",
     "open": "Открыть кошелек {{wallet}}",
     "downloadQuestion": "Если приложение не открывается, вы хотели бы скачать его из магазина?"
   },

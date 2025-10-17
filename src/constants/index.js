@@ -60,30 +60,6 @@ export const NETWORKS = {
       tx: 'https://optimism.blockscout.com/tx/%s',
     },
   },
-  2494104990: {
-    name: 'Shasta',
-    icon: require('assets/tron.png'),
-    blockExplorerUrls: {
-      address: 'https://shasta.tronscan.org/#/address/%s',
-      tx: 'https://shasta.tronscan.org/#/transaction/%s',
-    },
-  },
-  3448148188: {
-    name: 'Nile',
-    icon: require('assets/tron.png'),
-    blockExplorerUrls: {
-      address: 'https://nile.tronscan.org/#/address/%s',
-      tx: 'https://nile.tronscan.org/#/transaction/%s',
-    },
-  },
-  728126428: {
-    name: 'Tron',
-    icon: require('assets/tron.png'),
-    blockExplorerUrls: {
-      address: 'https://tronscan.org/#/address/%s',
-      tx: 'https://tronscan.org/#/transaction/%s',
-    },
-  }
 };
 
 export const TOKENS_ICONS = {
@@ -101,7 +77,6 @@ export const CONNECTORS_ICONS = {
   'MetaMask': require('assets/metamask.svg').default,
   'WalletConnect': require('assets/walletconnect.svg').default,
   'WalletConnectLegacy': require('assets/walletconnect.svg').default,
-  'TronLink': require('assets/tronlink.png'),
 };
 
 export const INCREASED_LIMITS_STATUSES = {

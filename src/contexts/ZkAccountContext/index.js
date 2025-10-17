@@ -162,7 +162,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       }
       setIsLoadingHistory(true);
       try {
-        history= await zkClient.getAllHistory();
+        history = await zkClient.getAllHistory();
         history = await Promise.all(history.map(async item => ({
           ...item,
           failed: [HistoryRecordState.RejectedByRelayer, HistoryRecordState.RejectedByPool].includes(item.state),
@@ -310,7 +310,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     openTxModal();
     setTxAmount(amount);
     try {
-      if (chain.id !== currentPool.chainId && !currentPool.isTron) {
+      if (chain.id !== currentPool.chainId) {
         setTxStatus(TX_STATUSES.SWITCH_NETWORK);
         try {
           await switchNetwork();
@@ -447,7 +447,7 @@ export const ZkAccountContextProvider = ({ children }) => {
         txCnt,
         insufficientFunds,
         relayerFee,
-      } = await zkClient.feeEstimate(shieldedAmounts, txType, shieldedAmountToConvert, false); 
+      } = await zkClient.feeEstimate(shieldedAmounts, txType, shieldedAmountToConvert, false);
       return {
         fee: await fromShieldedAmount(fee.total),
         numberOfTxs: txCnt,
@@ -509,12 +509,12 @@ export const ZkAccountContextProvider = ({ children }) => {
   const unlockAccount = useCallback(password => {
     if (!zkClient) return false;
     try {
-        const mnemonic = decryptMnemonic(password);
-        closePasswordModal();
-        loadZkAccount(mnemonic);
-        return true;
+      const mnemonic = decryptMnemonic(password);
+      closePasswordModal();
+      loadZkAccount(mnemonic);
+      return true;
     } catch (error) {
-        throw new Error('Incorrect password');
+      throw new Error('Incorrect password');
     }
   }, [zkClient, loadZkAccount, closePasswordModal, decryptMnemonic]);
 

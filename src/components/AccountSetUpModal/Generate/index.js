@@ -1,24 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
 import WalletConnectors from 'components/WalletConnectors';
 
-import { PoolContext, WalletContext } from 'contexts';
-
 export default ({ next, isCreation }) => {
   const { t } = useTranslation();
-  const { currentPool } = useContext(PoolContext);
-  const { noWalletInstalled, isMobileTronLink } = useContext(WalletContext);
 
   let description;
   if (isCreation) {
     description = t('accountSetupModal.createWithWallet.description');
-    if (isMobileTronLink) {
-      description = t('connectWalletModal.tronlinkMobileDescription');
-    } else if (noWalletInstalled) {
-      description = t('connectWalletModal.noWalletDescription', { wallet: 'TronLink' });
-    }
   } else {
     description = t('accountSetupModal.restoreWithWallet.description');
   }
@@ -27,7 +18,7 @@ export default ({ next, isCreation }) => {
     <Container>
       {!isCreation && (
         <Warning>
-          {t(`accountSetupModal.restoreWithWallet.warning${currentPool.isTron ? '_tron' : ''}`)}
+          {t(`accountSetupModal.restoreWithWallet.warning`)}
         </Warning>
       )}
       <Description>
