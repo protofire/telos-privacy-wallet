@@ -20,7 +20,6 @@ const Layout = styled.div`
   flex-direction: column;
   box-sizing: border-box;
   padding: 14px 40px 40px;
-  background: linear-gradient(180deg, #FBEED0 0%, #FAFAF9 78.71%);
   @media only screen and (max-width: 560px) {
     padding: 21px 7px 28px;
   }
@@ -46,8 +45,6 @@ const Gradient = styled.div`
   height: 585.08px;
   left: calc(50% - 270px);
   top: 100px;
-  background: linear-gradient(211.28deg, #F7C23B 19.66%, rgba(232, 110, 255, 0.5) 57.48%, rgba(255, 255, 255, 0.5) 97.74%);
-  background: -moz-linear-gradient(231.28deg, rgba(247, 194, 59, 0.2) 19.66%, rgba(232, 110, 255, 0.2) 57.48%, rgba(255, 255, 255, 0.5) 97.74%);
   filter: blur(250px);
   transform: rotate(27.74deg) translate3d(0,0,0);
 `;

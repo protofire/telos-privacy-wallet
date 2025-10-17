@@ -167,9 +167,10 @@ const light = {
       },
     },
   },
-  background: 'linear-gradient(180deg, #FBEED0 0%, #FAFAF9 78.71%)',
-  background2: 'linear-gradient(211.28deg, #F7C23B 19.66%, rgba(232, 110, 255, 0.5) 57.48%, rgba(255, 255, 255, 0.5) 97.74%)'
+  background: 'linear-gradient(135deg, rgba(0, 242, 243, 0.1) 0%, rgba(79, 172, 254, 0.1) 33%, rgba(196, 113, 245, 0.1) 66%)',
 };
+
+
 
 
 export default ({ children }) => (

@@ -78,7 +78,7 @@ Sentry.init({
             breadcrumb.data[param] = breadcrumb.data[param].split('?')[0] + '?gift-code=XXX';
           }
         });
-      } catch (error) {}
+      } catch (error) { }
     }
     return breadcrumb;
   }
@@ -134,7 +134,7 @@ const MainApp = () => {
         <Robot3Image src={robot3Image} />
       </BackgroundImages>
       {isDemo && <DemoBanner />}
-      <BannerWithCountdown />
+      {/* <BannerWithCountdown /> */}
       <Layout header={<Header />} footer={<Footer />}>
         <Tabs />
         <Routes showWelcome={showWelcome} params={location.search} />
