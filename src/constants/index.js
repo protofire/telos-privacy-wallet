@@ -54,7 +54,9 @@ export const NETWORKS = {
   },
 };
 
-export const TOKENS_ICONS = {
+const UNKNOWN_TOKEN_ICON = require('assets/unknown.svg').default;
+
+const TOKENS_ICONS_BASE = {
   'ETH': require('assets/eth.svg').default,
   'WETH': require('assets/weth.png'),
   'BOB': require('assets/bob.svg').default,
@@ -66,8 +68,16 @@ export const TOKENS_ICONS = {
   'TLOS': require('assets/telos.svg').default,
   'sTLOS': require('assets/sTLOS.svg').default,
   'wTLOS': require('assets/wTLOS.svg').default,
-
 };
+
+export const TOKENS_ICONS = new Proxy(TOKENS_ICONS_BASE, {
+  get(target, prop, receiver) {
+    if (typeof prop === 'string' && Object.prototype.hasOwnProperty.call(target, prop)) {
+      return Reflect.get(target, prop, receiver);
+    }
+    return UNKNOWN_TOKEN_ICON;
+  },
+});
 
 export const CONNECTORS_ICONS = {
   'MetaMask': require('assets/metamask.svg').default,

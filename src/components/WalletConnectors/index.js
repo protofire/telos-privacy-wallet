@@ -6,7 +6,7 @@ import { WalletContext } from 'contexts';
 import { CONNECTORS_ICONS } from 'constants';
 
 export default ({ callback, gaIdPrefix = '' }) => {
-  const { evmWallet } = useContext(WalletContext);
+  const evmWallet = useContext(WalletContext);
 
   const connectors = useMemo(() => {
     return evmWallet.connectors;
