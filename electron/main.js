@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, shell, protocol, net } = require('electron');
+const { app, BrowserWindow, session, shell, protocol, net, nativeImage } = require('electron');
 const { join } = require('path');
 
 let mainWindow;
@@ -89,12 +89,20 @@ async function registerAppProtocolHandler() {
 }
 
 function createWindow() {
+  // Set app icon
+  const iconPath = app.isPackaged
+    ? join(__dirname, '../build/logo512.png')
+    : join(__dirname, '../public/logo512.png');
+
+  const icon = nativeImage.createFromPath(iconPath);
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
     show: false,
+    icon: icon,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
       nodeIntegration: false,
