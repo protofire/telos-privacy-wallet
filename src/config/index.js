@@ -63,8 +63,8 @@ const config = {
         transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
         transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
       } : {
-        transferParamsUrl: 'https://r2.zkbob.com/transfer_params_22022023.bin',
-        transferVkUrl: 'https://r2.zkbob.com/transfer_verification_key_22022023.json',
+        transferParamsUrl: 'https://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
+        transferVkUrl: 'https://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
       }
     }
   },
