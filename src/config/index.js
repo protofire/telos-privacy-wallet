@@ -60,11 +60,11 @@ const config = {
     },
     "snarkParamsSet": {
       "prod": isElectron() ? {
-        transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
-        transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
+        transferParamsUrl: assetURL('assets/transfer_params.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
       } : {
-        transferParamsUrl: 'https://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
-        transferVkUrl: 'https://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
+        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key.json',
       }
     }
   },
@@ -73,9 +73,9 @@ const config = {
     pools: {
       'zkbob_sepolia': {
         chainId: 11155111,
-        poolAddress: '0x77f3D9Fb578a0F2B300347fb3Cd302dFd7eedf93',
-        tokenAddress: '0x2C74B18e2f84B78ac67428d0c7a9898515f0c46f',
-        proxyUrls: ['https://sepolia-decentralized-relayer.thgkjlr.website'],
+        poolAddress: '0x812E39FFCb58C48FB69872a510635697e8d3fc79',
+        tokenAddress: '0x58d695d9BEB1BC76E82B6094A61c7c47Fbf1de84',
+        proxyUrls: ['http://3.147.241.79/relayer'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -92,8 +92,8 @@ const config = {
     },
     "snarkParamsSet": {
       "staging": {
-        transferParamsUrl: 'https://r2-staging.zkbob.com/transfer_params_20022023.bin',
-        transferVkUrl: 'https://r2-staging.zkbob.com/transfer_verification_key_20022023.json'
+        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key.json',
       },
     },
     chains: {
