@@ -102,7 +102,7 @@ const PasswordPrompt = ({ setStep, close }) => {
 
 export default ({ isOpen, onClose, saveZkAccountMnemonic, closePasswordModal }) => {
   const { t } = useTranslation();
-  const { evmWallet } = useContext(WalletContext);
+  const evmWallet = useContext(WalletContext);
   const [step, setStep] = useState(STEP.START);
   const [newMnemonic, setNewMnemonic] = useState();
   const [confirmedMnemonic, setConfirmedMnemonic] = useState();
