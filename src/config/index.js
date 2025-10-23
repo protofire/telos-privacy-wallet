@@ -60,11 +60,11 @@ const config = {
     },
     "snarkParamsSet": {
       "prod": isElectron() ? {
-        transferParamsUrl: assetURL('assets/transfer_params.bin'),
-        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
+        transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
       } : {
-        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key.json',
+        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
+        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
       }
     }
   },
