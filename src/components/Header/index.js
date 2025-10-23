@@ -12,7 +12,7 @@ import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
 import Skeleton from 'components/Skeleton';
 
-import { ReactComponent as LogoDefault } from 'assets/logo-beta.svg';
+import { ReactComponent as LogoDefault } from 'assets/telos-zkevm-logo.svg';
 import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
@@ -226,11 +226,11 @@ const LogoSection = styled(Row)`
 `;
 
 const Logo = styled(LogoDefault)`
-  @media only screen and (max-width: 1000px) {
+
     height: 20px;
     width: 100px;
     margin-left: 10px;
-  }
+
 `;
 
 const AccountSection = styled(Row)`

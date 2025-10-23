@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 export default ({ header, footer, children }) => (
   <>
-    <Gradient />
     <Layout>
       {header}
       <PageContainer>
@@ -39,12 +38,3 @@ const PageContainer = styled.div`
   }
 `;
 
-const Gradient = styled.div`
-  position: absolute;
-  width: 544px;
-  height: 585.08px;
-  left: calc(50% - 270px);
-  top: 100px;
-  filter: blur(250px);
-  transform: rotate(27.74deg) translate3d(0,0,0);
-`;

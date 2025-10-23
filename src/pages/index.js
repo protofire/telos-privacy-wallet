@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { HashRouter, Switch, Route, Redirect, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
+
 import { createBrowserHistory } from 'history';
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
@@ -53,7 +53,7 @@ if (PUBLIC_KEY && PRIVATE_KEY && PROJECT_ID) {
 
 Sentry.init({
   dsn: sentryDsn,
-  tunnel: process.env.REACT_APP_HOSTING === 'netlify' ? '/telemetry' : undefined,
+  tunnel: undefined, // process.env.REACT_APP_HOSTING === 'netlify' ? '/telemetry' : 
   integrations: [
     new BrowserTracing({
       routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),

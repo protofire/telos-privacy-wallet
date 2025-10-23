@@ -1,7 +1,7 @@
 {
-  "short_name": "zkBob",
-  "name": "zkBob",
-  "description": "Your web3 wallet with privacy option for everyday use",
+  "short_name": "Telos zkWallet",
+  "name": "Telos zkWallet",
+  "description": "A privacy-focused wallet application based on ZKP technology for the Telos ecosystem",
   "icons": [
     {
       "src": "favicon.ico",
