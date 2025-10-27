@@ -85,7 +85,7 @@ const config = {
         tokenSymbol: 'INV',
         tokenDecimals: 18,
         feeDecimals: 2,
-        depositScheme: 'permit',
+        depositScheme: 'approve',
         addressPrefix: 'zkbob_sepolia',
         parameters: 'staging'
       },
