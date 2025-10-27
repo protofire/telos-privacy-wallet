@@ -73,7 +73,7 @@ const config = {
     pools: {
       'zkbob_sepolia': {
         chainId: 11155111,
-        poolAddress: '0x812E39FFCb58C48FB69872a510635697e8d3fc79',
+        poolAddress: '0x94e8B1C536c518947407Dd9247Af8E78e6292190',
         tokenAddress: '0x58d695d9BEB1BC76E82B6094A61c7c47Fbf1de84',
         proxyUrls: ['http://3.147.241.79/relayer'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
@@ -82,7 +82,7 @@ const config = {
           status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
           homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
         },
-        tokenSymbol: 'BOB',
+        tokenSymbol: 'INV',
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'permit',
@@ -98,7 +98,8 @@ const config = {
     },
     chains: {
       '11155111': {
-        rpcUrls: ['https://sepolia.infura.io/v3/9a94d181b23846209f01161dcd0f9ad6'],
+        // rpcUrls: ['https://virtual.sepolia.eu.rpc.tenderly.co/e2d3c7a3-b5e9-46c1-8b04-35febc2fb719'],
+        rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'],
       },
       '41': {
         rpcUrls: ['https://rpc.testnet.telos.net']
