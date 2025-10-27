@@ -63,8 +63,8 @@ const config = {
         transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
         transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
       } : {
-        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
-        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
+        transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
       }
     }
   },
@@ -73,8 +73,8 @@ const config = {
     pools: {
       'zkbob_sepolia': {
         chainId: 11155111,
-        poolAddress: '0x94e8B1C536c518947407Dd9247Af8E78e6292190',
-        tokenAddress: '0x58d695d9BEB1BC76E82B6094A61c7c47Fbf1de84',
+        poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
+        tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
         proxyUrls: ['http://3.147.241.79/relayer'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
@@ -82,18 +82,18 @@ const config = {
           status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
           homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
         },
-        tokenSymbol: 'INV',
+        tokenSymbol: 'PTK',
         tokenDecimals: 18,
         feeDecimals: 2,
-        depositScheme: 'approve',
+        depositScheme: 'permit',
         addressPrefix: 'zkbob_sepolia',
         parameters: 'staging'
       },
     },
     "snarkParamsSet": {
       "staging": {
-        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key.json',
+        transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
       },
     },
     chains: {
