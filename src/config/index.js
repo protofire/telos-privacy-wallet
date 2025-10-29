@@ -63,8 +63,8 @@ const config = {
         transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
         transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
       } : {
-        transferParamsUrl: 'https://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
-        transferVkUrl: 'https://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
+        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
+        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
       }
     }
   },
@@ -75,7 +75,7 @@ const config = {
         chainId: 11155111,
         poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
         tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        relayerUrls: ['http://localhost:3000'],
+        relayerUrls: ['http://3.147.241.79/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -92,8 +92,8 @@ const config = {
     },
     "snarkParamsSet": {
       "staging": {
-        transferParamsUrl: 'https://dev-telos-params.s3.us-east-1.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'https://dev-telos-params.s3.us-east-1.amazonaws.com/transfer_verification_key.json'
+        transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json'
       },
     },
     chains: {
