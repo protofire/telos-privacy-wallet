@@ -12,7 +12,7 @@ env:
 jobs:
   deploy:
     name: Build and Deploy to S3 staging
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     permissions:
       id-token: write
       contents: read
