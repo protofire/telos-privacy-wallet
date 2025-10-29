@@ -1,9 +1,9 @@
-import { ethers } from 'ethers';
-import { ZkBobClient, SignatureType, DirectDepositType } from 'zkbob-client-js';
-import { deriveSpendingKeyZkBob } from 'zkbob-client-js/lib/utils';
-import { ProverMode } from 'zkbob-client-js/lib/config';
+import {ethers} from 'ethers';
+import {ZkBobClient, SignatureType, DirectDepositType} from 'zkbob-client-js';
+import {deriveSpendingKeyZkBob} from 'zkbob-client-js/lib/utils';
+import {ProverMode} from 'zkbob-client-js/lib/config';
 
-import { TX_STATUSES } from 'constants';
+import {TX_STATUSES} from 'constants';
 import config from 'config';
 
 const createClient = (currentPoolAlias, supportId, callback) => {
@@ -14,7 +14,7 @@ const createClient = (currentPoolAlias, supportId, callback) => {
       snarkParams: config.snarkParams,
       extraPrefixes: config.extraPrefixes,
       supportId,
-      snarkParamsSet:config.snarkParamsSet
+      snarkParamsSet: config.snarkParamsSet
     },
     currentPoolAlias,
     callback,
@@ -37,15 +37,16 @@ const createAccount = async (zkClient, secretKey, birthIndex, useDelegatedProver
 
 const deposit = async (from, sign, signTypedData, zkClient, amount, fee, setTxStatus) => {
   setTxStatus(TX_STATUSES.GENERATING_PROOF);
-  const signFunction = async ({ type, data }) => {
+  const signFunction = async ({type, data}) => {
     setTxStatus(TX_STATUSES.SIGN_MESSAGE);
     let signature;
     if (type === SignatureType.TypedDataV4) {
-      const { domain, types, message } = data;
+      const {domain, types, message} = data;
       delete types.EIP712Domain;
       signature = await signTypedData(domain, types, message);
     } else if (type === SignatureType.PersonalSign) {
-      signature = await sign(data);
+      const messageBytes = ethers.utils.arrayify(data);
+      signature = await sign(messageBytes);
     }
     setTxStatus(TX_STATUSES.GENERATING_PROOF);
     return signature;
@@ -58,8 +59,8 @@ const deposit = async (from, sign, signTypedData, zkClient, amount, fee, setTxSt
 
 const directDeposit = async (from, sendTransaction, zkClient, amount, setTxStatus) => {
   setTxStatus(TX_STATUSES.CONFIRM_TRANSACTION);
-  const sendFunction = async ({ to, amount, data }) => {
-    const tx = await sendTransaction({ to, value: amount, data });
+  const sendFunction = async ({to, amount, data}) => {
+    const tx = await sendTransaction({to, value: amount, data});
     setTxStatus(TX_STATUSES.WAITING_FOR_TRANSACTION);
     const receipt = await tx.wait();
     return receipt.transactionHash;
@@ -84,5 +85,5 @@ const withdraw = async (zkClient, to, amount, amountToConvert, fee, setTxStatus)
   setTxStatus(TX_STATUSES.WITHDRAWN);
 };
 
-const zp = { createClient, createAccount, deposit, directDeposit, transfer, withdraw };
+const zp = {createClient, createAccount, deposit, directDeposit, transfer, withdraw};
 export default zp;

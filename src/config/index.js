@@ -73,9 +73,9 @@ const config = {
     pools: {
       'zkbob_sepolia': {
         chainId: 11155111,
-        poolAddress: '0x77f3D9Fb578a0F2B300347fb3Cd302dFd7eedf93',
-        tokenAddress: '0x2C74B18e2f84B78ac67428d0c7a9898515f0c46f',
-        proxyUrls: ['https://sepolia-decentralized-relayer.thgkjlr.website'],
+        poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
+        tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
+        relayerUrls: ['http://localhost:3000'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -85,20 +85,20 @@ const config = {
         tokenSymbol: 'BOB',
         tokenDecimals: 18,
         feeDecimals: 2,
-        depositScheme: 'permit',
+        depositScheme: 'approve',
         addressPrefix: 'zkbob_sepolia',
         parameters: 'staging'
       },
     },
     "snarkParamsSet": {
       "staging": {
-        transferParamsUrl: 'https://r2-staging.zkbob.com/transfer_params_20022023.bin',
-        transferVkUrl: 'https://r2-staging.zkbob.com/transfer_verification_key_20022023.json'
+        transferParamsUrl: 'https://dev-telos-params.s3.us-east-1.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://dev-telos-params.s3.us-east-1.amazonaws.com/transfer_verification_key.json'
       },
     },
     chains: {
       '11155111': {
-        rpcUrls: ['https://sepolia.infura.io/v3/9a94d181b23846209f01161dcd0f9ad6'],
+        rpcUrls: ['https://eth-sepolia.g.alchemy.com/v2/m9Mnq5IypuwHSh4H_oieniuNE-oN8KFb'],
       },
       '41': {
         rpcUrls: ['https://rpc.testnet.telos.net']
