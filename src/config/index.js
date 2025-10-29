@@ -73,9 +73,9 @@ const config = {
     pools: {
       'zkbob_sepolia': {
         chainId: 11155111,
-        poolAddress: '0x812E39FFCb58C48FB69872a510635697e8d3fc79',
-        tokenAddress: '0x58d695d9BEB1BC76E82B6094A61c7c47Fbf1de84',
-        proxyUrls: ['http://3.147.241.79/relayer'],
+        poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
+        tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
+        relayerUrls: ['http://3.147.241.79/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -85,15 +85,15 @@ const config = {
         tokenSymbol: 'BOB',
         tokenDecimals: 18,
         feeDecimals: 2,
-        depositScheme: 'permit',
+        depositScheme: 'approve',
         addressPrefix: 'zkbob_sepolia',
         parameters: 'staging'
       },
     },
     "snarkParamsSet": {
       "staging": {
-        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key.json',
+        transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json'
       },
     },
     chains: {
