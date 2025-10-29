@@ -98,7 +98,7 @@ const config = {
     },
     chains: {
       '11155111': {
-        rpcUrls: ['https://eth-sepolia.g.alchemy.com/v2/m9Mnq5IypuwHSh4H_oieniuNE-oN8KFb'],
+        rpcUrls: ['https://sepolia.infura.io/v3/9a94d181b23846209f01161dcd0f9ad6'],
       },
       '41': {
         rpcUrls: ['https://rpc.testnet.telos.net']
