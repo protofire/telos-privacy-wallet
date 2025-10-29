@@ -75,7 +75,7 @@ const config = {
         chainId: 11155111,
         poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
         tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        proxyUrls: ['http://3.147.241.79/relayer'],
+        relayerUrls: ['http://3.147.241.79/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -85,7 +85,7 @@ const config = {
         tokenSymbol: 'PTK',
         tokenDecimals: 18,
         feeDecimals: 2,
-        depositScheme: 'permit',
+        depositScheme: 'approve',
         addressPrefix: 'zkbob_sepolia',
         parameters: 'staging'
       },
@@ -93,7 +93,7 @@ const config = {
     "snarkParamsSet": {
       "staging": {
         transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json'
       },
     },
     chains: {
