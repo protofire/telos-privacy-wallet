@@ -69,13 +69,13 @@ const config = {
     }
   },
   dev: {
-    defaultPool: 'zkbob_sepolia',
+    defaultPool: 'eth_sepolia',
     pools: {
-      'zkbob_sepolia': {
+      'ptk_sepolia': {
         chainId: 11155111,
         poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
         tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        relayerUrls: ['http://3.147.241.79/'],
+        relayerUrls: ['https://3.147.241.79/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -86,7 +86,25 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: 'zkbob_sepolia',
+        addressPrefix: 'ptk_sepolia',
+        parameters: 'staging'
+      },
+      'eth_sepolia': {
+        chainId: 11155111,
+        poolAddress: '0xd65B229714FE713E91ee58dbD8e6cDaC414017cc',
+        tokenAddress: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
+        relayerUrls: ['https://3.147.241.79/'],
+        delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
+        coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
+        kycUrls: {
+          status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
+          homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
+        },
+        tokenSymbol: 'ETH',
+        tokenDecimals: 18,
+        feeDecimals: 2,
+        depositScheme: 'approve',
+        addressPrefix: 'eth_sepolia',
         parameters: 'staging'
       },
     },
