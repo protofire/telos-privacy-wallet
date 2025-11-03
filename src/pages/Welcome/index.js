@@ -1,13 +1,9 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-// import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
-
-// import AccountSetUpButton from 'containers/AccountSetUpButton';
 
 import Button from 'components/Button';
 
-// import { ReactComponent as BobIconDefault } from 'assets/bob.svg';
 
 import { OnboardingTutorialContext } from 'contexts';
 import welcomeImage from 'assets/telos-wallet-logo.svg';
@@ -31,7 +27,6 @@ export default () => {
           <Text>{t('welcome.content.paragraph3')}</Text>
         </Description>
         <Button onClick={startTour}>{t('welcome.startTour')}</Button>
-        {/* <AccountSetUpButton /> */}
       </Container>
     </WelcomeCard>
   );

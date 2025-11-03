@@ -432,9 +432,9 @@
   "onboardingTutorial": {
     "steps": {
       "createZkAccount": {
-        "title": "Connect your wallet and create your zkAccount",
+        "title": "Connect and create your zkAccount",
         "content": {
-          "paragraph1": "Connect your wallet (MetaMask, WalletConnect, etc.) to start using zkTelos Wallet.",
+          "paragraph1": "Connect your wallet to start using zkTelos Wallet.",
           "paragraph2": "Then create your zkAccount — your private identity within the protocol.",
           "paragraph3": "This address lets you send and receive tokens privately."
         }

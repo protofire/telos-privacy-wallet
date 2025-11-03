@@ -1,15 +1,16 @@
-import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useEffect, useMemo, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import Shepherd from 'shepherd.js';
 import { useTranslation } from 'react-i18next';
 
+import 'shepherd.js/dist/css/shepherd.css';
 import '../../styles/onboarding-tutorial.css';
 
-const TOUR_COMPLETED_KEY = 'zkTelos_tour_completed';
 
 const OnboardingTutorialContext = createContext();
 
 const tourOptions = {
+  useModalOverlay: true,
   defaultStepOptions: {
     cancelIcon: {
       enabled: true,
@@ -24,7 +25,7 @@ const createSteps = (t) => [
     id: 'create-zkaccount',
     title: t('onboardingTutorial.steps.createZkAccount.title'),
     text: `
-      <div class="create-zkaccount-content">
+    <div>
       <p>${t('onboardingTutorial.steps.createZkAccount.content.paragraph1')}</p>
       <p>${t('onboardingTutorial.steps.createZkAccount.content.paragraph2')}</p>
       <p>${t('onboardingTutorial.steps.createZkAccount.content.paragraph3')}</p>
@@ -33,14 +34,8 @@ const createSteps = (t) => [
       element: '[data-tour="create-zkaccount"]',
       on: 'bottom'
     },
+    extraHighlights: ['.create-zkaccount'],
     buttons: [
-      {
-        text: t('onboardingTutorial.buttons.back'),
-        classes: 'shepherd-button-secondary',
-        action() {
-          return this.back();
-        }
-      },
       {
         text: t('onboardingTutorial.buttons.next'),
         action() {
@@ -153,7 +148,7 @@ const createSteps = (t) => [
       {
         text: t('onboardingTutorial.buttons.next'),
         action() {
-          return this.complete();
+          return this.next();
         }
       }
     ]
@@ -190,15 +185,10 @@ const createSteps = (t) => [
 export const OnboardingTutorialProvider = ({ children }) => {
   const { t } = useTranslation();
   const history = useHistory();
-  const [tourCompleted, setTourCompleted] = useState(
-    () => localStorage.getItem(TOUR_COMPLETED_KEY) === 'true'
-  );
 
   const shepherdTourInstance = useMemo(() => new Shepherd.Tour(tourOptions), []);
 
   const handleTourEnd = useCallback(() => {
-    localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
-    setTourCompleted(true);
     history.push('/deposit');
   }, [history]);
 
@@ -216,23 +206,16 @@ export const OnboardingTutorialProvider = ({ children }) => {
     };
   }, [t, shepherdTourInstance, handleTourEnd]);
 
-  const resetTour = () => {
-    localStorage.removeItem(TOUR_COMPLETED_KEY);
-    setTourCompleted(false);
-  };
+
 
   const startTour = () => {
     shepherdTourInstance.start();
   };
 
-  const shouldShowTour = !tourCompleted;
 
   const tourWithExtras = {
     ...shepherdTourInstance,
-    resetTour,
     startTour,
-    tourCompleted,
-    shouldShowTour
   };
 
   return (
