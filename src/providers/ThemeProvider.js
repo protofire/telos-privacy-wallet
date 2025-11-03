@@ -17,6 +17,7 @@ const orangeLight = '#FAE4DA';
 const orangeExtraLight = '#FFFAEE';
 const red = '#EF102A';
 const yellow = '#FBEED0';
+const black = '#000000';
 
 const light = {
   color: {
@@ -34,6 +35,7 @@ const light = {
     blueExtraLight,
     purpleExtraLight,
     yellow,
+    black,
   },
   text: {
     color: {
@@ -50,7 +52,7 @@ const light = {
   button: {
     primary: {
       background: {
-        default: blue,
+        default: black,
         disabled: 'rgba(27, 77, 235, 0.2)',
         contrast: 'rgba(27, 77, 235, 0.1)',
       },

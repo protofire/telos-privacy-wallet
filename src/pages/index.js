@@ -119,7 +119,7 @@ const MainApp = () => {
   }
   return (
     <>
-      {isDemo && <DemoBanner />}
+      {/* {isDemo && <DemoBanner />} */}
       {/* <BannerWithCountdown /> */}
       <Layout header={<Header />} footer={<Footer />}>
         <Tabs />
