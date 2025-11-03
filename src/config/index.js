@@ -69,13 +69,13 @@ const config = {
     }
   },
   dev: {
-    defaultPool: 'eth_sepolia',
+    defaultPool: 'tlos_testnet',
     pools: {
       'ptk_sepolia': {
         chainId: 11155111,
         poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
         tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        relayerUrls: ['https://3.147.241.79/'],
+        relayerUrls: ['http://3.147.241.79/relayer/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -93,7 +93,7 @@ const config = {
         chainId: 11155111,
         poolAddress: '0xb58ea0df1DA512B1aF48a23216495223149232F6',
         tokenAddress: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
-        relayerUrls: ['https://3.147.241.79/'],
+        relayerUrls: ['http://3.147.241.79/relayer/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -109,9 +109,9 @@ const config = {
       },
       'tlos_testnet': {
         chainId: 41,
-        poolAddress: '0xE10aC6CF1DCD118a53f3744F52ddF7962CdCAD1e',
+        poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
         tokenAddress: '0x28d1BCc58E6Cd0270F45b63e4FFd13b3fF5E98af',
-        relayerUrls: ['https://3.147.241.79/'],
+        relayerUrls: ['http://3.147.241.79/relayer/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -122,7 +122,7 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: 'eth_sepolia',
+        addressPrefix: 'tlos_testnet',
         parameters: 'staging'
       },
     },
