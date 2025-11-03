@@ -68,7 +68,7 @@ export default ({
         overlayInnerStyle={{
           minHeight: 0,
           padding: '26px 24px',
-          borderRadius: '16px',
+          borderRadius: '6px',
           backgroundColor: '#FFFFFF',
           width: width || 370,
           boxSizing: 'border-box',

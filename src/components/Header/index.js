@@ -276,9 +276,12 @@ const DropdownIcon = styled(DropdownIconDefault)`
 
 const NetworkDropdownButton = styled(DropdownButton)`
   padding: 0 8px 0 10px;
+  border-radius: 8px;
+
   @media only screen and (max-width: 800px) {
     padding: 0;
     background-color: transparent;
+    border-radius: 6px;
   }
 `;
 

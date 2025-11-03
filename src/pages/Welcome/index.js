@@ -10,7 +10,7 @@ import welcomeImage from 'assets/telos-wallet-logo.svg';
 
 export default () => {
   const { t } = useTranslation();
-  const { startTour, } = useContext(OnboardingTutorialContext);
+  const { startTour, completeTour } = useContext(OnboardingTutorialContext);
 
   return (
     <WelcomeCard>
@@ -26,7 +26,10 @@ export default () => {
           </Text>
           <Text>{t('welcome.content.paragraph3')}</Text>
         </Description>
-        <Button onClick={startTour}>{t('welcome.startTour')}</Button>
+        <ButtonContainer>
+          <Button onClick={completeTour}>{t('welcome.skipTour')}</Button>
+          <Button onClick={startTour}>{t('welcome.startTour')}</Button>
+        </ButtonContainer>
       </Container>
     </WelcomeCard>
   );
@@ -69,6 +72,25 @@ const Description = styled.div`
   flex-direction: column;
   gap: 8px;
   margin: 16px 0 24px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+
+  button {
+   padding: 1rem;
+  }
+
+  button:first-child:hover {
+    background: ${props => props.theme.color.telosGradientSoft};
+    color: ${props => props.theme.color.black} !important;
+  }
+  
+  button:last-child:hover {
+    background: ${props => props.theme.color.telosGradient};
+  }
 `;
 
 const WelcomeCard = styled.div`

@@ -5,7 +5,7 @@ import SpinnerDefault from 'components/Spinner';
 
 export default props => {
   const { loading, ...otherProps } = props;
-  switch(props.type) {
+  switch (props.type) {
     case 'link':
       return <TransparentButton {...otherProps} />;
     case 'pripary':
@@ -31,7 +31,7 @@ const Button = styled.button`
   padding: ${props => props.small ? '8px 16px' : '0'};
   height: ${props => props.small ? '36px' : '60px'};
   box-sizing: border-box;
-  border-radius: ${props => props.small ? '18px' : '16px'};
+  border-radius: ${props => props.small ? '8px' : '6px'};
   border: 0;
   border-color: ${props => props.theme.button.primary.border.color};
   border-style: solid;
@@ -42,7 +42,7 @@ const Button = styled.button`
   @media only screen and (max-width: 1000px) {
     height: ${props => props.small ? '30px' : '60px'};
     padding: ${props => props.small ? '8px 12px' : '0'};
-    border-radius: 16px;
+    border-radius: 6px;
   }
 `;
 

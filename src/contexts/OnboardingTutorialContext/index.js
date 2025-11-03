@@ -216,6 +216,7 @@ export const OnboardingTutorialProvider = ({ children }) => {
   const tourWithExtras = {
     ...shepherdTourInstance,
     startTour,
+    completeTour: handleTourEnd
   };
 
   return (
