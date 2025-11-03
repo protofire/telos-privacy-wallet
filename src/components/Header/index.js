@@ -74,7 +74,7 @@ export default ({ empty }) => {
 
   const networkDropdown = (
     <NetworkDropdown>
-      <NetworkDropdownButton $refreshing={isPoolSwitching || isLoadingState}>
+      <NetworkDropdownButton $refreshing={isPoolSwitching || isLoadingState} data-tour="supported-tokens">
         <NetworkIcon src={NETWORKS[currentPool.chainId].icon} />
         <Divider />
         <NetworkIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
@@ -112,7 +112,7 @@ export default ({ empty }) => {
       </AccountDropdownButton>
     </WalletDropdown>
   ) : (
-    <Button small onClick={openWalletModal} data-ga-id="wallet-header">
+    <Button small onClick={openWalletModal} data-ga-id="wallet-header" data-tour="create-zkaccount">
       {t('buttonText.connectWallet')}
     </Button>
   );
@@ -144,6 +144,7 @@ export default ({ empty }) => {
       disabled={isLoadingZkAccount}
       onClick={openAccountSetUpModal}
       data-ga-id="zkaccount-header"
+      className="create-zkaccount"
     >
       {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.zkAccount')}
     </Button>
@@ -155,9 +156,9 @@ export default ({ empty }) => {
         <LogoSection>
           <Logo />
         </LogoSection>
-        <AccountSection data-tour="create-zkaccount">
+        <AccountSection>
           {!isMobile && networkDropdown}
-          <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header" data-tour="supported-tokens">
+          <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton>
           {!isMobile && walletDropdown}
