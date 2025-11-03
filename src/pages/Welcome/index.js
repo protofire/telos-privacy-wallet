@@ -1,53 +1,39 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { useHistory, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+// import { useHistory, useLocation } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 
-import AccountSetUpButton from 'containers/AccountSetUpButton';
+// import AccountSetUpButton from 'containers/AccountSetUpButton';
 
-import Card from 'components/Card';
 import Button from 'components/Button';
 
 // import { ReactComponent as BobIconDefault } from 'assets/bob.svg';
 
-import { ZkAccountContext } from 'contexts';
+import { OnboardingTutorialContext } from 'contexts';
+import welcomeImage from 'assets/telos-wallet-logo.svg';
 
 export default () => {
   const { t } = useTranslation();
-  const { isDemo } = useContext(ZkAccountContext);
-  const history = useHistory();
-  const location = useLocation();
+  const { startTour, } = useContext(OnboardingTutorialContext);
+
   return (
-    <Card>
+    <WelcomeCard>
       <Container>
-        {isDemo ? (
-          <>
-            <Title>{t('welcome.titleDemo')}</Title>
-            <Description>
-              {/* <Row>
-                <Text>Congrats! You have</Text>
-                <BobIcon />
-                <Text><b>10 BOB</b></Text>
-              </Row> */}
-              <Row>
-                <Text>{t('welcome.descriptionDemo')}</Text>
-              </Row>
-            </Description>
-            <Button onClick={() => history.push('/transfer' + location.search)}>
-              {t('buttonText.transfer')}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Title>{t('welcome.title')}</Title>
-            <Description>
-              <Text>{t('welcome.description')}</Text>
-            </Description>
-            <AccountSetUpButton />
-          </>
-        )}
+        <Title>{t('welcome.title')}</Title>
+        <img src={welcomeImage} alt="Welcome" />
+        <Description>
+          <Text>
+            <Trans i18nKey="welcome.content.paragraph1" />
+          </Text>
+          <Text>
+            <Trans i18nKey="welcome.content.paragraph2" />
+          </Text>
+          <Text>{t('welcome.content.paragraph3')}</Text>
+        </Description>
+        <Button onClick={startTour}>{t('welcome.startTour')}</Button>
+        {/* <AccountSetUpButton /> */}
       </Container>
-    </Card>
+    </WelcomeCard>
   );
 };
 
@@ -55,7 +41,7 @@ const Title = styled.span`
   font-size: 24px;
   color: ${props => props.theme.text.color.primary};
   font-weight: ${props => props.theme.text.weight.bold};
-  text-align: center;
+  text-align: start;
 `;
 
 const Text = styled.span`
@@ -63,32 +49,47 @@ const Text = styled.span`
   line-height: 22px;
   color: ${props => props.theme.text.color.secondary};
   font-weight: ${props => props.theme.text.weight.normal};
-  text-align: center;
+  text-align: left;
 `;
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 16px 24px 20px;
+
   @media only screen and (max-width: 500px) {
     padding: 0 6px 12px;
   }
-`;
 
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  img {
+    width: 200px;
+    height: 100px;
+    object-fit: contain;
+    margin: 0 auto;
+  }
 `;
 
 const Description = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 8px;
   margin: 16px 0 24px;
 `;
 
-// const BobIcon = styled(BobIconDefault)`
-//   width: 20px;
-//   height: 20px;
-//   margin: 0 5px;
-// `;
+const WelcomeCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${props => props.theme.card.background};
+  box-shadow: 0px 8px 50px rgba(255, 214, 110, 0.2);
+  border-radius: 24px;
+  padding: 16px 12px 12px;
+  width: 675px;
+  max-width: 100%;
+  box-sizing: border-box;
+  & > * {
+    margin-bottom: 12px;
+  }
+  & > :last-child {
+    margin-bottom: 0;
+  }
+`;

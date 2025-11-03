@@ -10,6 +10,7 @@ import PoolContext, { PoolContextProvider } from 'contexts/PoolContext';
 import TokenPriceContext, { TokenPriceContextProvider } from 'contexts/TokenPriceContext';
 import LanguageContext, { LanguageContextProvider } from 'contexts/LanguageContext';
 import WalletContext, { WalletContextProvider } from 'contexts/WalletContext';
+import OnboardingTutorialContext, { OnboardingTutorialProvider } from 'contexts/OnboardingTutorialContext';
 
 const ContextsProvider = ({ children }) => (
   <SupportIdContextProvider>
@@ -22,7 +23,9 @@ const ContextsProvider = ({ children }) => (
                 <ZkAccountContextProvider>
                   <IncreasedLimitsContextProvider>
                     <LanguageContextProvider>
-                      {children}
+                      <OnboardingTutorialProvider>
+                        {children}
+                      </OnboardingTutorialProvider>
                     </LanguageContextProvider>
                   </IncreasedLimitsContextProvider>
                 </ZkAccountContextProvider>
@@ -39,5 +42,5 @@ export default ContextsProvider;
 export {
   ZkAccountContext, TokenBalanceContext, TransactionModalContext,
   ModalContext, SupportIdContext, IncreasedLimitsContext, PoolContext,
-  TokenPriceContext, LanguageContext, WalletContext,
+  TokenPriceContext, LanguageContext, WalletContext, OnboardingTutorialContext,
 };

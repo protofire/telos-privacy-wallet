@@ -1,0 +1,245 @@
+import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
+import Shepherd from 'shepherd.js';
+import { useTranslation } from 'react-i18next';
+
+import '../../styles/onboarding-tutorial.css';
+
+const TOUR_COMPLETED_KEY = 'zkTelos_tour_completed';
+
+const OnboardingTutorialContext = createContext();
+
+const tourOptions = {
+  defaultStepOptions: {
+    cancelIcon: {
+      enabled: true,
+    },
+    classes: 'custom-shepherd-theme',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+  },
+};
+
+const createSteps = (t) => [
+  {
+    id: 'create-zkaccount',
+    title: t('onboardingTutorial.steps.createZkAccount.title'),
+    text: `
+      <div class="create-zkaccount-content">
+      <p>${t('onboardingTutorial.steps.createZkAccount.content.paragraph1')}</p>
+      <p>${t('onboardingTutorial.steps.createZkAccount.content.paragraph2')}</p>
+      <p>${t('onboardingTutorial.steps.createZkAccount.content.paragraph3')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="create-zkaccount"]',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.next'),
+        action() {
+          return this.next();
+        }
+      }
+    ]
+  },
+  {
+    id: 'supported-tokens',
+    title: t('onboardingTutorial.steps.supportedTokens.title'),
+    text: `<div class="supported-tokens-content">
+      <p>${t('onboardingTutorial.steps.supportedTokens.content.paragraph1')}</p>
+      <p>${t('onboardingTutorial.steps.supportedTokens.content.paragraph2')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="supported-tokens"]',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.next'),
+        action() {
+          return this.next();
+        }
+      }
+    ]
+  },
+  {
+    id: 'deposit',
+    title: t('onboardingTutorial.steps.deposit.title'),
+    text: `<div class="deposit-content">
+    <p>${t('onboardingTutorial.steps.deposit.content.paragraph1')}</p>
+    <p>${t('onboardingTutorial.steps.deposit.content.paragraph2')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="deposit-tab"]',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.next'),
+        action() {
+          return this.next();
+        }
+      }
+    ]
+  },
+  {
+    id: 'transfer',
+    title: t('onboardingTutorial.steps.transfer.title'),
+    text: `<div class="transfer-content">
+    <p>${t('onboardingTutorial.steps.transfer.content.paragraph1')}</p>
+    <p>${t('onboardingTutorial.steps.transfer.content.paragraph2')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="transfer-tab"]',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.next'),
+        action() {
+          return this.next();
+        }
+      }
+    ]
+  },
+  {
+    id: 'withdraw',
+    title: t('onboardingTutorial.steps.withdraw.title'),
+    text: `<div class="withdraw-content">
+    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph1')}</p>
+    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph2')}</p>
+    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph3')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="withdraw-tab"]',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.next'),
+        action() {
+          return this.complete();
+        }
+      }
+    ]
+  },
+  {
+    id: 'history',
+    title: t('onboardingTutorial.steps.history.title'),
+    text: `<div class="history-content">
+    <p>${t('onboardingTutorial.steps.history.content.paragraph1')}</p>
+    <p>${t('onboardingTutorial.steps.history.content.paragraph2')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="history-tab"]',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.finishTour'),
+        action() {
+          return this.complete();
+        }
+      }
+    ]
+  }
+];
+
+export const OnboardingTutorialProvider = ({ children }) => {
+  const { t } = useTranslation();
+  const history = useHistory();
+  const [tourCompleted, setTourCompleted] = useState(
+    () => localStorage.getItem(TOUR_COMPLETED_KEY) === 'true'
+  );
+
+  const shepherdTourInstance = useMemo(() => new Shepherd.Tour(tourOptions), []);
+
+  const handleTourEnd = useCallback(() => {
+    localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+    setTourCompleted(true);
+    history.push('/deposit');
+  }, [history]);
+
+  useEffect(() => {
+    const steps = createSteps(t);
+    shepherdTourInstance.addSteps(steps);
+
+    shepherdTourInstance.on('complete', handleTourEnd);
+    shepherdTourInstance.on('cancel', handleTourEnd);
+
+    return () => {
+      shepherdTourInstance.off('complete', handleTourEnd);
+      shepherdTourInstance.off('cancel', handleTourEnd);
+      shepherdTourInstance.complete();
+    };
+  }, [t, shepherdTourInstance, handleTourEnd]);
+
+  const resetTour = () => {
+    localStorage.removeItem(TOUR_COMPLETED_KEY);
+    setTourCompleted(false);
+  };
+
+  const startTour = () => {
+    shepherdTourInstance.start();
+  };
+
+  const shouldShowTour = !tourCompleted;
+
+  const tourWithExtras = {
+    ...shepherdTourInstance,
+    resetTour,
+    startTour,
+    tourCompleted,
+    shouldShowTour
+  };
+
+  return (
+    <OnboardingTutorialContext.Provider value={tourWithExtras}>
+      {children}
+    </OnboardingTutorialContext.Provider>
+  );
+};
+
+export default OnboardingTutorialContext;

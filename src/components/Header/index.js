@@ -155,9 +155,9 @@ export default ({ empty }) => {
         <LogoSection>
           <Logo />
         </LogoSection>
-        <AccountSection>
+        <AccountSection data-tour="create-zkaccount">
           {!isMobile && networkDropdown}
-          <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
+          <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header" data-tour="supported-tokens">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton>
           {!isMobile && walletDropdown}

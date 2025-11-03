@@ -140,11 +140,13 @@
     "senderAddress": "Sender address"
   },
   "welcome": {
-    "title": "Welcome to zkBob!",
-    "description": "Create a zkAccount to transfer tokens privately with your friends and colleagues.",
-    "titleDemo": "Welcome to zkBob Demo Version!",
-    "descriptionDemo": "Transfer BOB privately to friends, use to purchase sponsored items, or transfer to your own private zkAccount.",
-    "bannerDemo": "For secure deposits, withdrawals and full-featured privacy, create a <1>zkBob account here</1>"
+    "title": "Welcome!",
+    "startTour": "Start Tour",
+    "content": {
+      "paragraph1": "Create a <strong>zkAccount</strong> to transfer tokens <strong>privately</strong> with your friends and colleagues.",
+      "paragraph2": "Your transactions stay <strong>secure and anonymous</strong> inside the <strong>privacy pools</strong>.",
+      "paragraph3": "Let's take a quick tour to show you the main features."
+    }
   },
   "payment": {
     "title": "Enter {{symbol}} value and choose a token",
@@ -426,5 +428,59 @@
     "transactions_other": "transactions",
     "statuses": "status",
     "statuses_other": "statuses"
+  },
+  "onboardingTutorial": {
+    "steps": {
+      "createZkAccount": {
+        "title": "Connect your wallet and create your zkAccount",
+        "content": {
+          "paragraph1": "Connect your wallet (MetaMask, WalletConnect, etc.) to start using zkTelos Wallet.",
+          "paragraph2": "Then create your zkAccount — your private identity within the protocol.",
+          "paragraph3": "This address lets you send and receive tokens privately."
+        }
+      },
+      "supportedTokens": {
+        "title": "Choose supported networks and tokens",
+        "content": {
+          "paragraph1": "We support multiple networks and tokens.",
+          "paragraph2": "When you deposit, your tokens enter a privacy pool where they are anonymized — breaking the link between your public wallet and private activity."
+        }
+      },
+      "deposit": {
+        "title": "Deposit tokens",
+        "content": {
+          "paragraph1": "Use <strong>Deposit</strong> to move tokens from your wallet into the privacy pool.",
+          "paragraph2": "This is the first step to making private transfers."
+        }
+      },
+      "transfer": {
+        "title": "Send private transfers",
+        "content": {
+          "paragraph1": "Use <strong>Transfer</strong> to send tokens privately to another zkAccount.",
+          "paragraph2": "Sender, recipient, and amount remain hidden on-chain."
+        }
+      },
+      "withdraw": {
+        "title": "Withdraw tokens",
+        "content": {
+          "paragraph1": "Use <strong>Withdraw</strong> to move your tokens back to a public address.",
+          "paragraph2": "Remember: once withdrawn, funds are visible again.",
+          "paragraph3": "For stronger privacy, wait some time before withdrawing."
+        }
+      },
+      "history": {
+        "title": "View your history",
+        "content": {
+          "paragraph1": "Check your <strong>History</strong> tab to see deposits, transfers, and withdrawals.",
+          "paragraph2": "You're all set — start exploring zkTelos Wallet and enjoy private transactions! 🚀"
+        }
+      }
+    },
+    "buttons": {
+      "next": "Next",
+      "skipTour": "Skip Tour",
+      "back": "Back",
+      "finishTour": "Finish Tour 🎉"
+    }
   }
 }
