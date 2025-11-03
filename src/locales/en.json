@@ -142,6 +142,7 @@
   "welcome": {
     "title": "Welcome!",
     "startTour": "Start Tour",
+    "skipTour": "Skip Tour",
     "content": {
       "paragraph1": "Create a <strong>zkAccount</strong> to transfer tokens <strong>privately</strong> with your friends and colleagues.",
       "paragraph2": "Your transactions stay <strong>secure and anonymous</strong> inside the <strong>privacy pools</strong>.",
