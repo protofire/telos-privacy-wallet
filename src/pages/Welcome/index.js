@@ -96,9 +96,6 @@ const ButtonContainer = styled.div`
 const WelcomeCard = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${props => props.theme.card.background};
-  box-shadow: 0px 8px 50px rgba(255, 214, 110, 0.2);
-  border-radius: 24px;
   padding: 16px 12px 12px;
   width: 675px;
   max-width: 100%;
