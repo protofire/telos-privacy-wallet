@@ -1,71 +1,82 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { ReactComponent as BashIcon } from 'assets/bash.svg';
 
 export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
   return (
-    <Tabs>
+    <MenuContainer>
       {tabs.map((tab, index) =>
-        <Tab
+        <MenuItem
           key={index}
           active={activeTab === index}
           onClick={() => onTabClick(index)}
           $showBadge={showBadge && tab.badge}
           data-ga-id={`tab-${tab.name.toLowerCase()}`}
           data-tour={tab.dataTour}
-        >{t(tab.i18nKey)}</Tab>
+        >
+          <IconWrapper><BashIcon /></IconWrapper>
+          <MenuText>{t(tab.i18nKey)}</MenuText>
+        </MenuItem>
       )}
-    </Tabs>
+    </MenuContainer>
   );
 }
 
-const Tabs = styled.div`
+const MenuContainer = styled.div`
   display: flex;
-  align-items: center;
-  margin-bottom: 30px;
-  background-color: ${props => props.theme.tab.background.default};
-  border-radius: 16px;
+  flex-direction: column;
+  gap: 4px;
   padding: 8px;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  @media only screen and (max-width: 400px) {
-    width: 100%;
-  }
-  @media only screen and (max-width: 560px) {
-    margin-bottom: 20px;
-  }
+  width: 240px;
+  background-color: ${props => props.theme.color.white};
+  border-radius: 8px;
+  border: 2px solid ${props => props.theme.color.black};
 `;
 
-const Tab = styled.div`
+const MenuItem = styled.div`
   position: relative;
-  border-radius: 10px;
-  padding: 8px 16px;
-  background-color: ${props => props.theme.tab.background[props.active ? 'active' : 'default']};
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: ${props => props.active ? props.theme.color.telosGradientSoft : 'transparent'};
+  border-bottom: ${props => props.active ? `1px solid ${props.theme.color.black}` : 'none'};
   color: ${props => props.theme.text.color[props.active ? 'primary' : 'secondary']};
-  font-weight: ${props => props.theme.text.weight.bold};
+  font-weight: normal;
   cursor: pointer;
+  transition: all 0.2s ease;
+  
   &:hover {
+    background: ${props => props.active ? props.theme.color.telosGradientSoft : 'rgba(0, 0, 0, 0.02)'};
     color: ${props => props.theme.text.color.primary};
   }
-  @media only screen and (max-width: 400px) {
-    padding: 8px 10px;
-    text-align: center;
-  }
+
   &::after {
     content: '';
     display: ${props => props.$showBadge ? 'block' : 'none'};
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 12px;
+    right: 12px;
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background-color: #E53E3E;
   }
+`;
+
+const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: nowrap;
+  font-size: 20px;
+  width: 24px;
+  height: 24px;
+`;
+
+const MenuText = styled.span`
+  font-size: 16px;
+  white-space: nowrap;
 `;
