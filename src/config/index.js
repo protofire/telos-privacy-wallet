@@ -75,7 +75,7 @@ const config = {
         chainId: 11155111,
         poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
         tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        relayerUrls: ['http://3.147.241.79/relayer/'],
+        relayerUrls: ['http://3.150.55.197/relayer/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -93,7 +93,7 @@ const config = {
         chainId: 11155111,
         poolAddress: '0xb58ea0df1DA512B1aF48a23216495223149232F6',
         tokenAddress: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
-        relayerUrls: ['http://3.147.241.79/relayer/'],
+        relayerUrls: ['http://3.150.55.197/relayer/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
@@ -122,7 +122,7 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: 'tlos_testnet',
+        addressPrefix: 'zktelos_testnet',
         parameters: 'staging'
       },
     },
@@ -147,6 +147,11 @@ const config = {
         prefix: 'zkbob_sepolia',
         name: 'Bob Pool on Sepolia with decentralized relayer',
       },
+      {
+        poolId: 0x00000a,
+        prefix: 'eth_sepolia',
+        name: 'ETH on Sepolia',
+      }
     ],
   }
 };

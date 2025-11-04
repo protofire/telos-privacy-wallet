@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: deploy-prod-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: "18.x"
 
