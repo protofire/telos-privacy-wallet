@@ -111,7 +111,7 @@ const config = {
         chainId: 41,
         poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
         tokenAddress: '0x28d1BCc58E6Cd0270F45b63e4FFd13b3fF5E98af',
-        relayerUrls: ['http://3.150.55.197/relayer/'],
+        relayerUrls: ['http://3.150.55.197/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
