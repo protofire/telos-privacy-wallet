@@ -122,7 +122,7 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: 'tlos_testnet',
+        addressPrefix: 'zktelos_testnet',
         parameters: 'staging'
       },
     },
@@ -147,6 +147,11 @@ const config = {
         prefix: 'zkbob_sepolia',
         name: 'Bob Pool on Sepolia with decentralized relayer',
       },
+      {
+        poolId: 0x00000a,
+        prefix: 'eth_sepolia',
+        name: 'ETH on Sepolia',
+      }
     ],
   }
 };

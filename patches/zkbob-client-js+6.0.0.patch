@@ -1,0 +1,15 @@
+diff --git a/node_modules/zkbob-client-js/lib/address-prefixes.js b/node_modules/zkbob-client-js/lib/address-prefixes.js
+index fb80997..d34936a 100644
+--- a/node_modules/zkbob-client-js/lib/address-prefixes.js
++++ b/node_modules/zkbob-client-js/lib/address-prefixes.js
+@@ -10,8 +10,8 @@ export const hardcodedPrefixes = [
+     },
+     {
+         poolId: 0x000001,
+-        prefix: 'zkbob_optimism',
+-        name: 'USDC on Optimism'
++        prefix: 'zktelos_testnet',
++        name: 'TLOS on Telos Testnet'
+     },
+     {
+         poolId: 0x000002,
