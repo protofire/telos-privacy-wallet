@@ -122,7 +122,7 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: 'zktelos_testnet',
+        addressPrefix: '0zktelos',
         parameters: 'staging'
       },
     },
