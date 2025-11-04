@@ -57,8 +57,8 @@ const light = {
     primary: {
       background: {
         default: black,
-        disabled: 'rgba(27, 77, 235, 0.2)',
-        contrast: 'rgba(27, 77, 235, 0.1)',
+        disabled: 'rgba(64, 64, 64, 0.2)',
+        contrast: 'rgba(64, 64, 64, 0.1)',
       },
       border: {
         color: darkGrey,
