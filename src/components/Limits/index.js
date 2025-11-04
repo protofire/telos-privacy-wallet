@@ -52,6 +52,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   background: rgba(255, 250, 238, 0.6);
+  border: 2px solid #FBEED0;
   border-radius: 16px;
   margin-top: 20px;
   padding: 12px;
