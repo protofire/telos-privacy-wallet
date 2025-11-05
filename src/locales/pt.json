@@ -140,11 +140,14 @@
     "senderAddress": "Endereço do remetente"
   },
   "welcome": {
-    "title": "Bem-vindo ao zkBob!",
-    "description": "Crie uma conta zkBob para transferir tokens de forma privada com seus amigos e colegas.",
-    "titleDemo": "Bem-vindo à Versão de Demonstração do zkBob!",
-    "descriptionDemo": "Transfira BOB de forma privada para amigos, use para comprar itens patrocinados ou transfira para sua própria conta privada zkBob.",
-    "bannerDemo": "Para depósitos seguros, retiradas e privacidade completa, crie uma <1>conta zkBob aqui</1>"
+    "title": "Bem-vindo!",
+    "startTour": "Iniciar Tour",
+    "skipTour": "Pular Tour",
+    "content": {
+      "paragraph1": "Crie uma <strong>zkAccount</strong> para transferir tokens de forma <strong>privada</strong> com seus amigos e colegas.",
+      "paragraph2": "Suas transações permanecem <strong>seguras e anônimas</strong> dentro das <strong>pools de privacidade</strong>.",
+      "paragraph3": "Vamos fazer um tour rápido para mostrar os principais recursos."
+    }
   },
   "payment": {
     "title": "Insira o valor em {{symbol}} e escolha um token",
@@ -426,5 +429,59 @@
     "transactions_other": "transações",
     "statuses": "status",
     "statuses_other": "status"
+  },
+  "onboardingTutorial": {
+    "steps": {
+      "createZkAccount": {
+        "title": "Conecte e crie sua zkAccount",
+        "content": {
+          "paragraph1": "Conecte sua carteira para começar a usar o zkTelos Wallet.",
+          "paragraph2": "Em seguida, crie sua zkAccount — sua identidade privada dentro do protocolo.",
+          "paragraph3": "Este endereço permite que você envie e receba tokens de forma privada."
+        }
+      },
+      "supportedTokens": {
+        "title": "Escolha redes e tokens suportados",
+        "content": {
+          "paragraph1": "Suportamos múltiplas redes e tokens.",
+          "paragraph2": "Quando você deposita, seus tokens entram em uma pool de privacidade onde são anonimizados — quebrando o vínculo entre sua carteira pública e atividade privada."
+        }
+      },
+      "deposit": {
+        "title": "Depositar tokens",
+        "content": {
+          "paragraph1": "Use <strong>Depositar</strong> para mover tokens da sua carteira para a pool de privacidade.",
+          "paragraph2": "Este é o primeiro passo para fazer transferências privadas."
+        }
+      },
+      "transfer": {
+        "title": "Enviar transferências privadas",
+        "content": {
+          "paragraph1": "Use <strong>Transferir</strong> para enviar tokens de forma privada para outra zkAccount.",
+          "paragraph2": "Remetente, destinatário e valor permanecem ocultos na blockchain."
+        }
+      },
+      "withdraw": {
+        "title": "Sacar tokens",
+        "content": {
+          "paragraph1": "Use <strong>Sacar</strong> para mover seus tokens de volta para um endereço público.",
+          "paragraph2": "Lembre-se: uma vez sacados, os fundos ficam visíveis novamente.",
+          "paragraph3": "Para maior privacidade, aguarde algum tempo antes de sacar."
+        }
+      },
+      "history": {
+        "title": "Ver seu histórico",
+        "content": {
+          "paragraph1": "Verifique a guia <strong>Histórico</strong> para ver depósitos, transferências e saques.",
+          "paragraph2": "Tudo pronto — comece a explorar o zkTelos Wallet e aproveite transações privadas! 🚀"
+        }
+      }
+    },
+    "buttons": {
+      "next": "Próximo",
+      "skipTour": "Pular Tour",
+      "back": "Voltar",
+      "finishTour": "Finalizar Tour 🎉"
+    }
   }
 }
