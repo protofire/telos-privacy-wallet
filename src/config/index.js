@@ -1,6 +1,5 @@
 const isElectron = () => process.env.REACT_APP_BUILD_TARGET === 'electron';
 
-
 const getAppBaseURL = () => {
   const href =
     (typeof window !== 'undefined' && window.location?.href) ||
