@@ -10,13 +10,14 @@ import { ReactComponent as CheckSVGIcon } from 'assets/check.svg';
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
 
-import { ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
+import { ZkAccountContext, PoolContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import useAutoReset from 'hooks/useAutoReset';
 
 import Skeleton from 'components/Skeleton';
 import { ZkAvatar } from 'components/ZkAccountIdentifier';
 import Tooltip from 'components/Tooltip';
+import BalanceDisplay from 'components/BalanceDisplay';
 
 const shortPrivateAddress = (address) => {
   if (!address) return '';
@@ -33,7 +34,6 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
   const { priceMap } = useTokenMapPrices();
   const { currentPool } = useContext(PoolContext);
-  const { isVisible } = useContext(BalanceVisibilityContext);
   const [hasCopied, setHasCopied] = useAutoReset();
   const {
     zkAccount, balance: poolBalance,
@@ -113,7 +113,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
               {isLoadingState ? (
                 <Skeleton width={100} height={16} />
               ) : (
-                <UsdBalance>{isVisible ? usdBalance : '••••••'}</UsdBalance>
+                <UsdBalance value={usdBalance} />
               )}
             </WalletInfo>
           </WalletHeader>
@@ -169,7 +169,7 @@ const Address = styled.span`
   font-weight: ${props => props.theme.text.weight.bold};
 `;
 
-const UsdBalance = styled.span`
+const UsdBalance = styled(BalanceDisplay)`
   font-size: 12px;
   font-weight: ${props => props.theme.text.weight.normal};
 `;

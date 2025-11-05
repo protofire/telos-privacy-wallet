@@ -11,6 +11,7 @@ import NetworkDropdown from 'components/NetworkDropdown';
 import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
 import Skeleton from 'components/Skeleton';
+import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
 import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
@@ -98,12 +99,13 @@ export default ({ empty }) => {
           ) : (
             <>
               <Balance>
-                {formatBalance(
-                  currentPool.isNative ? nativeBalance.add(balance) : balance,
-                  currentPool.tokenDecimals,
-                  isMobile
-                )}{' '}
-                {currentPool.tokenSymbol}{currentPool.isNative && '*'}
+                <BalanceDisplay
+                  value={`${formatBalance(
+                    currentPool.isNative ? nativeBalance.add(balance) : balance,
+                    currentPool.tokenDecimals,
+                    isMobile
+                  )} ${currentPool.tokenSymbol}${currentPool.isNative ? '*' : ''}`}
+                />
               </Balance>
               <DropdownIcon />
             </>
@@ -128,7 +130,9 @@ export default ({ empty }) => {
           ) : (
             <>
               <Balance>
-                {formatBalance(poolBalance, currentPool.tokenDecimals, isMobile)} {currentPool.tokenSymbol}
+                <BalanceDisplay
+                  value={`${formatBalance(poolBalance, currentPool.tokenDecimals, isMobile)} ${currentPool.tokenSymbol}`}
+                />
               </Balance>
               <DropdownIcon />
             </>

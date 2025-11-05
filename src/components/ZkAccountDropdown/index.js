@@ -9,6 +9,7 @@ import OptionButton from 'components/OptionButton';
 import Button from 'components/Button';
 import PrivateAddress from 'components/PrivateAddress';
 import QRCodeReader from 'components/QRCodeReader';
+import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
@@ -116,7 +117,9 @@ const Content = ({
         <Row>
           <TokenIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
           <Tooltip content={formatNumber(balance, currentPool.tokenDecimals, 18)} placement="bottom">
-            <Balance>{formatNumber(balance, currentPool.tokenDecimals, 6)}</Balance>
+            <Balance>
+              <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
+            </Balance>
           </Tooltip>
           <Balance style={{ marginLeft: 5 }}>{currentPool.tokenSymbol}</Balance>
         </Row>

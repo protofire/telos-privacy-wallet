@@ -6,6 +6,7 @@ import { useTokenMapPrices } from '../../hooks';
 import { ReactComponent as EyeIcon } from 'assets/eye.svg';
 import { ReactComponent as EyeClosedIcon } from 'assets/eye-off.svg';
 import Skeleton from 'components/Skeleton';
+import BalanceDisplay from 'components/BalanceDisplay';
 
 export default () => {
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
@@ -41,8 +42,8 @@ export default () => {
           <IconWrapper onClick={toggleVisibility}>
             {isVisible ? <StyledEyeIcon /> : <StyledEyeClosedIcon />}
           </IconWrapper>
-          <Value>{isVisible ? totalUsdValue : '••••••••'}</Value> </>)
-        }
+          <Value value={totalUsdValue} hiddenPlaceholder="••••••••" />
+        </>)}
       </ValueRow>
       <Separator />
     </Container>
@@ -68,7 +69,7 @@ const ValueRow = styled.div`
   gap: 12px;
 `;
 
-const Value = styled.span`
+const Value = styled(BalanceDisplay)`
   font-size: 48px;
   font-weight: ${props => props.theme.text.weight.bold};
   color: ${props => props.theme.text.color.primary};
