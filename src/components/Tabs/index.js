@@ -179,7 +179,7 @@ const AddressRow = styled.div`
 `;
 
 const ShieldedAddress = styled.span`
-  font-size: 12px;
+  font-size: 14px;
   color: ${props => props.theme.color.black};
   line-height: 16px;
 `;
