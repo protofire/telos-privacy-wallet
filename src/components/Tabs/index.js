@@ -1,16 +1,22 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
+
 import { ReactComponent as BashIcon } from 'assets/bash.svg';
+import { ReactComponent as CopySVGIcon } from 'assets/copy.svg';
+import { ReactComponent as CheckSVGIcon } from 'assets/check.svg';
+import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
+import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
+
+import { ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
-import { useContext } from 'react';
-import { ZkAccountContext, PoolContext } from 'contexts';
-import { ZkAvatar } from 'components/ZkAccountIdentifier';
-import Skeleton from 'components/Skeleton';
-import { ReactComponent as CopyIcon } from 'assets/copy.svg';
-import { ReactComponent as CheckIcon } from 'assets/check.svg';
 import useAutoReset from 'hooks/useAutoReset';
+
+import Skeleton from 'components/Skeleton';
+import { ZkAvatar } from 'components/ZkAccountIdentifier';
+import Tooltip from 'components/Tooltip';
 
 const shortPrivateAddress = (address) => {
   if (!address) return '';
@@ -23,22 +29,18 @@ const shortPrivateAddress = (address) => {
   return `${prefix}:${shortenedPrivateAddress}`;
 };
 
-
-
 export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
   const { priceMap } = useTokenMapPrices();
   const { currentPool } = useContext(PoolContext);
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const [hasCopied, setHasCopied] = useAutoReset();
-
   const {
     zkAccount, balance: poolBalance,
     isLoadingState,
     generateAddress,
   } = useContext(ZkAccountContext);
-
   const [shieldedAddress, setShieldedAddress] = useState('');
-
 
   const copyToClipboard = async (text) => {
     try {
@@ -54,23 +56,6 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
     }
     setHasCopied(true);
   };
-
-  useEffect(() => {
-    if (!zkAccount) return;
-
-    const generateAndStoreAddress = async () => {
-      const storedAddress = localStorage.getItem(`shielded_address_${zkAccount}`);
-      if (storedAddress) {
-        setShieldedAddress(storedAddress);
-      } else {
-        const address = await generateAddress();
-        setShieldedAddress(address);
-        localStorage.setItem(`shielded_address_${zkAccount}`, address);
-      }
-    };
-
-    generateAndStoreAddress();
-  }, [zkAccount, generateAddress]);
 
   const usdBalance = useMemo(() => {
     if (!poolBalance || !priceMap || !currentPool) return null;
@@ -90,18 +75,32 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
 
   }, [poolBalance, priceMap, currentPool]);
 
+
+  const generateAndStoreAddress = useCallback(async () => {
+    const address = await generateAddress();
+    setShieldedAddress(address);
+  }, [generateAddress]);
+
   const CopyTick = () => {
-    return (
-      <CopyIconContainer>
-        <AnimatedIcon $show={!hasCopied} onClick={() => copyToClipboard(shieldedAddress)}>
-          <CopyIcon width={16} height={16} />
-        </AnimatedIcon>
-        <AnimatedIcon $show={hasCopied}>
-          <CheckIcon width={16} height={16} style={{ stroke: "#00D100" }} />
-        </AnimatedIcon>
-      </CopyIconContainer>
-    );
+    if (hasCopied) {
+      return <Tooltip content={t('common.copied')} placement="top" delay={0} visible={hasCopied} trigger={[]}>
+        <CheckIcon />
+      </Tooltip>;
+    }
+    return <CopyIcon onClick={() => copyToClipboard(shieldedAddress)} />;
   };
+
+  const RefreshLoading = () => {
+    if (isLoadingState) {
+      return <SpinnerIcon width={16} height={16} />;
+    }
+    return <RenewIcon onClick={generateAndStoreAddress} />;
+  }
+
+  useEffect(() => {
+    if (!zkAccount) return;
+    generateAndStoreAddress();
+  }, [zkAccount, generateAndStoreAddress]);
 
   return (
     <MenuContainer>
@@ -111,12 +110,18 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
             <ZkAvatar seed={zkAccount} size={46} />
             <WalletInfo>
               <Address>{t('common.zkAccount')}</Address>
-              {isLoadingState ? <Skeleton width={100} height={16} /> : <UsdBalance>{usdBalance}</UsdBalance>}
+              {isLoadingState ? (
+                <Skeleton width={100} height={16} />
+              ) : (
+                <UsdBalance>{isVisible ? usdBalance : '••••••'}</UsdBalance>
+              )}
             </WalletInfo>
           </WalletHeader>
 
           <AddressRow>
-            <ShieldedAddress>{shortPrivateAddress(shieldedAddress) || 'Generating address...'}</ShieldedAddress> <CopyTick />
+            <RefreshLoading />
+            <ShieldedAddress>{shortPrivateAddress(shieldedAddress) || 'Generating address...'}</ShieldedAddress>
+            <CopyTick />
           </AddressRow>
         </WalletContainer>
       ) : null}
@@ -143,7 +148,6 @@ const WalletContainer = styled.div`
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  margin-bottom: 32px;
 `;
 
 const WalletHeader = styled.div`
@@ -174,13 +178,15 @@ const AddressRow = styled.div`
   display: flex;
   align-items: center;
   padding: 8px;
+  border-top: 1px solid ${props => props.theme.color.grey};
+  border-bottom: 1px solid ${props => props.theme.color.grey};
+  gap: 8px;
 `;
 
 const ShieldedAddress = styled.span`
-  font-size: 12px;
+  font-size: 14px;
   color: ${props => props.theme.color.black};
   line-height: 16px;
-  margin-right: 8px;
 `;
 
 const MenuContainer = styled.div`
@@ -226,25 +232,23 @@ const MenuItem = styled.div`
   }
 `;
 
-const CopyIconContainer = styled.div`
-  position: relative;
-  width: 24px;
-  height: 24px;
+const CheckIcon = styled(CheckSVGIcon)`
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  stroke: ${props => props.theme.color.success};
 `;
 
-const AnimatedIcon = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: ${props => props.$show ? 1 : 0};
-  pointer-events: ${props => props.$show ? 'auto' : 'none'};
-  transition: opacity 0.3s ease-in-out;
+const CopyIcon = styled(CopySVGIcon)`
   cursor: pointer;
+  width: 16px;
+  height: 16px;
+`;
+
+const RenewIcon = styled(RenewSVGIcon)`
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  width: 16px;
+  height: 16px;
 `;
 
 const MenuText = styled.span`

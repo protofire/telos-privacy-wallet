@@ -9,7 +9,7 @@ import useDisplayedFee from 'hooks/useDisplayedFee';
 import useMaxTransferable from './useMaxTransferable';
 import useApproval from './useApproval';
 import useHistoricalTokenSymbol from './useHistoricalTokenSymbol';
-import useTokenMapPrices from './useTokenMapPrices';
+import useTokenPrices from './useTokenPrices';
 import useAutoReset from './useAutoReset';
 
 export {
@@ -24,6 +24,6 @@ export {
   useMaxTransferable,
   useApproval,
   useHistoricalTokenSymbol,
-  useTokenMapPrices,
+  useTokenPrices as useTokenMapPrices,
   useAutoReset,
 };
