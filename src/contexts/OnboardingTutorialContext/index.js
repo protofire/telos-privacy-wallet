@@ -183,7 +183,7 @@ const createSteps = (t) => [
 ];
 
 export const OnboardingTutorialProvider = ({ children }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const history = useHistory();
 
   const shepherdTourInstance = useMemo(() => new Shepherd.Tour(tourOptions), []);
@@ -193,6 +193,14 @@ export const OnboardingTutorialProvider = ({ children }) => {
   }, [history]);
 
   useEffect(() => {
+    if (shepherdTourInstance.isActive()) {
+      shepherdTourInstance.complete();
+    }
+
+    shepherdTourInstance.off('complete', handleTourEnd);
+    shepherdTourInstance.off('cancel', handleTourEnd);
+
+    shepherdTourInstance.steps = [];
     const steps = createSteps(t);
     shepherdTourInstance.addSteps(steps);
 
@@ -202,9 +210,11 @@ export const OnboardingTutorialProvider = ({ children }) => {
     return () => {
       shepherdTourInstance.off('complete', handleTourEnd);
       shepherdTourInstance.off('cancel', handleTourEnd);
-      shepherdTourInstance.complete();
+      if (shepherdTourInstance.isActive()) {
+        shepherdTourInstance.complete();
+      }
     };
-  }, [t, shepherdTourInstance, handleTourEnd]);
+  }, [i18n.language, shepherdTourInstance, handleTourEnd, t]);
 
 
 
