@@ -10,7 +10,7 @@ import { ReactComponent as CheckSVGIcon } from 'assets/check.svg';
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
 
-import { ZkAccountContext, PoolContext } from 'contexts';
+import { ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import useAutoReset from 'hooks/useAutoReset';
 
@@ -33,6 +33,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
   const { priceMap } = useTokenMapPrices();
   const { currentPool } = useContext(PoolContext);
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const [hasCopied, setHasCopied] = useAutoReset();
   const {
     zkAccount, balance: poolBalance,
@@ -109,7 +110,11 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
             <ZkAvatar seed={zkAccount} size={46} />
             <WalletInfo>
               <Address>{t('common.zkAccount')}</Address>
-              {isLoadingState ? <Skeleton width={100} height={16} /> : <UsdBalance>{usdBalance}</UsdBalance>}
+              {isLoadingState ? (
+                <Skeleton width={100} height={16} />
+              ) : (
+                <UsdBalance>{isVisible ? usdBalance : '••••••'}</UsdBalance>
+              )}
             </WalletInfo>
           </WalletHeader>
 

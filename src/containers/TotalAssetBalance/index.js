@@ -1,14 +1,14 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
-import { TokenBalanceContext, ZkAccountContext, PoolContext } from 'contexts';
+import { TokenBalanceContext, ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from '../../hooks';
 import { ReactComponent as EyeIcon } from 'assets/eye.svg';
 import { ReactComponent as EyeClosedIcon } from 'assets/eye-off.svg';
 import Skeleton from 'components/Skeleton';
 
 export default () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { balance } = useContext(TokenBalanceContext);
   const { balance: zkAccountBalance, isLoadingState } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
@@ -32,10 +32,6 @@ export default () => {
       maximumFractionDigits: 2,
     });
   }, [balance, zkAccountBalance, priceMap, currentPool]);
-
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
 
   return (
     <Container>
