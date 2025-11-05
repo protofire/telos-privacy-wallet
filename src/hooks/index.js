@@ -9,6 +9,8 @@ import useDisplayedFee from 'hooks/useDisplayedFee';
 import useMaxTransferable from './useMaxTransferable';
 import useApproval from './useApproval';
 import useHistoricalTokenSymbol from './useHistoricalTokenSymbol';
+import useTokenMapPrices from './useTokenMapPrices';
+import useAutoReset from './useAutoReset';
 
 export {
   useDateFromNow,
@@ -22,4 +24,6 @@ export {
   useMaxTransferable,
   useApproval,
   useHistoricalTokenSymbol,
+  useTokenMapPrices,
+  useAutoReset,
 };
