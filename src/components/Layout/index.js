@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
+import TotalAssetBalance from 'containers/TotalAssetBalance'
 export default ({ header, footer, children }) => {
   const [menu, content] = React.Children.toArray(children);
   return (
@@ -8,10 +8,13 @@ export default ({ header, footer, children }) => {
       <Layout>
         {header}
         <PageContainer>
-          {menu}
-          <ContentContainer>
-            {content}
-          </ContentContainer>
+          <TotalAssetBalance />
+          <MenuAndPageContainer>
+            {menu}
+            <ContentContainer>
+              {content}
+            </ContentContainer>
+          </MenuAndPageContainer>
         </PageContainer>
         {footer}
       </Layout>
@@ -34,12 +37,19 @@ const Layout = styled.div`
 
 const PageContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+  margin: 0 auto 40px auto;
+`;
+
+const MenuAndPageContainer = styled.div`
+  display: flex;
   flex-direction: row;
   align-items: flex-start;
   justify-content: center;
   flex: 1;
   gap: 32px;
-  margin: 80px 0;
   position: relative;
   @media only screen and (max-width: 560px) {
     margin: 30px 0;
