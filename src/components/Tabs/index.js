@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import { ReactComponent as BashIcon } from 'assets/bash.svg';
 import { ReactComponent as CopySVGIcon } from 'assets/copy.svg';
 import { ReactComponent as CheckSVGIcon } from 'assets/check.svg';
-import { ReactComponent as RefreshSVGIcon } from 'assets/refresh.svg';
+import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
@@ -93,7 +93,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
     if (isLoadingState) {
       return <SpinnerIcon width={16} height={16} />;
     }
-    return <RefreshIcon onClick={generateAndStoreAddress} />;
+    return <RenewIcon onClick={generateAndStoreAddress} />;
   }
 
   useEffect(() => {
@@ -240,7 +240,7 @@ const CopyIcon = styled(CopySVGIcon)`
   height: 16px;
 `;
 
-const RefreshIcon = styled(RefreshSVGIcon)`
+const RenewIcon = styled(RenewSVGIcon)`
   cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   width: 16px;
   height: 16px;
