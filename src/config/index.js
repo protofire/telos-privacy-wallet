@@ -70,42 +70,6 @@ const config = {
   dev: {
     defaultPool: 'tlos_testnet',
     pools: {
-      'ptk_sepolia': {
-        chainId: 11155111,
-        poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
-        tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        relayerUrls: ['http://3.150.55.197/relayer/'],
-        delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
-        coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
-        kycUrls: {
-          status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
-          homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
-        },
-        tokenSymbol: 'PTK',
-        tokenDecimals: 18,
-        feeDecimals: 2,
-        depositScheme: 'approve',
-        addressPrefix: 'ptk_sepolia',
-        parameters: 'staging'
-      },
-      'eth_sepolia': {
-        chainId: 11155111,
-        poolAddress: '0xb58ea0df1DA512B1aF48a23216495223149232F6',
-        tokenAddress: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
-        relayerUrls: ['http://3.150.55.197/relayer/'],
-        delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
-        coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
-        kycUrls: {
-          status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
-          homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
-        },
-        tokenSymbol: 'ETH',
-        tokenDecimals: 18,
-        feeDecimals: 2,
-        depositScheme: 'approve',
-        addressPrefix: 'eth_sepolia',
-        parameters: 'staging'
-      },
       'tlos_testnet': {
         chainId: 41,
         poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
@@ -117,7 +81,7 @@ const config = {
           status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
           homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
         },
-        tokenSymbol: 'TLOS',
+        tokenSymbol: 'PUSD',
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
@@ -132,26 +96,11 @@ const config = {
       },
     },
     chains: {
-      '11155111': {
-        // rpcUrls: ['https://virtual.sepolia.eu.rpc.tenderly.co/e2d3c7a3-b5e9-46c1-8b04-35febc2fb719'],
-        rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'],
-      },
       '41': {
         rpcUrls: ['https://rpc.testnet.telos.net']
       },
     },
-    extraPrefixes: [
-      {
-        poolId: 16776969,
-        prefix: 'zkbob_sepolia',
-        name: 'Bob Pool on Sepolia with decentralized relayer',
-      },
-      {
-        poolId: 0x00000a,
-        prefix: 'eth_sepolia',
-        name: 'ETH on Sepolia',
-      }
-    ],
+    extraPrefixes: [],
   }
 };
 
