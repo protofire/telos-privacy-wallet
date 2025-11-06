@@ -1,19 +1,27 @@
 import React, { useContext, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
-import { TokenBalanceContext, ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
-import { useTokenMapPrices } from '../../hooks';
+
 import { ReactComponent as EyeIcon } from 'assets/eye.svg';
 import { ReactComponent as EyeClosedIcon } from 'assets/eye-off.svg';
+
+import { TokenBalanceContext, ZkAccountContext, PoolContext, BalanceVisibilityContext, WalletContext } from 'contexts';
+
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
+import Tooltip from 'components/Tooltip';
+
+import { useTokenMapPrices } from 'hooks';
 
 export default () => {
+  const { address: account } = useContext(WalletContext)
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { balance } = useContext(TokenBalanceContext);
-  const { balance: zkAccountBalance, isLoadingState } = useContext(ZkAccountContext);
+  const { balance: zkAccountBalance, isLoadingState, zkAccount } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const { priceMap } = useTokenMapPrices();
+  const { t } = useTranslation();
 
   const totalUsdValue = useMemo(() => {
     if (!balance || !zkAccountBalance || !priceMap || !currentPool) return null;
@@ -32,6 +40,8 @@ export default () => {
     });
   }, [balance, zkAccountBalance, priceMap, currentPool]);
 
+  if (!account && !zkAccount) return null;
+
   return (
     <Container>
       <Label>Total asset value</Label>
@@ -40,7 +50,11 @@ export default () => {
           <IconWrapper onClick={toggleVisibility}>
             {isVisible ? <StyledEyeIcon /> : <StyledEyeClosedIcon />}
           </IconWrapper>
-          <Value value={totalUsdValue} hiddenPlaceholder="••••••••" />
+          <Tooltip content={t('common.totalAssetBalance')} delay={0.3}>
+            <span>
+              <Value value={totalUsdValue} hiddenPlaceholder="••••••••" />
+            </span>
+          </Tooltip>
         </>)}
       </ValueRow>
       <Separator />

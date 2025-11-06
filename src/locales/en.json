@@ -22,7 +22,8 @@
     "sender": "Sender",
     "recipient": "Recipient",
     "link": "Link",
-    "payment": "Payment"
+    "payment": "Payment",
+    "totalAssetBalance": "Sum of assets held in your public wallet and zkAccount, shown in USD."
   },
   "buttonText": {
     "connectWallet": "Connect wallet",

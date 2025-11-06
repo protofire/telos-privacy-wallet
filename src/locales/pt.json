@@ -22,7 +22,8 @@
     "sender": "Remetente",
     "recipient": "Destinatário",
     "link": "Link",
-    "payment": "Pagamento"
+    "payment": "Pagamento",
+    "totalAssetBalance": "Soma dos ativos mantidos em sua carteira pública e zkAccount, mostrados em USD."
   },
   "buttonText": {
     "connectWallet": "Conectar carteira",

@@ -22,7 +22,8 @@
     "sender": "发送人",
     "recipient": "收款人",
     "link": "链接",
-    "payment": "支付"
+    "payment": "支付",
+    "totalAssetBalance": "您公共钱包和zk账户中资产的总价值，以USD显示。"
   },
   "buttonText": {
     "connectWallet": "连接钱包",

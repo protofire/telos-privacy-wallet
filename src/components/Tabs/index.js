@@ -208,7 +208,7 @@ const MenuItem = styled.div`
   padding: 12px 16px;
   border-radius: 12px;
   background: ${props => props.active ? props.theme.color.telosGradientSoft : 'transparent'};
-  border-bottom: ${props => props.active ? `1px solid ${props.theme.color.black}` : 'none'};
+  border: ${props => props.active ? `1px solid rgb(149 126 223 / 40%)` : 'none'};
   color: ${props => props.theme.text.color[props.active ? 'primary' : 'secondary']};
   font-weight: normal;
   cursor: pointer;

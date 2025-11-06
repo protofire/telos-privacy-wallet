@@ -22,7 +22,8 @@
     "sender": "Отправитель",
     "recipient": "Получатель",
     "link": "Ссылка",
-    "payment": "Платеж"
+    "payment": "Платеж",
+    "totalAssetBalance": "Сумма активов, хранящихся в вашем публичном кошельке и zkAccount, показана в USD."
   },
   "buttonText": {
     "connectWallet": "Подключить кошелек",

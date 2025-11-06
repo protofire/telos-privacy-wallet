@@ -231,11 +231,9 @@ const LogoSection = styled(Row)`
 `;
 
 const Logo = styled(LogoDefault)`
-
     height: 20px;
-    width: 100px;
+    width: 135px;
     margin-left: 10px;
-
 `;
 
 const AccountSection = styled(Row)`
