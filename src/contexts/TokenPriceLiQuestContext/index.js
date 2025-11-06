@@ -24,7 +24,7 @@ const getChainId = (chainId) => {
 
 export const TokenPriceLiQuestProvider = ({ children }) => {
   const { currentPool } = useContext(PoolContext);
-  const [priceMap, setPriceMap] = useState(null);
+  const [priceMap, setPriceMap] = useState(new Map());
   const [isLoading, setIsLoading] = useState(false);
   const intervalRef = useRef(null);
   const abortControllerRef = useRef(null);
@@ -51,7 +51,9 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
       });
 
       const results = await Promise.all(pricePromises);
-      const priceMapData = new Map();
+      const priceMapData = new Map([
+        ['PUSD', 1], // Mocked price for ProtoUSD
+      ]);
 
       results.forEach(({ symbol, price }) => {
         if (price !== null) {

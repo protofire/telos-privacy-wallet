@@ -18,9 +18,7 @@ export default () => {
   const totalUsdValue = useMemo(() => {
     if (!balance || !zkAccountBalance || !priceMap || !currentPool) return null;
 
-    const tokenPrice = priceMap.get(currentPool.tokenSymbol);
-    if (!tokenPrice) return null;
-
+    const tokenPrice = priceMap.get(currentPool.tokenSymbol) || 0;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, currentPool.tokenDecimals));
     const zkBalanceInToken = parseFloat(ethers.utils.formatUnits(zkAccountBalance, currentPool.tokenDecimals));
     const totalInToken = balanceInToken + zkBalanceInToken;
