@@ -11,9 +11,9 @@ import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 
 const links = [
-  { key: 'dune', href: 'https://dune.com/projects/zkBob' },
-  { key: 'docs', href: 'https://docs.zkbob.com/' },
-  { key: 'linktree', href: 'https://linktr.ee/zkbob' },
+  // { key: 'dune', href: 'https://dune.com/projects/zkBob' },
+  // { key: 'docs', href: 'https://docs.zkbob.com/' },
+  // { key: 'linktree', href: 'https://linktr.ee/zkbob' },
 ];
 
 const languages = {
