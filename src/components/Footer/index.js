@@ -20,10 +20,10 @@ export default () => {
   const { relayerVersion } = useContext(ZkAccountContext);
 
   const resources = [
-    { icon: TwitterIcon, href: 'https://twitter.com/zkBob_' },
-    { icon: TelegramIcon, href: 'https://t.me/zkbobcommunity' },
-    { icon: MirrorIcon, href: 'https://blog.zkbob.com/' },
-    { icon: GithubIcon, href: 'https://github.com/zkBob' },
+    { icon: TwitterIcon, href: 'https://x.com/HelloTelos' },
+    { icon: TelegramIcon, href: 'https://t.me/HelloTelos' },
+    { icon: MirrorIcon, href: 'https://www.telos.net/blog' },
+    { icon: GithubIcon, href: 'https://github.com/telosnetwork' },
   ];
 
   return (

@@ -78,7 +78,7 @@
   "transfer": {
     "title": "Transfer",
     "note": "The transfer will be performed privately. Sender, recipient and amount are never disclosed.",
-    "addressInputPlaceholder": "Enter address of zkBob receiver",
+    "addressInputPlaceholder": "Enter address of zkTelos receiver",
     "addressInputHint": "The address can be generated in the account modal window"
   },
   "multitransfer": {
@@ -92,12 +92,12 @@
       "insufficientBalance": "Insufficient balance: {{amount}} {{symbol}} ({{fee}} fee) is required."
     },
     "addressesList": "Addresses list",
-    "willBeTransferredTo": "will be transferred to {{count}} zkBob $t(glossary.addresses, {\"count\": {{count}} })",
-    "hasBeenTransferredTo": "has been transferred to {{count}} zkBob $t(glossary.addresses, {\"count\": {{count}} })"
+    "willBeTransferredTo": "will be transferred to {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
+    "hasBeenTransferredTo": "has been transferred to {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
     "title": "Withdraw",
-    "note": "{{symbol}} will be withdrawn from zkBob and deposited into the provided wallet address.",
+    "note": "{{symbol}} will be withdrawn from zkTelos and deposited into the provided wallet address.",
     "addressInputPlaceholder": "Enter {{network}} address of receiver",
     "convertion": "Convert some {{from}} to {{to}} on withdrawal",
     "convertionDetails": "You will get <strong>{{amount1}} {{symbol1}}</strong> and <strong>~ {{amount2}} {{symbol2}}</strong>"
@@ -132,7 +132,7 @@
       "multitransfer": "multitransfer details"
     },
     "sendTo": "send to",
-    "sendToZk": "send to zkBob address",
+    "sendToZk": "send to zkTelos address",
     "sendToMultiple": "$t(multitransfer.willBeTransferredTo)",
     "viewAll": "view all",
     "withdrawAmount": "Withdraw amount",
@@ -199,20 +199,20 @@
   "accountSetupModal": {
     "start": {
       "title": "zkAccount",
-      "description": "To start working with zkBob you need a zkAccount",
+      "description": "To start working with zkTelos you need a zkAccount",
       "button1": "Create new zkAccount",
       "button2": "I already have a zkAccount"
     },
     "createOptions": {
       "title": "Choose how you would like to create your account",
-      "description": "By creating zkAccount, you hereby agree to and accept zkBob <1>Terms of Service</1>",
+      "description": "By creating zkAccount, you hereby agree to and accept zkTelos <1>Terms of Service</1>",
       "button1": "Use my Web3 wallet",
-      "button2": "Instant zkBob account"
+      "button2": "Instant zkTelos account"
     },
     "restoreOptions": {
       "title": "How did you create your account?",
       "button1": "I used a Web3 wallet",
-      "button2": "I used zkBob secret phrase"
+      "button2": "I used zkTelos secret phrase"
     },
     "createWithWallet": {
       "title": "Create new zkAccount",
@@ -227,7 +227,7 @@
     "restoreWithWallet": {
       "title": "Login to your zkAccount",
       "description": "Select the wallet you used to create your zkAccount",
-      "warning": "MetaMask and Wallet Connect wallets will be used only for restoring access to your previous zkBob account"
+      "warning": "MetaMask and Wallet Connect wallets will be used only for restoring access to your previous zkTelos account"
     },
     "restoreWithSecret": {
       "title": "Restore zkAccount",
@@ -278,8 +278,8 @@
   },
   "demoCard": {
     "title": "Demo version",
-    "description1": "This zkBob version is designed for private, small-value transfers only (not for deposits/withdrawals).",
-    "description2": "<0>For a full-featured version,</0><1>create a free zkBob account here.</1>"
+    "description1": "This zkTelos version is designed for private, small-value transfers only (not for deposits/withdrawals).",
+    "description2": "<0>For a full-featured version,</0><1>create a free zkTelos account here.</1>"
   },
   "increasedLimitsBanner": {
     "inactive": "Want to increase your deposit limits?",
@@ -326,7 +326,7 @@
     },
     "createAccount": {
       "title": "Before you can redeem<br /> a gift card",
-      "description": "To redeem a gift card you need a zkBob zkAccount! Create an account, or login into an existing account to claim your {{symbol}} tokens.",
+      "description": "To redeem a gift card you need a zkTelos zkAccount! Create an account, or login into an existing account to claim your {{symbol}} tokens.",
       "button": "Log in or create zkAccount"
     },
     "switchNetwork": {
@@ -398,7 +398,7 @@
   },
   "connectWalletModal": {
     "title": "Connect web3 wallet",
-    "description": "Connect your wallet to deposit {{symbol}} into your zkAccount. If you are creating a new zkAccount, your wallet is used to derive a private encryption key for the zkBob application.",
+    "description": "Connect your wallet to deposit {{symbol}} into your zkAccount. If you are creating a new zkAccount, your wallet is used to derive a private encryption key for the zkTelos application.",
     "note": "By connecting a wallet, you agree to zkBob<br /><1>Terms of Service</1>",
     "noWalletTitle": "{{wallet}} wallet is not found",
     "noWalletDescription": "Ensure that the {{wallet}} wallet extension is installed.",
@@ -412,7 +412,7 @@
     "description": "To receive a private transfer from another zkAccount, your friend can scan this code from their app.<br />The other user just has to scan your QR code on the Transfer page"
   },
   "zkAccount": {
-    "addressDescription": "Use this address to receive tokens to your zkBob account. You create a new address each time you connect. Receive tokens to this address or a previously generated address."
+    "addressDescription": "Use this address to receive tokens to your zkTelos account. You create a new address each time you connect. Receive tokens to this address or a previously generated address."
   },
   "paymentStatement": {
     "amount": "Amount in {{symbol}}",
