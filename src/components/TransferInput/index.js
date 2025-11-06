@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +13,7 @@ import { formatNumber } from 'utils';
 import { useDisplayedFee } from 'hooks';
 
 import { TOKENS_ICONS } from 'constants';
+import { BalanceVisibilityContext } from 'contexts';
 
 export default ({
   amount, onChange, balance, nativeBalance, isLoadingBalance, fee,
@@ -22,6 +23,7 @@ export default ({
   const { t } = useTranslation();
   const displayedFee = useDisplayedFee(currentPool, fee);
   const [showTooltip, setShowTooltip] = useState(false);
+  const { isVisible } = useContext(BalanceVisibilityContext);
 
   const handleAmountChange = useCallback(value => {
     if (!value || /^\d*(?:[.]\d*)?$/.test(value)) {
@@ -71,7 +73,7 @@ export default ({
             {isLoadingBalance ? (
               <Skeleton width={80} />
             ) : (
-              <Row>
+              <Row style={{ visibility: isVisible ? 'visible' : 'hidden' }}>
                 <Text>
                   {formatNumber(isNativeTokenUsed ? nativeBalance : balance, currentPool.tokenDecimals)}{' '}
                   {currentPool.tokenSymbol}
