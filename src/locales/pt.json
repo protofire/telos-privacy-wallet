@@ -71,6 +71,9 @@
     "signingIn": "Entrando...",
     "getToken": "Obter {{symbol}}"
   },
+  "home": {
+    "title": "Início"
+  },
   "deposit": {
     "title": "Depositar",
     "note": "{{symbol}} será depositado em sua conta zkAccount. Uma vez recebido, você pode transferir {{symbol}} de forma privada.",

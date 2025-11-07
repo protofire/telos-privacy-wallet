@@ -231,7 +231,7 @@ const LogoSection = styled(Row)`
 `;
 
 const Logo = styled(LogoDefault)`
-    height: 20px;
+    height: 35px;
     width: 135px;
     margin-left: 10px;
 `;

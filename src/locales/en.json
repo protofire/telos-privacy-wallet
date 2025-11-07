@@ -71,6 +71,9 @@
     "signingIn": "Signing in...",
     "getToken": "Get {{symbol}}"
   },
+  "home": {
+    "title": "Home"
+  },
   "deposit": {
     "title": "Deposit",
     "note": "{{symbol}} will be deposited to your zkAccount. Once received, you can transfer {{symbol}} privately.",
