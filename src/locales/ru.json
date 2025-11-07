@@ -72,7 +72,9 @@
     "getToken": "Получить {{symbol}}"
   },
   "home": {
-    "title": "Главная"
+    "title": "Главная",
+    "portfolio": "Мой портфель",
+    "latestTransactions": "Последние транзакции"
   },
   "deposit": {
     "title": "Пополнение",
@@ -119,6 +121,7 @@
     "total": "из {{amount}} {{symbol}} всего"
   },
   "latestAction": {
+    "viewAll": "Посмотреть все",
     "deposit": "Последнее пополнение средств",
     "withdraw": "Последний вывод средств",
     "transfer": "Последний перевод средств",

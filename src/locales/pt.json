@@ -72,7 +72,9 @@
     "getToken": "Obter {{symbol}}"
   },
   "home": {
-    "title": "Início"
+    "title": "Início",
+    "portfolio": "Meu portfólio",
+    "latestTransactions": "Últimas transações"
   },
   "deposit": {
     "title": "Depositar",
@@ -119,6 +121,7 @@
     "total": "de um total de {{amount}} {{symbol}}"
   },
   "latestAction": {
+    "viewAll": "Ver todos",
     "deposit": "Último depósito",
     "withdraw": "Última retirada",
     "transfer": "Última transferência",

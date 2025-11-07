@@ -72,7 +72,9 @@
     "getToken": "获取{{symbol}}"
   },
   "home": {
-    "title": "首页"
+    "title": "首页",
+    "portfolio": "我的投资组合",
+    "latestTransactions": "最新交易"
   },
   "deposit": {
     "title": "存入",
@@ -119,6 +121,7 @@
     "total": "总共 {{amount}} {{symbol}}"
   },
   "latestAction": {
+    "viewAll": "查看全部",
     "deposit": "最近存入",
     "withdraw": "最近提款",
     "transfer": "最近转账",
