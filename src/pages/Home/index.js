@@ -6,14 +6,16 @@ import { useHistory, useLocation } from 'react-router-dom';
 import Card from 'components/Card';
 import Spinner from 'components/Spinner';
 import LatestTransactions from 'components/LatestTransactions';
+import Portfolio from 'components/Portfolio';
 import Link from 'components/Link';
 
-import { PoolContext, ZkAccountContext } from 'contexts';
+import { PoolContext, ZkAccountContext, WalletContext } from 'contexts';
 
 export default () => {
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
+  const { address: account } = useContext(WalletContext);
   const {
     history: fullHistory, zkAccount, pendingDirectDeposits,
     isLoadingZkAccount, isLoadingHistory,
@@ -31,11 +33,13 @@ export default () => {
 
   return (
     <ContentContainer>
-      <CardsContainer>
-        <Card title={t('home.portfolio')}>
-          TODO: Portfolio
-        </Card>
-      </CardsContainer>
+      {(account || zkAccount) && (
+        <CardsContainer>
+          <Card title={t('home.portfolio')}>
+            <Portfolio />
+          </Card>
+        </CardsContainer>
+      )}
 
       {zkAccount && (
         <CardsContainer>

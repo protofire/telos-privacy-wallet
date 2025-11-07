@@ -76,6 +76,12 @@
     "portfolio": "My portfolio",
     "latestTransactions": "Latest transactions"
   },
+  "portfolio": {
+    "asset": "Asset",
+    "price": "Price",
+    "balance": "Balance",
+    "value": "Value"
+  },
   "deposit": {
     "title": "Deposit",
     "note": "{{symbol}} will be deposited to your zkAccount. Once received, you can transfer {{symbol}} privately.",
