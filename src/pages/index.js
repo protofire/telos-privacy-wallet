@@ -22,7 +22,6 @@ import ChangePasswordModal from 'components/ChangePasswordModal';
 import DisablePasswordModal from 'components/DisablePasswordModal';
 import ToastContainer from 'components/ToastContainer';
 import Footer from 'components/Footer';
-import DemoBanner from 'components/DemoBanner';
 import RestrictionModal from 'components/RestrictionModal';
 import Layout from 'components/Layout';
 import PaymentLinkModal from 'components/PaymentLinkModal';
@@ -33,6 +32,7 @@ import Transfer from 'pages/Transfer';
 import Withdraw from 'pages/Withdraw';
 import History from 'pages/History';
 import Payment from 'pages/Payment';
+import Home from 'pages/Home';
 
 import ContextsProvider, { ZkAccountContext } from 'contexts';
 
@@ -84,6 +84,9 @@ const Routes = ({ showWelcome, params }) => (
         <Welcome />
       </SentryRoute>
     )}
+    <SentryRoute exact strict path="/home">
+      <Home />
+    </SentryRoute>
     <SentryRoute exact strict path="/deposit">
       <Deposit />
     </SentryRoute>

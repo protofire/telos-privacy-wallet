@@ -71,7 +71,7 @@ export default () => {
     URL.revokeObjectURL(url);
   }
   return (
-    <div>
+    <ContentContainer>
       <Card title={!isHistoryEmpty ? title : null} titleStyle={{ marginBottom: 22 }}>
         {((isLoading && isHistoryEmpty) || isHistoryEmpty || !zkAccount) && (
           <Title>{title}</Title>
@@ -108,7 +108,7 @@ export default () => {
             Export to CSV
           </ExportButton>
         </ExportButtonContainer>}
-    </div>
+    </ContentContainer>
   );
 };
 
@@ -136,4 +136,18 @@ const ExportButtonContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding-top: 5px;
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${props => props.theme.color.white};
+  border-radius: 8px;
+  border: 2px solid ${props => props.theme.color.black};
+  padding: 16px 12px;
+
+  @media only screen and (max-width: 560px) {
+    margin: 30px 0;
+  }
 `;

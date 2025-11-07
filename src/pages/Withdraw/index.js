@@ -80,7 +80,7 @@ export default () => {
     } else if (amount.gt(balance)) {
       button = <Button disabled>{t('buttonText.insufficientBalance', { symbol: currentPool.tokenSymbol })}</Button>;
     } else if (amount.gt(maxWithdrawable)) {
-      button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals)})}</Button>;
+      button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>;
     } else if (amount.gt(limits.dailyWithdrawalLimit.available)) {
       button = <Button disabled>{t('buttonText.amountExceedsLimit')}</Button>;
     } else if (!receiver) {
@@ -98,7 +98,7 @@ export default () => {
     button = <AccountSetUpButton />;
   }
   return isPending ? <PendingAction /> : (
-    <>
+    <ContentContainer>
       <Card
         title={t('withdraw.title')}
         note={t('withdraw.note', { symbol: currentPool.tokenSymbol })}
@@ -181,7 +181,7 @@ export default () => {
           currentPool={currentPool}
         />
       )}
-    </>
+    </ContentContainer>
   );
 };
 
@@ -192,5 +192,19 @@ const Text = styled.span`
   text-align: center;
   & > b, & > strong {
     font-weight: 600;
+  }
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${props => props.theme.color.white};
+  border-radius: 8px;
+  border: 2px solid ${props => props.theme.color.black};
+  padding: 16px 12px;
+
+  @media only screen and (max-width: 560px) {
+    margin: 30px 0;
   }
 `;
