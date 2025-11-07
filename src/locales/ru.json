@@ -74,7 +74,14 @@
   "home": {
     "title": "Главная",
     "portfolio": "Мой портфель",
-    "latestTransactions": "Последние транзакции"
+    "latestTransactions": "Последние транзакции",
+    "connectWalletToViewPortfolio": "Подключите ваш кошелек, чтобы просматривать ваш портфель"
+  },
+  "portfolio": {
+    "asset": "Актив",
+    "price": "Цена",
+    "balance": "Баланс",
+    "value": "Стоимость"
   },
   "deposit": {
     "title": "Пополнение",

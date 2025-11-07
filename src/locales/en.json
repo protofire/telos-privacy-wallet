@@ -74,7 +74,8 @@
   "home": {
     "title": "Home",
     "portfolio": "My portfolio",
-    "latestTransactions": "Latest transactions"
+    "latestTransactions": "Latest transactions",
+    "connectWalletToViewPortfolio": "Connect your wallet to view your portfolio"
   },
   "portfolio": {
     "asset": "Asset",

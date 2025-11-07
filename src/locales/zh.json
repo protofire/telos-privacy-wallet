@@ -74,7 +74,14 @@
   "home": {
     "title": "首页",
     "portfolio": "我的投资组合",
-    "latestTransactions": "最新交易"
+    "latestTransactions": "最新交易",
+    "connectWalletToViewPortfolio": "连接您的钱包以查看您的投资组合"
+  },
+  "portfolio": {
+    "asset": "资产",
+    "price": "价格",
+    "balance": "余额",
+    "value": "价值"
   },
   "deposit": {
     "title": "存入",
