@@ -4,7 +4,11 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
 
-import { ReactComponent as BashIcon } from 'assets/bash.svg';
+import { ReactComponent as MenuDepositIcon } from 'assets/menu_deposit.svg';
+import { ReactComponent as MenuWithdrawIcon } from 'assets/menu_withdraw.svg';
+import { ReactComponent as MenuTransferIcon } from 'assets/menu_transfer.svg';
+import { ReactComponent as MenuTransactionsIcon } from 'assets/menu_transactions.svg';
+import { ReactComponent as MenuHomeIcon } from 'assets/menu_home.svg';
 import { ReactComponent as CopySVGIcon } from 'assets/copy.svg';
 import { ReactComponent as CheckSVGIcon } from 'assets/check.svg';
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
@@ -97,6 +101,17 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
     return <RenewIcon onClick={generateAndStoreAddress} />;
   }
 
+  const getTabIcon = (tabName) => {
+    const iconMap = {
+      'Home': MenuHomeIcon,
+      'Deposit': MenuDepositIcon,
+      'Withdraw': MenuWithdrawIcon,
+      'Transfer': MenuTransferIcon,
+      'History': MenuTransactionsIcon,
+    };
+    return iconMap[tabName];
+  };
+
   useEffect(() => {
     if (!zkAccount) return;
     generateAndStoreAddress();
@@ -126,19 +141,22 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
         </WalletContainer>
       ) : null}
 
-      {tabs.map((tab, index) =>
-        <MenuItem
-          key={index}
-          active={activeTab === index}
-          onClick={() => onTabClick(index)}
-          $showBadge={showBadge && tab.badge}
-          data-ga-id={`tab-${tab.name.toLowerCase()}`}
-          data-tour={tab.dataTour}
-        >
-          <IconWrapper><BashIcon /></IconWrapper>
-          <MenuText>{t(tab.i18nKey)}</MenuText>
-        </MenuItem>
-      )}
+      {tabs.map((tab, index) => {
+        const TabIcon = getTabIcon(tab.name);
+        return (
+          <MenuItem
+            key={index}
+            active={activeTab === index}
+            onClick={() => onTabClick(index)}
+            $showBadge={showBadge && tab.badge}
+            data-ga-id={`tab-${tab.name.toLowerCase()}`}
+            data-tour={tab.dataTour}
+          >
+            <IconWrapper><TabIcon width={14} height={14} /></IconWrapper>
+            <MenuText>{t(tab.i18nKey)}</MenuText>
+          </MenuItem>
+        );
+      })}
     </MenuContainer>
   );
 }
@@ -257,8 +275,7 @@ const MenuText = styled.span`
 `;
 
 const IconWrapper = styled.div`
-  font-size: 20px;
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   transition: all 0.2s ease;
 `;

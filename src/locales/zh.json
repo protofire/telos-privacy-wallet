@@ -71,6 +71,18 @@
     "signingIn": "正在登入……",
     "getToken": "获取{{symbol}}"
   },
+  "home": {
+    "title": "首页",
+    "portfolio": "我的投资组合",
+    "latestTransactions": "最新交易",
+    "connectWalletToViewPortfolio": "连接您的钱包以查看您的投资组合"
+  },
+  "portfolio": {
+    "asset": "资产",
+    "price": "价格",
+    "balance": "余额",
+    "value": "价值"
+  },
   "deposit": {
     "title": "存入",
     "note": "{{symbol}}将会被存入您的zk账户。成功收款后，您可以进行{{symbol}}的隐私转账。",
@@ -116,6 +128,7 @@
     "total": "总共 {{amount}} {{symbol}}"
   },
   "latestAction": {
+    "viewAll": "查看全部",
     "deposit": "最近存入",
     "withdraw": "最近提款",
     "transfer": "最近转账",

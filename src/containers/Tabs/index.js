@@ -7,6 +7,7 @@ import Tabs from 'components/Tabs';
 import { ZkAccountContext } from 'contexts';
 
 const tabs = [
+  { name: 'Home', path: '/home', i18nKey: 'home.title' },
   { name: 'Deposit', path: '/deposit', i18nKey: 'deposit.title', dataTour: 'deposit-tab' },
   { name: 'Transfer', path: '/transfer', i18nKey: 'transfer.title', dataTour: 'transfer-tab' },
   { name: 'Withdraw', path: '/withdraw', i18nKey: 'withdraw.title', dataTour: 'withdraw-tab' },

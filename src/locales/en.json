@@ -71,6 +71,18 @@
     "signingIn": "Signing in...",
     "getToken": "Get {{symbol}}"
   },
+  "home": {
+    "title": "Home",
+    "portfolio": "My portfolio",
+    "latestTransactions": "Latest transactions",
+    "connectWalletToViewPortfolio": "Connect your wallet to view your portfolio"
+  },
+  "portfolio": {
+    "asset": "Asset",
+    "price": "Price",
+    "balance": "Balance",
+    "value": "Value"
+  },
   "deposit": {
     "title": "Deposit",
     "note": "{{symbol}} will be deposited to your zkAccount. Once received, you can transfer {{symbol}} privately.",
@@ -116,6 +128,7 @@
     "total": "out of {{amount}} {{symbol}} total"
   },
   "latestAction": {
+    "viewAll": "View all",
     "deposit": "Latest Deposit",
     "withdraw": "Latest Withdrawal",
     "transfer": "Latest Transfer",
