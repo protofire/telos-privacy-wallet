@@ -22,7 +22,11 @@
     "sender": "发送人",
     "recipient": "收款人",
     "link": "链接",
-    "payment": "支付"
+    "payment": "支付",
+    "totalAssetBalance": "您公共钱包和zk账户中资产的总价值，以USD显示。",
+    "shieldedAddress": "隐私地址: ",
+    "shieldedBalance": "隐私余额: ",
+    "generatingAddress": "生成隐私地址..."
   },
   "buttonText": {
     "connectWallet": "连接钱包",
@@ -70,6 +74,18 @@
     "signingIn": "正在登入……",
     "getToken": "获取{{symbol}}"
   },
+  "home": {
+    "title": "首页",
+    "portfolio": "我的投资组合",
+    "latestTransactions": "最新交易",
+    "connectWalletToViewPortfolio": "连接您的钱包以查看您的投资组合"
+  },
+  "portfolio": {
+    "asset": "资产",
+    "price": "价格",
+    "balance": "余额",
+    "value": "价值"
+  },
   "deposit": {
     "title": "存入",
     "note": "{{symbol}}将会被存入您的zk账户。成功收款后，您可以进行{{symbol}}的隐私转账。",
@@ -78,7 +94,7 @@
   "transfer": {
     "title": "转账",
     "note": "转账将会以隐私的方式完成。发送人，收款人，及转账金额将不会被公开。",
-    "addressInputPlaceholder": "请输入zkBob收款人地址",
+    "addressInputPlaceholder": "请输入zkTelos收款人地址",
     "addressInputHint": "地址可以在账户模态窗口中生成"
   },
   "multitransfer": {
@@ -92,12 +108,12 @@
       "insufficientBalance": "余额不足：需要{{amount}} {{symbol}} ({{fee}} 作为手续费。"
     },
     "addressesList": "地址列表",
-    "willBeTransferredTo": "将发送至 {{count}} zkBob $t(glossary.addresses, {\"count\": {{count}} })",
-    "hasBeenTransferredTo": "已发送至{{count}} zkBob $t(glossary.addresses, {\"count\": {{count}} })"
+    "willBeTransferredTo": "将发送至 {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
+    "hasBeenTransferredTo": "已发送至{{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
     "title": "提现",
-    "note": "{{symbol}}将会从zkBob中取出并存入到您提供的钱包地址",
+    "note": "{{symbol}}将会从zkTelos中取出并存入到您提供的钱包地址",
     "addressInputPlaceholder": "输入收款人的{{network}}地址",
     "convertion": "提款时将一部分 {{from}} 转化为 {{to}}",
     "convertionDetails": " 您将收到 <strong>{{amount1}} {{symbol1}}</strong> 和 <strong>~ {{amount2}} {{symbol2}}</strong>"
@@ -115,6 +131,7 @@
     "total": "总共 {{amount}} {{symbol}}"
   },
   "latestAction": {
+    "viewAll": "查看全部",
     "deposit": "最近存入",
     "withdraw": "最近提款",
     "transfer": "最近转账",
@@ -132,7 +149,7 @@
       "multitransfer": "多地址转账详情"
     },
     "sendTo": "发送至",
-    "sendToZk": "发送至zkBob地址",
+    "sendToZk": "发送至zkTelos地址",
     "sendToMultiple": "$t(multitransfer.willBeTransferredTo)",
     "viewAll": "显示全部",
     "withdrawAmount": "提款金额",
@@ -140,11 +157,14 @@
     "senderAddress": "发送人地址"
   },
   "welcome": {
-    "title": "欢迎来到zkBob！",
-    "description": "创建专属于您的zk账户，以安全私密的方式转账给您的家人及朋友。",
-    "titleDemo": "欢迎来到zkBob测试版！",
-    "descriptionDemo": "以安全私密的方式转账BOB给朋友、购买合作的产品、或转账至您的私人zk账户。",
-    "bannerDemo": " 在<1>此处创建zkBob帐户</1>, 解锁安全私密的存取款方式，获得全方位隐私"
+    "title": "欢迎！",
+    "startTour": "开始导览",
+    "skipTour": "跳过导览",
+    "content": {
+      "paragraph1": "创建<strong>zkAccount</strong>，以<strong>私密</strong>方式向您的朋友和同事转账代币。",
+      "paragraph2": "您的交易在<strong>隐私池</strong>中保持<strong>安全和匿名</strong>。",
+      "paragraph3": "让我们快速导览一下，向您展示主要功能。"
+    }
   },
   "payment": {
     "title": "输入 {{symbol}} 金额并选择代币种类",
@@ -196,20 +216,20 @@
   "accountSetupModal": {
     "start": {
       "title": "zk账户",
-      "description": "您需要一个zk账户以开始使用zkBob",
+      "description": "您需要一个zk账户以开始使用zkTelos",
       "button1": "创建新的zk账户",
       "button2": "已有zk账户"
     },
     "createOptions": {
       "title": "选择您创建账户的方式",
-      "description": "创建zk账户，即表示您同意并接受zkBob<1>服务条款</1>",
+      "description": "创建zk账户，即表示您同意并接受zkTelos<1>服务条款</1>",
       "button1": "使用Web3钱包",
-      "button2": "即时zkBob账户"
+      "button2": "即时zkTelos账户"
     },
     "restoreOptions": {
       "title": "您通过何种方式创建账户？",
       "button1": "我用的是Web3钱包",
-      "button2": "我用的是zkBob助记词"
+      "button2": "我用的是zkTelos助记词"
     },
     "createWithWallet": {
       "title": "创建新的zk账户",
@@ -224,7 +244,7 @@
     "restoreWithWallet": {
       "title": "登入zk账户",
       "description": "请选择您用于创建zk账户的钱包地址",
-      "warning": "MetaMask和Wallet Connect钱包仅用于恢复对您之前的zkBob账户的访问权限"
+      "warning": "MetaMask和Wallet Connect钱包仅用于恢复对您之前的zkTelos账户的访问权限"
     },
     "restoreWithSecret": {
       "title": "恢复zk账户",
@@ -275,8 +295,8 @@
   },
   "demoCard": {
     "title": "测试版",
-    "description1": "此zkBob版本仅为测试私密，小额转账功能使用（不适用于存入/取款）。",
-    "description2": "<0>如需使用全功能版本，</0><1>请在此处免费创建zkBob帐户。</1>"
+    "description1": "此zkTelos版本仅为测试私密，小额转账功能使用（不适用于存入/取款）。",
+    "description2": "<0>如需使用全功能版本，</0><1>请在此处免费创建zkTelos帐户。</1>"
   },
   "increasedLimitsBanner": {
     "inactive": "提高存款限额？",
@@ -287,13 +307,13 @@
     "title": "提高限额",
     "paragraph1": "若需提高个人存款限额，您需要在BNB Smart Chain上拥有BAB代币。什么是BAB代币？ <1>点击了解。</1>",
     "paragraph2": "验证您的BAB代币：",
-    "step1": "请将持有BAB代币的Metamask或WalletConnect钱包连接到zkBob。无需切换网络，请继续使用Polygon。",
+    "step1": "请将持有BAB代币的Metamask或WalletConnect钱包连接到zkTelos。无需切换网络，请继续使用Polygon。",
     "step2": "点击下方 验证我的BAB代币。",
     "paragraph3": "已完成！如果您连接的地址持有BAB代币，您的存款限额将自动提升。",
     "button": "验证我的BAB代币"
   },
   "more": {
-    "title": "了解更多关于zkBob的资讯",
+    "title": "了解更多关于zkTelos的资讯",
     "dune": "Dune Analytics",
     "docs": "文档",
     "linktree": "Linktree"
@@ -323,7 +343,7 @@
     },
     "createAccount": {
       "title": "在兑换<br />礼品卡之前",
-      "description": "如需兑换礼品卡，您需要一个zkBob zk账户！请创建帐户，或登入现有帐户，以领取您的 {{symbol}} 代币。",
+      "description": "如需兑换礼品卡，您需要一个zkTelos zk账户！请创建帐户，或登入现有帐户，以领取您的 {{symbol}} 代币。",
       "button": "登入或创建zk账户"
     },
     "switchNetwork": {
@@ -345,8 +365,8 @@
     }
   },
   "restrictionModal": {
-    "title": "该国家或地区暂不支缓zkBob业务",
-    "description": "您的国家不支持zkBob。您需要在受支缓的国家或地区使用该应用。"
+    "title": "该国家或地区暂不支缓zkTelos业务",
+    "description": "您的国家不支持zkTelos。您需要在受支缓的国家或地区使用该应用。"
   },
   "secretPhraseModal": {
     "title": "显示助记词",
@@ -382,7 +402,7 @@
       "transferredMulti": "正在进行零知识池内的<strong>{{amount}} {{symbol}}</strong>多地址转账。",
       "withdrawn": "正在进行零知识池内的<strong>{{amount}} {{symbol}}</strong>代币提款。",
       "signatureExpired": "签名超时，请重试。",
-      "suspiciousAccountDeposit": "您的钱包地址可能涉及可疑活动。您无法在zkBob上使用该钱包地址，请使用另一个地址。",
+      "suspiciousAccountDeposit": "您的钱包地址可能涉及可疑活动。您无法在zkTelos上使用该钱包地址，请使用另一个地址。",
       "suspiciousAccountWithdrawal": "收款人的钱包地址可能涉及可疑活动，您无法将资金提取到该地址。",
       "wrongNetwork": "切换网络失败。请将您的钱包连接到{{network}}，然后重试。",
       "approved": "Approval已完成。您现在可以存入代币。",
@@ -395,8 +415,8 @@
   },
   "connectWalletModal": {
     "title": "连接Web3钱包",
-    "description": "连接您的钱包，并将{{symbol}}存入您的zk账户。若您正在创建新的zk账户，当前连接的钱包将被用于为zkBob应用程序生成私密的加密密钥。",
-    "note": "点击连接钱包即表示您同意zkBob<br /><1>服务条款</1>",
+    "description": "连接您的钱包，并将{{symbol}}存入您的zk账户。若您正在创建新的zk账户，当前连接的钱包将被用于为zkTelos应用程序生成私密的加密密钥。",
+    "note": "点击连接钱包即表示您同意zkTelos<br /><1>服务条款</1>",
     "noWalletTitle": "未找到{{wallet}}钱包",
     "noWalletDescription": "确保已安装{{wallet}}钱包扩展。",
     "noWalletDescriptionWithDeposit": "确保已安装{{wallet}}钱包扩展。连接Web3钱包以将{{symbol}}存入您的zkAccount。",
@@ -409,7 +429,7 @@
     "description": "若要接收来自其他zk账户的私密转账，转账人可以从他们的应用中扫描此二维码。<br />其他用户只需在转账页面上扫描您的二维码"
   },
   "zkAccount": {
-    "addressDescription": "使用该地址接收代币至您的zkBob帐户。每次连接钱包时都将自动创建一个新地址，您可以使用该地址或之前生成的地址接收代币。"
+    "addressDescription": "使用该地址接收代币至您的zkTelos帐户。每次连接钱包时都将自动创建一个新地址，您可以使用该地址或之前生成的地址接收代币。"
   },
   "paymentStatement": {
     "amount": "{{symbol}}金额",
@@ -426,5 +446,59 @@
     "transactions_other": "交易",
     "statuses": "状态",
     "statuses_other": "状态"
+  },
+  "onboardingTutorial": {
+    "steps": {
+      "createZkAccount": {
+        "title": "连接并创建您的zkAccount",
+        "content": {
+          "paragraph1": "连接您的钱包以开始使用zkTelos Wallet。",
+          "paragraph2": "然后创建您的zkAccount — 您在协议中的私人身份。",
+          "paragraph3": "此地址允许您私密地发送和接收代币。"
+        }
+      },
+      "supportedTokens": {
+        "title": "选择支持的网络和代币",
+        "content": {
+          "paragraph1": "我们支持多个网络和代币。",
+          "paragraph2": "当您存入时，您的代币会进入隐私池，在那里它们会被匿名化 — 打破您的公共钱包和私人活动之间的联系。"
+        }
+      },
+      "deposit": {
+        "title": "存入代币",
+        "content": {
+          "paragraph1": "使用<strong>存入</strong>将代币从您的钱包移动到隐私池。",
+          "paragraph2": "这是进行私密转账的第一步。"
+        }
+      },
+      "transfer": {
+        "title": "发送私密转账",
+        "content": {
+          "paragraph1": "使用<strong>转账</strong>将代币私密地发送到另一个zkAccount。",
+          "paragraph2": "发送人、收款人和金额在链上保持隐藏。"
+        }
+      },
+      "withdraw": {
+        "title": "提取代币",
+        "content": {
+          "paragraph1": "使用<strong>提取</strong>将您的代币移回公共地址。",
+          "paragraph2": "请记住：一旦提取，资金将再次可见。",
+          "paragraph3": "为了更强的隐私性，请在提取前等待一段时间。"
+        }
+      },
+      "history": {
+        "title": "查看您的历史记录",
+        "content": {
+          "paragraph1": "查看<strong>历史记录</strong>标签页以查看存入、转账和提取。",
+          "paragraph2": "一切就绪 — 开始探索zkTelos Wallet并享受私密交易！🚀"
+        }
+      }
+    },
+    "buttons": {
+      "next": "下一步",
+      "skipTour": "跳过导览",
+      "back": "返回",
+      "finishTour": "完成导览 🎉"
+    }
   }
 }

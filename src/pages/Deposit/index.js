@@ -35,10 +35,10 @@ export default () => {
   const { t } = useTranslation();
   const { address: account } = useContext(WalletContext);
   const {
-      zkAccount, isLoadingZkAccount, deposit,
-      isLoadingState, isPending, isDemo,
-      isLoadingLimits, limits, minTxAmount,
-    } = useContext(ZkAccountContext);
+    zkAccount, isLoadingZkAccount, deposit,
+    isLoadingState, isPending, isDemo,
+    isLoadingLimits, limits, minTxAmount,
+  } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const { balance, nativeBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { openWalletModal, openIncreasedLimitsModal } = useContext(ModalContext);
@@ -89,7 +89,7 @@ export default () => {
   if (isDemo) return <DemoCard />;
 
   return isPending ? <PendingAction /> : (
-    <>
+    <ContentContainer>
       <Card
         title={t('deposit.title')}
         note={t('deposit.note', { symbol: currentPool.tokenSymbol })}
@@ -135,7 +135,7 @@ export default () => {
             return <Button disabled>{t('buttonText.insufficientBalance', { symbol: currentPool.tokenSymbol })}</Button>;
           }
           else if (amount.gt(usedBalance.sub(usedFee))) {
-            return <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(usedFee, currentPool.tokenDecimals)})}</Button>;
+            return <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(usedFee, currentPool.tokenDecimals) })}</Button>;
           }
           else if (amount.gt(depositLimit)) {
             return <Button disabled>{t('buttonText.amountExceedsLimit')}</Button>;
@@ -149,7 +149,7 @@ export default () => {
         })()}
         {isNativeTokenUsed && (
           <MessageContainer>
-            <WargingIcon/>
+            <WargingIcon />
             <span style={{ margin: '0 4px 0 8px' }}>
               {t('deposit.ddNote', { symbol: currentPool.tokenSymbol })}
             </span>
@@ -189,7 +189,7 @@ export default () => {
           currentPool={currentPool}
         />
       )}
-    </>
+    </ContentContainer>
   );
 };
 
@@ -211,4 +211,18 @@ const MessageContainer = styled(Row)`
 
 const Link = styled(DefaultLink)`
   font-weight: ${props => props.theme.text.weight.bold};
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${props => props.theme.color.white};
+  border-radius: 8px;
+  border: 2px solid ${props => props.theme.color.black};
+  padding: 16px 12px;
+
+  @media only screen and (max-width: 560px) {
+    margin: 30px 0;
+  }
 `;

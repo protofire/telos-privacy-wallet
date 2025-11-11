@@ -11,8 +11,9 @@ import NetworkDropdown from 'components/NetworkDropdown';
 import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
 import Skeleton from 'components/Skeleton';
+import BalanceDisplay from 'components/BalanceDisplay';
 
-import { ReactComponent as LogoDefault } from 'assets/telos-zkevm-logo.svg';
+import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
 import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
@@ -74,7 +75,7 @@ export default ({ empty }) => {
 
   const networkDropdown = (
     <NetworkDropdown>
-      <NetworkDropdownButton $refreshing={isPoolSwitching || isLoadingState}>
+      <NetworkDropdownButton $refreshing={isPoolSwitching || isLoadingState} data-tour="supported-tokens">
         <NetworkIcon src={NETWORKS[currentPool.chainId].icon} />
         <Divider />
         <NetworkIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
@@ -98,12 +99,13 @@ export default ({ empty }) => {
           ) : (
             <>
               <Balance>
-                {formatBalance(
-                  currentPool.isNative ? nativeBalance.add(balance) : balance,
-                  currentPool.tokenDecimals,
-                  isMobile
-                )}{' '}
-                {currentPool.tokenSymbol}{currentPool.isNative && '*'}
+                <BalanceDisplay
+                  value={`${formatBalance(
+                    currentPool.isNative ? nativeBalance.add(balance) : balance,
+                    currentPool.tokenDecimals,
+                    isMobile
+                  )} ${currentPool.tokenSymbol}${currentPool.isNative ? '*' : ''}`}
+                />
               </Balance>
               <DropdownIcon />
             </>
@@ -112,7 +114,7 @@ export default ({ empty }) => {
       </AccountDropdownButton>
     </WalletDropdown>
   ) : (
-    <Button small onClick={openWalletModal} data-ga-id="wallet-header">
+    <Button small onClick={openWalletModal} data-ga-id="wallet-header" data-tour="create-zkaccount">
       {t('buttonText.connectWallet')}
     </Button>
   );
@@ -128,7 +130,9 @@ export default ({ empty }) => {
           ) : (
             <>
               <Balance>
-                {formatBalance(poolBalance, currentPool.tokenDecimals, isMobile)} {currentPool.tokenSymbol}
+                <BalanceDisplay
+                  value={`${formatBalance(poolBalance, currentPool.tokenDecimals, isMobile)} ${currentPool.tokenSymbol}`}
+                />
               </Balance>
               <DropdownIcon />
             </>
@@ -144,6 +148,7 @@ export default ({ empty }) => {
       disabled={isLoadingZkAccount}
       onClick={openAccountSetUpModal}
       data-ga-id="zkaccount-header"
+      className="create-zkaccount"
     >
       {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.zkAccount')}
     </Button>
@@ -226,11 +231,9 @@ const LogoSection = styled(Row)`
 `;
 
 const Logo = styled(LogoDefault)`
-
-    height: 20px;
-    width: 100px;
+    height: 35px;
+    width: 135px;
     margin-left: 10px;
-
 `;
 
 const AccountSection = styled(Row)`
@@ -275,9 +278,12 @@ const DropdownIcon = styled(DropdownIconDefault)`
 
 const NetworkDropdownButton = styled(DropdownButton)`
   padding: 0 8px 0 10px;
+  border-radius: 8px;
+
   @media only screen and (max-width: 800px) {
     padding: 0;
     background-color: transparent;
+    border-radius: 6px;
   }
 `;
 

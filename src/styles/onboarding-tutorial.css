@@ -1,0 +1,122 @@
+.custom-shepherd-theme {
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin-top: 16px;
+  border: none;
+}
+
+.shepherd-header {
+  background: linear-gradient(135deg, rgba(0, 242, 243, 0.1) 0%, rgba(79, 172, 254, 0.1) 33%, rgba(196, 113, 245, 0.1) 66%) !important;
+}
+
+.shepherd-title {
+  color: black;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.shepherd-cancel-icon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  color: white !important;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.shepherd-text {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.shepherd-footer {
+  margin-bottom: 8px;
+  text-align: right;
+}
+
+.shepherd-button {
+  background: black !important;
+  color: white !important;
+  border: none;
+  border-radius: 6px;
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 6px;
+}
+
+.shepherd-button:hover {
+  background: linear-gradient(147.39deg, #FFA1E5 16.02%, #6F9AE3 85.63%) !important;
+  transform: translateY(-1px);
+}
+
+.shepherd-button-secondary {
+  background: #e2e8f0 !important;
+  color: #4a5568;
+}
+
+.shepherd-button-secondary:hover {
+  background: #cbd5e0 !important;
+}
+
+
+.shepherd-arrow::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white !important;
+  transform: rotate(45deg);
+} 
+
+/* Modal Overlay - Backdrop */
+.shepherd-modal-overlay-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9997;
+  pointer-events: none;
+}
+
+.shepherd-modal-overlay-container.shepherd-modal-is-visible {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.shepherd-modal-overlay-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.shepherd-modal-overlay-container path {
+  fill: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  [data-shepherd-step-id="create-zkaccount"] {
+    top: 460px !important;
+  }
+  [data-shepherd-step-id="supported-tokens"] {
+    top: 470px !important;
+  }
+  .shepherd-element {
+    max-width: 90vw;
+  }
+}

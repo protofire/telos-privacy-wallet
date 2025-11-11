@@ -68,17 +68,18 @@ Centralized configuration that switches between `prod` and `dev` environments ba
 
 **Key Configuration Elements:**
 - **Pool Definitions**: Each pool has chainId, poolAddress, tokenAddress, relayerUrls/proxyUrls, deposit schemes
-- **SNARK Parameters**: Uses `isElectron()` helper to determine asset loading strategy:
-  - Web: Load from remote CDN (r2.zkbob.com)
-  - Electron: Load from local bundled assets via `assetURL()` helper
-- **Chain RPC URLs**: Infura endpoints for Polygon (137), Optimism (10), Sepolia (11155111)
+- **SNARK Parameters**: Downloaded from s3 bucket: https://telos-privacy-params.s3.us-east-2.amazonaws.com/
+- **Chain RPC URLs**: Telos Testnet (41)
 - **Current Pools**:
-  - Production: BOB2USDC-polygon, BOB2USDC-optimism, WETH-optimism
-  - Development: zkbob_sepolia testnet
-- **Address Prefixes**: Each pool has unique prefix (e.g., 'zkbob_polygon', 'zkbob_optimism_eth')
+  - Production: Nothing yet
+  - Development: 0zk-pusd-testnet, 0zk-wtelos-testnet
+- **Address Prefixes**: Each pool has unique prefix starting with '0zk-' then followed by the pool name and network name.
+
+- Added a patch to zkbob-client-js to support the new address prefixes under the folder `patches/zkbob-client-js+6.0.0.patch`
 
 ### Page Structure (`src/pages/`)
 - **Welcome**: Onboarding for new users
+- **Home**: Main dashboard with private and public balances
 - **Deposit**: Convert public tokens to private balance
 - **Transfer**: Private peer-to-peer transfers
 - **Withdraw**: Convert private balance back to public tokens
@@ -91,7 +92,6 @@ Dual-mode application supporting both web and desktop execution:
 **Custom Protocol Handler (`app://`):**
 - Maps `app://` URLs to local filesystem
 - Serves React build from `../build/` directory
-- Serves SNARK assets from `electron/assets/` directory
 - Required for loading large .wasm and .bin files locally
 
 **Security Configuration:**

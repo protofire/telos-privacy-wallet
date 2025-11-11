@@ -1,0 +1,75 @@
+name: Deploy Web to S3 Staging
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "18.x"
+
+jobs:
+  deploy:
+    name: Build and Deploy to S3 staging
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build web application
+        env:
+          CI: false # Treat warnings as warnings, not errors
+          REACT_APP_CONFIG: "dev"
+          REACT_APP_BUILD_TARGET: "web"
+          REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}
+        run: yarn build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: us-east-2
+
+      - name: Sync build to S3
+        run: |
+          aws s3 sync build/ s3://telos-privacy-ui-staging/ \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html" \
+            --exclude "manifest.json" \
+
+          aws s3 cp build/index.html s3://telos-privacy-ui-staging/index.html \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+          aws s3 cp build/manifest.json s3://telos-privacy-ui-staging/manifest.json \
+            --cache-control "no-cache, no-store, must-revalidate" || true
+
+          aws s3 sync electron/assets/ s3://telos-privacy-ui-staging/ \
+              --cache-control "public, max-age=31536000, immutable" \
+              --exclude "*" \
+              --include "transfer_params_22022023.bin" \
+              --include "transfer_verification_key_22022023.json"
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployment successful!"
+          echo "📦 Bucket: s3://telos-privacy-ui-staging"
+          echo "🌍 Region: us-east-2"

@@ -7,6 +7,7 @@ import Dropdown from 'components/Dropdown';
 import Tooltip from 'components/Tooltip';
 import OptionButton from 'components/OptionButton';
 import ShortAddress from './ShortAddress';
+import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as CopyIconDefault } from 'assets/copy.svg';
 import { ReactComponent as CheckIcon } from 'assets/check.svg';
@@ -25,7 +26,7 @@ const Balance = ({ tokenSymbol, balance, isWrapped, isNative, tokenDecimals }) =
       style={{ marginRight: isWrapped || isNative ? 4 : 8 }}
     />
     <Tooltip content={formatNumber(balance, tokenDecimals, 18)} placement="bottom">
-      <Text>{formatNumber(balance, tokenDecimals, isWrapped || isNative ? 4 : 6)}</Text>
+      <BalanceDisplay color="black" fontSize="16px" value={formatNumber(balance, tokenDecimals, isWrapped || isNative ? 4 : 6)} />
     </Tooltip>
     <Text style={{ marginLeft: 5 }}>{isWrapped ? 'W' : ''}{tokenSymbol}</Text>
   </Row>

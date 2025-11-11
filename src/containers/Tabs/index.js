@@ -1,15 +1,17 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
+
 import Tabs from 'components/Tabs';
 
 import { ZkAccountContext } from 'contexts';
 
 const tabs = [
-  { name: 'Deposit', path: '/deposit', i18nKey: 'deposit.title' },
-  { name: 'Transfer', path: '/transfer', i18nKey: 'transfer.title' },
-  { name: 'Withdraw', path: '/withdraw', i18nKey: 'withdraw.title' },
-  { name: 'History', path: '/history', i18nKey: 'history.title', badge: true },
+  { name: 'Home', path: '/home', i18nKey: 'home.title' },
+  { name: 'Deposit', path: '/deposit', i18nKey: 'deposit.title', dataTour: 'deposit-tab' },
+  { name: 'Transfer', path: '/transfer', i18nKey: 'transfer.title', dataTour: 'transfer-tab' },
+  { name: 'Withdraw', path: '/withdraw', i18nKey: 'withdraw.title', dataTour: 'withdraw-tab' },
+  { name: 'History', path: '/history', i18nKey: 'history.title', badge: true, dataTour: 'history-tab' },
 ]
 
 export default () => {

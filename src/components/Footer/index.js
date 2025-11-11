@@ -1,11 +1,5 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import zkBobLibPackage from 'zkbob-client-js/package.json';
-import appPackage from '../../../package.json';
-
-import { SupportIdContext, ZkAccountContext } from 'contexts';
-
 import Link from 'components/Link';
 
 import { ReactComponent as TwitterIcon } from 'assets/twitter.svg';
@@ -13,17 +7,13 @@ import { ReactComponent as TelegramIcon } from 'assets/telegram.svg';
 import { ReactComponent as MirrorIcon } from 'assets/mirror.svg';
 import { ReactComponent as GithubIcon } from 'assets/github.svg';
 
-
 export default () => {
-  const { t } = useTranslation();
-  const { supportId } = useContext(SupportIdContext);
-  const { relayerVersion } = useContext(ZkAccountContext);
 
   const resources = [
-    { icon: TwitterIcon, href: 'https://twitter.com/zkBob_' },
-    { icon: TelegramIcon, href: 'https://t.me/zkbobcommunity' },
-    { icon: MirrorIcon, href: 'https://blog.zkbob.com/' },
-    { icon: GithubIcon, href: 'https://github.com/zkBob' },
+    { icon: TwitterIcon, href: 'https://x.com/HelloTelos' },
+    { icon: TelegramIcon, href: 'https://t.me/HelloTelos' },
+    { icon: MirrorIcon, href: 'https://www.telos.net/blog' },
+    { icon: GithubIcon, href: 'https://github.com/telosnetwork' },
   ];
 
   return (
@@ -35,17 +25,6 @@ export default () => {
               {React.createElement(resource.icon, {})}
             </CustomLink>
           ))}
-        </InnerRow>
-      </Row>
-      <Row>
-        <InnerRow>
-          <Text>{t('common.web')}: v{appPackage.version}</Text>
-          <Text>{t('common.library')}: v{zkBobLibPackage.version}</Text>
-          <Text>{t('common.relayer')}: {relayerVersion || 'N/A'}</Text>
-          <TextRow>
-            <Text style={{ marginRight: 4 }}>{t('common.supportId')}:</Text>
-            <Text>{supportId}</Text>
-          </TextRow>
         </InnerRow>
       </Row>
     </Column>
@@ -74,20 +53,6 @@ const InnerRow = styled.div`
   & > * {
     margin: 7px 10px 0;
   }
-`;
-
-const Text = styled.span`
-  font-size: 14px;
-  color: #A7A2B8;
-  font-weight: ${props => props.theme.text.weight.bold};
-  line-height: 20px;
-  text-align: center;
-`;
-
-const TextRow = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
 `;
 
 const CustomLink = styled(Link)`

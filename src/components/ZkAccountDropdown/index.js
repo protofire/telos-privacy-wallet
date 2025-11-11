@@ -9,6 +9,7 @@ import OptionButton from 'components/OptionButton';
 import Button from 'components/Button';
 import PrivateAddress from 'components/PrivateAddress';
 import QRCodeReader from 'components/QRCodeReader';
+import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
@@ -16,7 +17,7 @@ import { formatNumber } from 'utils';
 
 import { TOKENS_ICONS } from 'constants';
 
-import { ZkAccountContext, ModalContext, PoolContext } from 'contexts';
+import { ZkAccountContext, ModalContext, PoolContext, BalanceVisibilityContext } from 'contexts';
 
 const Content = ({
   balance, generateAddress, getSeed, setPassword,
@@ -28,6 +29,7 @@ const Content = ({
   const [privateAddress, setPrivateAddress] = useState(null);
   const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const { isVisible } = useContext(BalanceVisibilityContext);
 
   const { hasPassword } = getSeed();
 
@@ -115,8 +117,10 @@ const Content = ({
         <SmallText>{t('common.zkAccount')}</SmallText>
         <Row>
           <TokenIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
-          <Tooltip content={formatNumber(balance, currentPool.tokenDecimals, 18)} placement="bottom">
-            <Balance>{formatNumber(balance, currentPool.tokenDecimals, 6)}</Balance>
+          <Tooltip content={formatNumber(balance, currentPool.tokenDecimals, 18)} placement="bottom" visible={isVisible}>
+            <Balance>
+              <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
+            </Balance>
           </Tooltip>
           <Balance style={{ marginLeft: 5 }}>{currentPool.tokenSymbol}</Balance>
         </Row>

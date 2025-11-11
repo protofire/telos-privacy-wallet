@@ -1,6 +1,5 @@
 const isElectron = () => process.env.REACT_APP_BUILD_TARGET === 'electron';
 
-
 const getAppBaseURL = () => {
   const href =
     (typeof window !== 'undefined' && window.location?.href) ||
@@ -60,57 +59,51 @@ const config = {
     },
     "snarkParamsSet": {
       "prod": isElectron() ? {
-        transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
-        transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
+        transferParamsUrl: assetURL('assets/transfer_params.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
       } : {
-        transferParamsUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_params_22022023.bin',
-        transferVkUrl: 'http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/transfer_verification_key_22022023.json',
+        transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
       }
     }
   },
   dev: {
-    defaultPool: 'zkbob_sepolia',
+    defaultPool: 'tlos_testnet',
     pools: {
-      'zkbob_sepolia': {
-        chainId: 11155111,
-        poolAddress: '0x31dD7AD6f82F657266c47ac5dDeeB5e02A14aCB6',
-        tokenAddress: '0x53FA37CCad75d391bBEc857C6f359A101D754441',
-        relayerUrls: ['http://3.147.241.79/'],
+      'tlos_testnet': {
+        chainId: 41,
+        poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
+        tokenAddress: '0x28d1BCc58E6Cd0270F45b63e4FFd13b3fF5E98af',
+        relayerUrls: ['http://3.150.55.197/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
         kycUrls: {
           status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
           homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
         },
-        tokenSymbol: 'BOB',
+        tokenSymbol: 'PUSD',
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: 'zkbob_sepolia',
+        addressPrefix: '0zk-pusd-testnet',
         parameters: 'staging'
-      },
+      }
     },
     "snarkParamsSet": {
-      "staging": {
+      "staging": isElectron() ? {
+        transferParamsUrl: assetURL('assets/transfer_params.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
+      } : {
         transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json'
-      },
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
+      }
     },
     chains: {
-      '11155111': {
-        rpcUrls: ['https://sepolia.infura.io/v3/9a94d181b23846209f01161dcd0f9ad6'],
-      },
       '41': {
         rpcUrls: ['https://rpc.testnet.telos.net']
       },
     },
-    extraPrefixes: [
-      {
-        poolId: 16776969,
-        prefix: 'zkbob_sepolia',
-        name: 'Bob Pool on Sepolia with decentralized relayer',
-      },
-    ],
+    extraPrefixes: [],
   }
 };
 

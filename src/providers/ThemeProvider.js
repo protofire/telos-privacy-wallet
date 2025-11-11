@@ -17,6 +17,10 @@ const orangeLight = '#FAE4DA';
 const orangeExtraLight = '#FFFAEE';
 const red = '#EF102A';
 const yellow = '#FBEED0';
+const black = '#000000';
+const success = '#00D100';
+const telosGradient = 'linear-gradient(147.39deg, #FFA1E5 16.02%, #6F9AE3 85.63%)';
+const telosGradientSoft = 'linear-gradient(135deg, rgba(0, 242, 243, 0.1) 0%, rgba(79, 172, 254, 0.1) 33%, rgba(196, 113, 245, 0.1) 66%)';
 
 const light = {
   color: {
@@ -34,6 +38,10 @@ const light = {
     blueExtraLight,
     purpleExtraLight,
     yellow,
+    black,
+    telosGradient,
+    telosGradientSoft,
+    success,
   },
   text: {
     color: {
@@ -50,9 +58,9 @@ const light = {
   button: {
     primary: {
       background: {
-        default: blue,
-        disabled: 'rgba(27, 77, 235, 0.2)',
-        contrast: 'rgba(27, 77, 235, 0.1)',
+        default: black,
+        disabled: 'rgba(64, 64, 64, 0.2)',
+        contrast: 'rgba(64, 64, 64, 0.1)',
       },
       border: {
         color: darkGrey,

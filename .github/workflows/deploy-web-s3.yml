@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: deploy-prod-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: "18.x"
 
@@ -33,7 +37,7 @@ jobs:
       - name: Build web application
         env:
           CI: false # Treat warnings as warnings, not errors
-          REACT_APP_CONFIG: "prod"
+          REACT_APP_CONFIG: "dev"
           REACT_APP_BUILD_TARGET: "web"
           REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}
         run: yarn build
