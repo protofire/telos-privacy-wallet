@@ -30,7 +30,6 @@ const Content = ({
   const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { isVisible } = useContext(BalanceVisibilityContext);
-  console.log('isVisible', isVisible);
 
   const { hasPassword } = getSeed();
 

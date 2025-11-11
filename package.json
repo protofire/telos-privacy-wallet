@@ -1,7 +1,8 @@
 {
   "name": "zkTelos-wallet",
-  "version": "3.5.3",
+  "version": "0.0.1",
   "private": true,
+  "author": "Protofire <info@protofire.io>",
   "main": "electron/main.js",
   "homepage": "./",
   "scripts": {

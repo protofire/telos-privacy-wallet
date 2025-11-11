@@ -1,7 +1,7 @@
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from '@wagmi/core/providers/public'
-import { sepolia, polygon, telos, telosTestnet } from 'wagmi/chains';
+import { telos, telosTestnet } from 'wagmi/chains';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import config from '../config'
@@ -27,7 +27,7 @@ const getRpcByPriority = (priority) => {
 
 }
 
-const networks = process.env.REACT_APP_CONFIG === 'dev' ? [sepolia, telos, telosTestnet] : [polygon, telos];
+const networks = process.env.REACT_APP_CONFIG === 'dev' ? [telosTestnet] : [telos];
 
 const { chains, provider, webSocketProvider } = configureChains(
   networks,
@@ -63,7 +63,7 @@ const walletConnect = new WalletConnectConnector({
   options: {
     qrcode: true,
     projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID,
-    name: 'zkBob',
+    name: 'zkTelos',
     relayUrl: 'wss://relay.walletconnect.org'
   },
 });

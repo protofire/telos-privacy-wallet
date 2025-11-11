@@ -59,8 +59,8 @@ const config = {
     },
     "snarkParamsSet": {
       "prod": isElectron() ? {
-        transferParamsUrl: assetURL('assets/transfer_params_22022023.bin'),
-        transferVkUrl: assetURL('assets/transfer_verification_key_22022023.json'),
+        transferParamsUrl: assetURL('assets/transfer_params.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
       } : {
         transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
         transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
@@ -108,10 +108,13 @@ const config = {
       }
     },
     "snarkParamsSet": {
-      "staging": {
+      "staging": isElectron() ? {
+        transferParamsUrl: assetURL('assets/transfer_params.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
+      } : {
         transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json'
-      },
+        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
+      }
     },
     chains: {
       '41': {
