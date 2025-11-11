@@ -23,7 +23,10 @@
     "recipient": "Destinatário",
     "link": "Link",
     "payment": "Pagamento",
-    "totalAssetBalance": "Soma dos ativos mantidos em sua carteira pública e zkAccount, mostrados em USD."
+    "totalAssetBalance": "Soma dos ativos mantidos em sua carteira pública e zkAccount, mostrados em USD.",
+    "shieldedAddress": "Endereço protegido: ",
+    "shieldedBalance": "Saldo protegido: ",
+    "generatingAddress": "Gerando endereço..."
   },
   "buttonText": {
     "connectWallet": "Conectar carteira",
