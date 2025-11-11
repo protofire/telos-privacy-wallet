@@ -135,7 +135,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
 
           <AddressRow>
             <RefreshLoading />
-            <ShieldedAddress>{shortPrivateAddress(shieldedAddress) || 'Generating address...'}</ShieldedAddress>
+            <ShieldedAddress>{shortPrivateAddress(shieldedAddress) + '...' || t('common.generatingAddress')}</ShieldedAddress>
             <CopyTick />
           </AddressRow>
         </WalletContainer>
