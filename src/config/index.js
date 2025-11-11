@@ -85,9 +85,9 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: '0zktelos',
+        addressPrefix: '0zk-pusd-testnet',
         parameters: 'staging'
-      },
+      }
     },
     "snarkParamsSet": {
       "staging": {

@@ -83,7 +83,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const generateAndStoreAddress = useCallback(async () => {
     const address = await generateAddress();
     setShieldedAddress(address);
-  }, [generateAddress]);
+  }, [generateAddress, currentPool]);
 
   const CopyTick = () => {
     if (hasCopied) {
