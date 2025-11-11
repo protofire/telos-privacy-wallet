@@ -45,9 +45,9 @@ export default ({
           {!amountToConvert.isZero() && (
             <ConvertedAmount>
               + {formatNumber(
-                  amountToConvert.mul(convertionDetails.price).div(ethers.utils.parseUnits('1', convertionDetails.decimals)),
-                  currentPool.tokenDecimals
-                )}{' '}
+                amountToConvert.mul(convertionDetails.price).div(ethers.utils.parseUnits('1', convertionDetails.decimals)),
+                currentPool.tokenDecimals
+              )}{' '}
               {convertionDetails.toTokenSymbol}
             </ConvertedAmount>
           )}
@@ -61,7 +61,7 @@ export default ({
               <SmallText>
                 {isZkAddress ? t('confirmTransaction.sendToZk') : t('confirmTransaction.sendTo')}
               </SmallText>
-              <MediumText>{receiver}</MediumText>
+              <SmallText>{receiver}</SmallText>
             </>
           )}
           <SmallText>{t(`confirmTransaction.details.${type}`)}</SmallText>
