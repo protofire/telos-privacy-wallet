@@ -30,6 +30,7 @@ const Content = ({
   const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { isVisible } = useContext(BalanceVisibilityContext);
+  console.log('isVisible', isVisible);
 
   const { hasPassword } = getSeed();
 
@@ -117,11 +118,21 @@ const Content = ({
         <SmallText>{t('common.zkAccount')}</SmallText>
         <Row>
           <TokenIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
-          <Tooltip content={formatNumber(balance, currentPool.tokenDecimals, 18)} placement="bottom" visible={isVisible}>
+          {isVisible ? (
+            <Tooltip
+              content={formatNumber(balance, currentPool.tokenDecimals, 18)}
+              placement="bottom"
+              trigger={['hover']}
+            >
+              <Balance>
+                <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
+              </Balance>
+            </Tooltip>
+          ) : (
             <Balance>
               <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
             </Balance>
-          </Tooltip>
+          )}
           <Balance style={{ marginLeft: 5 }}>{currentPool.tokenSymbol}</Balance>
         </Row>
       </RowSpaceBetween>
