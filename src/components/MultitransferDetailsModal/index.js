@@ -33,23 +33,23 @@ const ListItem = ({ index, data, zkAccount, currentPool }) => {
         <IncognitoAvatar />
       )}
       <Tooltip
-          content={data.address}
-          delay={0.3}
-          placement="bottom"
-          width={300}
-          style={{
-            wordBreak: 'break-all',
-            textAlign: 'center',
-          }}
-        >
-          <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>
-            <CopyToClipboard text={data.address} onCopy={onCopy}>
-              <Address>
-                {shortAddress(data.address, 22)}
-              </Address>
-            </CopyToClipboard>
-          </Tooltip>
+        content={data.address}
+        delay={0.3}
+        placement="bottom"
+        width={300}
+        style={{
+          wordBreak: 'break-all',
+          textAlign: 'center',
+        }}
+      >
+        <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>
+          <CopyToClipboard text={data.address} onCopy={onCopy}>
+            <Address>
+              {shortAddress(data.address, 22)}
+            </Address>
+          </CopyToClipboard>
         </Tooltip>
+      </Tooltip>
       <Amount>
         {formatNumber(data.amount, currentPool.tokenDecimals, 18)} {currentPool.tokenSymbol}
       </Amount>
@@ -171,7 +171,8 @@ const Text = styled(MediumText)`
 const List = styled.div`
   display: flex;
   flex-direction: column;
-  overflow: scroll;
+  overflow-y: auto;
+  max-height: 200px;
 `;
 
 const Index = styled.span`
