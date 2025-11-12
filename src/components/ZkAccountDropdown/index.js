@@ -157,16 +157,16 @@ const Content = ({
       <Description>
         {t('zkAccount.addressDescription')}
       </Description>
-      {currentPool.paymentContractAddress && (
+      {/* {currentPool.paymentContractAddress && (
         <OptionButton onClick={() => handleOptionClick(generatePaymentLink)} data-ga-id="zkaccount-payment-link">
           {t('buttonText.getPaymentLink')}
         </OptionButton>
-      )}
-      <QRCodeReader onResult={initGiftCard}>
+      )} */}
+      {/* <QRCodeReader onResult={initGiftCard}>
         <OptionButton data-ga-id="zkaccount-gift-card">
           {t('buttonText.redeemGiftCard')}
         </OptionButton>
-      </QRCodeReader>
+      </QRCodeReader> */}
       <OptionButton onClick={() => setShowSettings(true)} data-ga-id="zkaccount-settings">
         {t('common.settings')}
       </OptionButton>

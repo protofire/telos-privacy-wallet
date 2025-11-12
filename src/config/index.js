@@ -17,42 +17,11 @@ const assetURL = (relPath) => {
 
 const config = {
   prod: {
-    defaultPool: 'BOB2USDC-polygon',
+    defaultPool: '',
     pools: {
-      'BOB2USDC-polygon': {
-        chainId: 137,
-        poolAddress: '0x72e6B59D4a90ab232e55D4BB7ed2dD17494D62fB',
-        tokenAddress: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
-        relayerUrls: ['https://relayer-mvp.zkbob.com'],
-        delegatedProverUrls: ['https://remoteprover-mvp.zkbob.com/'],
-        coldStorageConfigPath: 'https://r2.zkbob.com/coldstorage/coldstorage.cfg',
-        kycUrls: {
-          status: 'https://api.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
-          homepage: 'https://knowyourcat.id/address/%s/BABTokenBOB',
-        },
-        tokenSymbol: 'USDC',
-        tokenDecimals: 6,
-        feeDecimals: 2,
-        depositScheme: 'usdc',
-        minTxAmount: 50000000n, // 0.05 USDC
-        ddSubgraph: 'zkbob-usdc-polygon',
-        migrations: [{
-          timestamp: 1689689468,
-          prevTokenSymbol: 'BOB',
-        }, {
-          timestamp: 1700481600,
-          prevTokenSymbol: 'USDC.e',
-        }],
-        addressPrefix: 'zkbob_polygon',
-        paymentContractAddress: '0x76a911E76fC78F39e73cE0c532F8866ac28Dfe43',
-        parameters: 'prod',
-        closingDate: '2025-02-01T00:00:00Z',
-      },
+
     },
     chains: {
-      '137': {
-        rpcUrls: ['https://polygon-mainnet.infura.io/v3/be5a139ca13b42609fab98b55dbb5a03'],
-      },
       '40': {
         rpcUrls: ['https://rpc.telos.net']
       },
