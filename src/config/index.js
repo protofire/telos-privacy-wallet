@@ -46,10 +46,6 @@ const config = {
         relayerUrls: ['http://3.150.55.197/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
-        kycUrls: {
-          status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
-          homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
-        },
         tokenSymbol: 'PUSD',
         tokenDecimals: 18,
         feeDecimals: 2,
@@ -64,10 +60,6 @@ const config = {
         relayerUrls: ['http://3.150.201.113/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: 'https://r2-staging.zkbob.com/coldstorage/coldstorage.cfg',
-        kycUrls: {
-          status: 'https://api-stage.knowyourcat.id/v1/%s/categories?category=BABTokenBOB',
-          homepage: 'https://stage.knowyourcat.id/address/%s/BABTokenBOB',
-        },
         tokenSymbol: 'TLOS',
         tokenDecimals: 18,
         feeDecimals: 2,
