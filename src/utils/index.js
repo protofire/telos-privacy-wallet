@@ -9,8 +9,12 @@ import { SUPPORT_URL } from 'constants';
 
 const { parseUnits, formatUnits, commify } = ethers.utils;
 
-export const shortAddress = (string, length = 10) =>
-  string.substring(0, length - 4) + '...' + string.substring(string.length - 4);
+export const shortAddress = (string, length = 10) => {
+  if (!string) {
+    return string;
+  }
+  return string.substring(0, length - 4) + '...' + string.substring(string.length - 4);
+}
 
 export const formatNumber = (wei, tokenDecimals, customNumberDecimals) => {
   if (wei.isZero()) return '0';
@@ -30,10 +34,10 @@ export const formatNumber = (wei, tokenDecimals, customNumberDecimals) => {
 };
 
 export const minBigNumber = (...numbers) =>
-  numbers.reduce((p, v) =>  (p.lt(v) ? p : v));
+  numbers.reduce((p, v) => (p.lt(v) ? p : v));
 
 export const maxBigNumber = (...numbers) =>
-  numbers.reduce((p, v) =>  (p.gt(v) ? p : v));
+  numbers.reduce((p, v) => (p.gt(v) ? p : v));
 
 export const showLoadingError = cause => {
   toast.error(

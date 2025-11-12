@@ -66,8 +66,8 @@ const TOKENS_ICONS_BASE = {
   'USDT': require('assets/usdt.png'),
   'USDT*': require('assets/usdt.png'),
   'TLOS': require('assets/telos.svg').default,
-  'sTLOS': require('assets/sTLOS.svg').default,
-  'wTLOS': require('assets/wTLOS.svg').default,
+  'STLOS': require('assets/sTLOS.svg').default,
+  'WTLOS': require('assets/wTLOS.svg').default,
 };
 
 export const TOKENS_ICONS = new Proxy(TOKENS_ICONS_BASE, {

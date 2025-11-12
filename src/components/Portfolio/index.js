@@ -57,7 +57,7 @@ export default () => {
   const tlosPrice = priceMap?.get('TLOS') || null;
   const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
 
-  const totalPusdBalance = useMemo(() => {
+  const totalErc20Balance = useMemo(() => {
     if (!publicTokenBalance && !zkAccountBalance) return ethers.constants.Zero;
     const publicBal = publicTokenBalance || ethers.constants.Zero;
     const privateBal = zkAccountBalance || ethers.constants.Zero;
@@ -66,6 +66,8 @@ export default () => {
 
   const isLoading = isLoadingBalance || isLoadingState || isLoadingPrices;
   const hasData = account || zkAccount;
+  const isNative = currentPool.isNative;
+  const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
 
   if (!hasData) {
     return null;
@@ -89,9 +91,9 @@ export default () => {
           isLoading={isLoading}
         />
         <PortfolioRow
-          asset={currentPool?.tokenSymbol}
-          icon={TOKENS_ICONS[currentPool?.tokenSymbol]}
-          balance={totalPusdBalance}
+          asset={tokenSymbol}
+          icon={TOKENS_ICONS[tokenSymbol]}
+          balance={totalErc20Balance}
           price={poolTokenPrice}
           tokenDecimals={currentPool?.tokenDecimals || 18}
           isLoading={isLoading}

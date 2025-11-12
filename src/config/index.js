@@ -65,7 +65,8 @@ const config = {
         feeDecimals: 2,
         depositScheme: 'approve',
         addressPrefix: '0zk-tlos-testnet',
-        parameters: 'staging'
+        parameters: 'staging',
+        isNative: true,
       }
     },
     "snarkParamsSet": {
