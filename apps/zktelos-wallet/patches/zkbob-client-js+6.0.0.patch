@@ -201,6 +201,86 @@ index 9a5552d..eeb0eb3 100644
      ) {
          await this.updateStateWithFallback();
          return this.feProcessor().requestForcedExit(executerAddress, toAddress, sendTxCallback, (pub, sec) => this.proveTx(pub, sec));
+diff --git a/node_modules/zkbob-client-js/lib/networks/evm/index.js b/node_modules/zkbob-client-js/lib/networks/evm/index.js
+index f3e0c10..3f366db 100644
+--- a/node_modules/zkbob-client-js/lib/networks/evm/index.js
++++ b/node_modules/zkbob-client-js/lib/networks/evm/index.js
+@@ -286,8 +286,8 @@ export class EvmNetwork extends MultiRpcManager {
+     async createCommitForcedExitTx(poolAddress, forcedExit) {
+         const method = 'commitForcedExit(address,address,uint256,uint256,uint256,uint256,uint256[8])';
+         const encodedTx = await this.contractByType(ZkBobContractType.Pool).methods[method](forcedExit.operator, forcedExit.to, forcedExit.amount.toString(), forcedExit.index, forcedExit.nullifier.toString(), forcedExit.out_commit.toString(), [forcedExit.tx_proof.a,
+-            forcedExit.tx_proof.b,
+-            forcedExit.tx_proof.c
++        forcedExit.tx_proof.b,
++        forcedExit.tx_proof.c
+         ].flat(2)).encodeABI();
+         return {
+             to: poolAddress,
+@@ -318,24 +318,24 @@ export class EvmNetwork extends MultiRpcManager {
+         associatedEvents
+             .sort((e1, e2) => e1.blockNumber - e2.blockNumber)
+             .forEach((e) => {
+-            switch (e.topics[0]) {
+-                case commitSignature:
+-                    const decoded = this.activeWeb3().eth.abi.decodeLog(commitEventAbi.inputs ?? [], e.data, e.topics.slice(1));
+-                    result = {
+-                        nullifier: BigInt(decoded.nullifier),
+-                        operator: decoded.operator,
+-                        to: decoded.to,
+-                        amount: BigInt(decoded.amount),
+-                        exitStart: Number(decoded.exitStart),
+-                        exitEnd: Number(decoded.exitEnd),
+-                        txHash: e.transactionHash,
+-                    };
+-                    break;
+-                case cancelSignature:
+-                    result = undefined;
+-                    break;
+-            }
+-        });
++                switch (e.topics[0]) {
++                    case commitSignature:
++                        const decoded = this.activeWeb3().eth.abi.decodeLog(commitEventAbi.inputs ?? [], e.data, e.topics.slice(1));
++                        result = {
++                            nullifier: BigInt(decoded.nullifier),
++                            operator: decoded.operator,
++                            to: decoded.to,
++                            amount: BigInt(decoded.amount),
++                            exitStart: Number(decoded.exitStart),
++                            exitEnd: Number(decoded.exitEnd),
++                            txHash: e.transactionHash,
++                        };
++                        break;
++                    case cancelSignature:
++                        result = undefined;
++                        break;
++                }
++            });
+         return result;
+     }
+     async executedForcedExit(poolAddress, nullifier) {
+@@ -420,7 +420,9 @@ export class EvmNetwork extends MultiRpcManager {
+         return BigInt(fee);
+     }
+     async createDirectDepositTx(ddQueueAddress, amount, zkAddress, fallbackAddress) {
+-        const zkAddrBytes = `0x${Buffer.from(bs58.decode(zkAddress.substring(zkAddress.indexOf(':') + 1))).toString('hex')}`;
++        console.log('zkAddress - amount ', zkAddress, amount);
++        const address = zkAddress.indexOf(':') === -1 ? zkAddress : zkAddress.substring(zkAddress.indexOf(':') + 1);
++        const zkAddrBytes = `0x${Buffer.from(bs58.decode(address)).toString('hex')}`;
+         const encodedTx = await this.contractByType(ZkBobContractType.DD).methods["directDeposit(address,uint256,bytes)"](fallbackAddress, amount, zkAddrBytes).encodeABI();
+         return {
+             to: ddQueueAddress,
+@@ -429,7 +431,9 @@ export class EvmNetwork extends MultiRpcManager {
+         };
+     }
+     async createNativeDirectDepositTx(ddQueueAddress, nativeAmount, zkAddress, fallbackAddress) {
+-        const zkAddrBytes = `0x${Buffer.from(bs58.decode(zkAddress.substring(zkAddress.indexOf(':') + 1))).toString('hex')}`;
++        console.log('zkAddress - nativeAmount ', zkAddress, nativeAmount);
++        const address = zkAddress.indexOf(':') === -1 ? zkAddress : zkAddress.substring(zkAddress.indexOf(':') + 1);
++        const zkAddrBytes = `0x${Buffer.from(bs58.decode(address)).toString('hex')}`;
+         const encodedTx = await this.contractByType(ZkBobContractType.DD).methods["directNativeDeposit(address,bytes)"](fallbackAddress, zkAddrBytes).encodeABI();
+         return {
+             to: ddQueueAddress,
 diff --git a/node_modules/zkbob-client-js/lib/state.js b/node_modules/zkbob-client-js/lib/state.js
 index de27efd..f0558fd 100644
 --- a/node_modules/zkbob-client-js/lib/state.js

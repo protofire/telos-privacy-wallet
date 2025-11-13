@@ -170,10 +170,6 @@ const AddressRow = styled.div`
   border-top: 1px solid ${props => props.theme.color.grey};
   border-bottom: 1px solid ${props => props.theme.color.grey};
   gap: 8px;
-  
-  > ${PrivateAddress} {
-    flex: 1;
-  }
 `;
 
 const ShieldedAddress = styled.span`

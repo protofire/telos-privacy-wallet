@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import Tooltip from 'components/Tooltip';
 
-import { ReactComponent as CopyIconDefault } from 'assets/copy.svg';
+import { ReactComponent as CopyIcon } from 'assets/copy.svg';
 import { ReactComponent as CheckIcon } from 'assets/check.svg';
 
 export default ({
@@ -57,14 +57,14 @@ export default ({
       </Address>
       <CopyToClipboard text={children} onCopy={onCopy}>
         <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>
-          {isCopied ? <CheckIcon /> : <CopyIcon />}
+          {isCopied ? <CheckIcon /> : <CopyWrapper><CopyIcon /></CopyWrapper>}
         </Tooltip>
       </CopyToClipboard>
     </PrivateAddressContainer>
   );
 }
 
-const CopyIcon = styled(CopyIconDefault)`
+const CopyWrapper = styled.div`
   cursor: pointer;
   &:hover {
     path {

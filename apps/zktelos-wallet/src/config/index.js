@@ -50,7 +50,7 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: '0zk-pusd-testnet',
+        addressPrefix: '',
         parameters: 'staging'
       },
       'tlos_testnet_native': {
@@ -64,7 +64,7 @@ const config = {
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
-        addressPrefix: '0zk-tlos-testnet',
+        addressPrefix: '',
         parameters: 'staging',
         isNative: true,
       }
