@@ -9,57 +9,27 @@ import { ReactComponent as MenuWithdrawIcon } from 'assets/menu_withdraw.svg';
 import { ReactComponent as MenuTransferIcon } from 'assets/menu_transfer.svg';
 import { ReactComponent as MenuTransactionsIcon } from 'assets/menu_transactions.svg';
 import { ReactComponent as MenuHomeIcon } from 'assets/menu_home.svg';
-import { ReactComponent as CopySVGIcon } from 'assets/copy.svg';
-import { ReactComponent as CheckSVGIcon } from 'assets/check.svg';
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
-import useAutoReset from 'hooks/useAutoReset';
 
 import Skeleton from 'components/Skeleton';
 import { ZkAvatar } from 'components/ZkAccountIdentifier';
-import Tooltip from 'components/Tooltip';
 import BalanceDisplay from 'components/BalanceDisplay';
-
-const shortPrivateAddress = (address) => {
-  if (!address) return '';
-
-  const parts = address.split(':');
-
-  const prefix = parts[0];
-  const shortenedPrivateAddress = parts[1].substring(0, 12);
-
-  return `${prefix}:${shortenedPrivateAddress}`;
-};
+import PrivateAddress from 'components/PrivateAddress';
 
 export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
   const { priceMap } = useTokenMapPrices();
   const { currentPool } = useContext(PoolContext);
-  const [hasCopied, setHasCopied] = useAutoReset();
   const {
     zkAccount, balance: poolBalance,
     isLoadingState,
     generateAddress,
   } = useContext(ZkAccountContext);
   const [shieldedAddress, setShieldedAddress] = useState('');
-
-  const copyToClipboard = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-    setHasCopied(true);
-  };
 
   const usdBalance = useMemo(() => {
     if (!poolBalance || !priceMap || !currentPool) return null;
@@ -79,26 +49,16 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
 
   }, [poolBalance, priceMap, currentPool]);
 
-
   const generateAndStoreAddress = useCallback(async () => {
     const address = await generateAddress();
     setShieldedAddress(address);
-  }, [generateAddress, currentPool]);
+  }, [generateAddress]);
 
-  const CopyTick = () => {
-    if (hasCopied) {
-      return <Tooltip content={t('common.copied')} placement="top" delay={0} visible={hasCopied} trigger={[]}>
-        <CheckIcon />
-      </Tooltip>;
-    }
-    return <CopyIcon onClick={() => copyToClipboard(shieldedAddress)} />;
-  };
-
-  const RefreshLoading = () => {
+  const getRefreshIcon = () => {
     if (isLoadingState) {
-      return <SpinnerIcon width={16} height={16} />;
+      return <SpinnerIcon width={18} height={18} />;
     }
-    return <RenewIcon onClick={generateAndStoreAddress} />;
+    return <RenewIcon width={18} height={18} />;
   }
 
   const getTabIcon = (tabName) => {
@@ -134,9 +94,20 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
           </WalletHeader>
 
           <AddressRow>
-            <RefreshLoading />
-            <ShieldedAddress>{shortPrivateAddress(shieldedAddress) + '...' || t('common.generatingAddress')}</ShieldedAddress>
-            <CopyTick />
+            {shieldedAddress ? (
+              <PrivateAddress
+                prefixIcon={getRefreshIcon()}
+                onPrefixClick={generateAndStoreAddress}
+                $noBorder
+                $fontSize="14px"
+                $height="auto"
+                $padding="8px 16px"
+              >
+                {shieldedAddress}
+              </PrivateAddress>
+            ) : (
+              <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
+            )}
           </AddressRow>
         </WalletContainer>
       ) : null}
@@ -199,6 +170,10 @@ const AddressRow = styled.div`
   border-top: 1px solid ${props => props.theme.color.grey};
   border-bottom: 1px solid ${props => props.theme.color.grey};
   gap: 8px;
+  
+  > ${PrivateAddress} {
+    flex: 1;
+  }
 `;
 
 const ShieldedAddress = styled.span`
@@ -250,23 +225,8 @@ const MenuItem = styled.div`
   }
 `;
 
-const CheckIcon = styled(CheckSVGIcon)`
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-  stroke: ${props => props.theme.color.success};
-`;
-
-const CopyIcon = styled(CopySVGIcon)`
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-`;
-
 const RenewIcon = styled(RenewSVGIcon)`
   cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
-  width: 16px;
-  height: 16px;
 `;
 
 const MenuText = styled.span`

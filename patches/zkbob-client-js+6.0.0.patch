@@ -1,8 +1,8 @@
 diff --git a/node_modules/zkbob-client-js/lib/address-prefixes.js b/node_modules/zkbob-client-js/lib/address-prefixes.js
-index fb80997..a6f419c 100644
+index fb80997..142205d 100644
 --- a/node_modules/zkbob-client-js/lib/address-prefixes.js
 +++ b/node_modules/zkbob-client-js/lib/address-prefixes.js
-@@ -1,63 +1,19 @@
+@@ -1,63 +1,8 @@
  export const GENERIC_ADDRESS_PREFIX = 'zkbob';
 -export const PREFIXED_ADDR_REGEX = /^[a-zA-Z][a-zA-Z0-9+_\-\,@&]+:([1-9A-HJ-NP-Za-km-z]{62,63})$/;
 +export const PREFIXED_ADDR_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9+_\-\,@&]+:([1-9A-HJ-NP-Za-km-z]{62,63})$/;
@@ -11,23 +11,16 @@ index fb80997..a6f419c 100644
 +
  export const hardcodedPrefixes = [
 -    // Production address prefixes
-+    // Telos Testnet
-     {
+-    {
 -        poolId: 0x000000,
 -        prefix: 'zkbob_polygon',
 -        name: 'USDC on Polygon'
-+        poolId: 1,
-+        prefix: '0zk-pusd-testnet',
-+        name: 'PUSD on Telos Testnet'
-     },
-     {
+-    },
+-    {
 -        poolId: 0x000001,
 -        prefix: 'zkbob_optimism',
 -        name: 'USDC on Optimism'
-+        poolId: 2,
-+        prefix: '0zk-wtelos-testnet',
-+        name: 'WTELOS on Telos Testnet'
-     },
+-    },
 -    {
 -        poolId: 0x000002,
 -        prefix: 'zkbob_optimism_eth',
@@ -78,3 +71,299 @@ index fb80997..a6f419c 100644
 +]
  //# sourceMappingURL=address-prefixes.js.map
 \ No newline at end of file
+diff --git a/node_modules/zkbob-client-js/lib/client.js b/node_modules/zkbob-client-js/lib/client.js
+index 9a5552d..eeb0eb3 100644
+--- a/node_modules/zkbob-client-js/lib/client.js
++++ b/node_modules/zkbob-client-js/lib/client.js
+@@ -360,8 +360,7 @@ export class ZkBobClient extends ZkBobProvider {
+     // ---------------------------------------------------------------------------
+     // Generate shielded address to receive funds
+     async generateAddress() {
+-        const prefix = (await this.addressPrefix()).prefix;
+-        return `${prefix}:${await this.zpState().generateAddress()}`;
++        return await this.zpState().generateAddress();
+     }
+     async generateUniversalAddress() {
+         ;
+@@ -375,33 +374,12 @@ export class ZkBobClient extends ZkBobProvider {
+     // returns address checksum type (pool sspecific includes poolId to checksum calculation)
+     async checkShieldedAddressFormat(address, forCurrentPool = true) {
+         let format = ShieldedAddressFormat.Unknown;
+-        if (PREFIXED_ADDR_REGEX.test(address)) {
+-            const addrPrefix = address.split(':')[0].toLowerCase();
+-            if (addrPrefix != GENERIC_ADDRESS_PREFIX) {
+-                if (forCurrentPool) {
+-                    // check if address prefix is equal to the current one
+-                    const poolSpecificPrefix = (await this.addressPrefix()).prefix.toLowerCase();
+-                    if (addrPrefix == poolSpecificPrefix) {
+-                        format = ShieldedAddressFormat.PoolSpecific;
+-                    }
+-                }
+-                else {
+-                    // check if prefix supported
+-                    if (this.addressPrefixes.findIndex((p) => p.prefix.toLowerCase() == addrPrefix) != -1) {
+-                        format = ShieldedAddressFormat.PoolSpecific;
+-                    }
+-                }
+-            }
+-            else {
+-                format = ShieldedAddressFormat.Generic;
+-            }
+-        }
+-        else if (NAKED_ADDR_REGEX.test(address)) {
+-            if (!forCurrentPool || ((await this.addressPrefix()).poolId == 0 && this.pool().chainId == 137)) {
+-                // addresses without any prefix are accepted for Polygon USDC pool only
+-                // so here is a hardcoded crutch for backward compatibility
+-                // (still returns a valid format if the flag 'forCurrentPool' isnt set)
+-                format = ShieldedAddressFormat.Generic;
++        if (NAKED_ADDR_REGEX.test(address)) {
++            const poolId = await this.poolId();
++            if (poolId === 1 || poolId === 2) { // Telos testnet pools
++                format = ShieldedAddressFormat.PoolSpecific;
++            } else {
++                format = ShieldedAddressFormat.Generic; // Fallback for other pools
+             }
+         }
+         return format;
+@@ -410,6 +388,21 @@ export class ZkBobClient extends ZkBobProvider {
+     async verifyShieldedAddress(address) {
+         switch (await this.checkShieldedAddressFormat(address)) {
+             case ShieldedAddressFormat.PoolSpecific:
++                if (NAKED_ADDR_REGEX.test(address)) {
++                    try {
++                        const components = await this.zpState().parseAddress(address);
++                        if (components.format === 'pool') {
++                            const currentPoolId = await this.poolId();
++                            // Verify poolId matches
++                            if (components.pool_id !== currentPoolId.toString()) {
++                                return false; // Address belongs to different pool
++                            }
++                        }
++                    } catch (error) {
++                        return false; // Invalid address format
++                    }
++                }
++                // Then validate checksum
+                 return this.zpState().verifyShieldedAddress(address);
+             case ShieldedAddressFormat.Generic:
+                 return this.zpState().verifyUniversalShieldedAddress(address);
+@@ -429,28 +422,13 @@ export class ZkBobClient extends ZkBobProvider {
+         const format = await this.checkShieldedAddressFormat(address, false); // expected format by address form
+         if (format != ShieldedAddressFormat.Unknown) {
+             let components;
+-            if (PREFIXED_ADDR_REGEX.test(address)) {
+-                const prefix = address.split(':')[0].toLowerCase();
+-                if (prefix == GENERIC_ADDRESS_PREFIX) {
+-                    components = await this.zpState().parseAddress(address).catch(handleAddressError);
+-                }
+-                else {
+-                    const found = this.addressPrefixes.find((p) => p.prefix.toLowerCase() == prefix);
+-                    if (found) {
+-                        components = await this.zpState().parseAddress(address, found.poolId).catch(handleAddressError);
+-                    }
+-                }
+-            }
+-            else {
++            if (NAKED_ADDR_REGEX.test(address)) {
+                 components = await this.zpState().parseAddress(address).catch(handleAddressError);
+                 if (components) {
+                     if (components.format == 'generic') {
+-                        // prefixless format available for Polygon USDC pool only (backward compatibility)
+-                        components.pool_id = '0';
+-                    }
+-                    else {
+-                        components = undefined;
++                        components.pool_id = (await this.poolId()).toString();
+                     }
++
+                 }
+             }
+             if (components) { // the address was decoded
+@@ -770,8 +748,8 @@ export class ZkBobClient extends ZkBobProvider {
+     }
+     // Deposit funds 
+     async directDeposit(type, fromAddress, amount, // in pool dimension
+-    sendTxCallback, // => txHash
+-    blockNumber) {
++        sendTxCallback, // => txHash
++        blockNumber) {
+         const pool = this.pool();
+         const processor = this.ddProcessor();
+         const ddQueueAddress = await processor.getQueueContract();
+@@ -1603,8 +1581,8 @@ export class ZkBobClient extends ZkBobProvider {
+         return this.feProcessor().availableFundsToForcedExit();
+     }
+     async requestForcedExit(executerAddress, // who will send emergency exit execute transaction
+-    toAddress, // which address should receive funds
+-    sendTxCallback // callback to send transaction 
++        toAddress, // which address should receive funds
++        sendTxCallback // callback to send transaction 
+     ) {
+         await this.updateStateWithFallback();
+         return this.feProcessor().requestForcedExit(executerAddress, toAddress, sendTxCallback, (pub, sec) => this.proveTx(pub, sec));
+diff --git a/node_modules/zkbob-client-js/lib/state.js b/node_modules/zkbob-client-js/lib/state.js
+index de27efd..f0558fd 100644
+--- a/node_modules/zkbob-client-js/lib/state.js
++++ b/node_modules/zkbob-client-js/lib/state.js
+@@ -46,7 +46,7 @@ export class ZkBobState {
+     // Create regular state with the provided spending key
+     // and other parameters
+     static async create(sk, birthIndex, network, subgraph, networkName, denominator, poolId, isObsoletePool, // support for obsolete pools with old calldata format
+-    addressPrefix, tokenAddress, worker) {
++        addressPrefix, tokenAddress, worker) {
+         const zpState = new ZkBobState();
+         zpState.sk = new Uint8Array(sk);
+         zpState.network = network;
+@@ -64,7 +64,7 @@ export class ZkBobState {
+     // Create a naked state without history and ephemeral pool
+     // Could be used for redeeming gift-cards
+     static async createNaked(sk, birthIndex, network, networkName, poolId, isObsoletePool, // support for obsolete pools with old calldata format
+-    worker) {
++        worker) {
+         const zpState = new ZkBobState();
+         zpState.sk = new Uint8Array(sk);
+         zpState.network = network;
+@@ -166,14 +166,8 @@ export class ZkBobState {
+         return res;
+     }
+     async assembleAddress(d, p_d) {
+-        let addr;
+-        if (this.addressPrefix) {
+-            addr = await this.worker.assembleAddress(this.stateId, forceDecimal(d), forceDecimal(p_d));
+-        }
+-        else {
+-            addr = await this.worker.assembleUniversalAddress(this.stateId, forceDecimal(d), forceDecimal(p_d));
+-        }
+-        return `${this.addressPrefix ?? GENERIC_ADDRESS_PREFIX}:${addr}`;
++        const addr = await this.worker.assembleAddress(this.stateId, forceDecimal(d), forceDecimal(p_d));
++        return addr; // Return naked address
+     }
+     // Converts zk-addresss from the old prefixless format to the new chain-specific one
+     async convertAddress(shieldedAddress) {
+@@ -414,49 +408,49 @@ export class ZkBobState {
+     async fetchBatch(sequencer, fromIndex, count) {
+         return sequencer.fetchTransactionsOptimistic(this.network, fromIndex, count)
+             .catch((err) => {
+-            if (this.subgraph) {
+-                console.warn(`Unable to load transactions from the sequencer (${err.message}), fallbacking to subgraph`);
+-                return this.subgraph.getTxesMinimal(fromIndex, count);
+-            }
+-            else {
+-                console.log(`🔥[HotSync] cannot get txs batch from index ${fromIndex}: ${err.message}`);
+-                throw new InternalError(`Cannot fetch txs from the sequencer: ${err.message}`);
+-            }
+-        })
+-            .then(async (txs) => {
+-            const txHashes = {};
+-            const indexedTxs = [];
+-            const indexedTxsPending = [];
+-            let maxMinedIndex = -1;
+-            let maxPendingIndex = -1;
+-            for (let txIdx = 0; txIdx < txs.length; ++txIdx) {
+-                const tx = txs[txIdx];
+-                txHashes[tx.index] = tx.txHash;
+-                const indexedTx = {
+-                    index: tx.index,
+-                    memo: tx.memo,
+-                    commitment: tx.commitment,
+-                };
+-                if (tx.state == TxState.Finalized) {
+-                    indexedTxs.push(indexedTx);
+-                    maxMinedIndex = Math.max(maxMinedIndex, tx.index);
++                if (this.subgraph) {
++                    console.warn(`Unable to load transactions from the sequencer (${err.message}), fallbacking to subgraph`);
++                    return this.subgraph.getTxesMinimal(fromIndex, count);
+                 }
+                 else {
+-                    indexedTxsPending.push(indexedTx);
+-                    maxPendingIndex = Math.max(maxPendingIndex, tx.index);
++                    console.log(`🔥[HotSync] cannot get txs batch from index ${fromIndex}: ${err.message}`);
++                    throw new InternalError(`Cannot fetch txs from the sequencer: ${err.message}`);
+                 }
+-            }
+-            console.log(`🔥[HotSync] got batch of ${txs.length} transactions from index ${fromIndex}`);
+-            return {
+-                fromIndex: fromIndex,
+-                count: txs.length,
+-                minedTxs: indexedTxs,
+-                pendingTxs: indexedTxsPending,
+-                maxMinedIndex,
+-                maxPendingIndex,
+-                txHashes,
+-            };
+-        });
++            })
++            .then(async (txs) => {
++                const txHashes = {};
++                const indexedTxs = [];
++                const indexedTxsPending = [];
++                let maxMinedIndex = -1;
++                let maxPendingIndex = -1;
++                for (let txIdx = 0; txIdx < txs.length; ++txIdx) {
++                    const tx = txs[txIdx];
++                    txHashes[tx.index] = tx.txHash;
++                    const indexedTx = {
++                        index: tx.index,
++                        memo: tx.memo,
++                        commitment: tx.commitment,
++                    };
++                    if (tx.state == TxState.Finalized) {
++                        indexedTxs.push(indexedTx);
++                        maxMinedIndex = Math.max(maxMinedIndex, tx.index);
++                    }
++                    else {
++                        indexedTxsPending.push(indexedTx);
++                        maxPendingIndex = Math.max(maxPendingIndex, tx.index);
++                    }
++                }
++                console.log(`🔥[HotSync] got batch of ${txs.length} transactions from index ${fromIndex}`);
++                return {
++                    fromIndex: fromIndex,
++                    count: txs.length,
++                    minedTxs: indexedTxs,
++                    pendingTxs: indexedTxsPending,
++                    maxMinedIndex,
++                    maxPendingIndex,
++                    txHashes,
++                };
++            });
+     }
+     // The heaviest work: parse txs batch
+     // and returns batch result
+@@ -608,22 +602,22 @@ export class ZkBobState {
+                     console.log(`🧊[ColdSync] loading txs up to index ${coldConfig.next_index}...`);
+                     const promises = coldConfig.bulks
+                         .filter(aBulk => {
+-                        return isRangesIntersected(actualRangeStart, actualRangeEnd, Number(aBulk.index_from), Number(aBulk.next_index));
+-                    })
++                            return isRangesIntersected(actualRangeStart, actualRangeEnd, Number(aBulk.index_from), Number(aBulk.next_index));
++                        })
+                         .map(async (bulkInfo) => {
+-                        let response = await fetch(`${coldStorageBaseAddr}/${bulkInfo.filename}`);
+-                        if (response.ok) {
+-                            let aBulk = await response.arrayBuffer();
+-                            if (aBulk.byteLength == bulkInfo.bytes) {
+-                                console.log(`🧊[ColdSync] got bulk ${bulkInfo.filename} with ${bulkInfo.tx_count} txs (${bulkInfo.bytes} bytes)`);
+-                                return new Uint8Array(aBulk);
++                            let response = await fetch(`${coldStorageBaseAddr}/${bulkInfo.filename}`);
++                            if (response.ok) {
++                                let aBulk = await response.arrayBuffer();
++                                if (aBulk.byteLength == bulkInfo.bytes) {
++                                    console.log(`🧊[ColdSync] got bulk ${bulkInfo.filename} with ${bulkInfo.tx_count} txs (${bulkInfo.bytes} bytes)`);
++                                    return new Uint8Array(aBulk);
++                                }
++                                throw new InternalError(`Cold storage corrupted (invalid file size: ${aBulk.byteLength})`);
+                             }
+-                            throw new InternalError(`Cold storage corrupted (invalid file size: ${aBulk.byteLength})`);
+-                        }
+-                        else {
+-                            throw new InternalError(`Couldn't load cold storage (invalid response code: ${response.status})`);
+-                        }
+-                    });
++                            else {
++                                throw new InternalError(`Couldn't load cold storage (invalid response code: ${response.status})`);
++                            }
++                        });
+                     let bulksData = (await Promise.all(promises)).filter(data => data.length > 0);
+                     let result = await this.updateStateColdStorage(bulksData, BigInt(actualRangeStart), BigInt(actualRangeEnd));
+                     result.decryptedMemos.forEach((aMemo) => {
