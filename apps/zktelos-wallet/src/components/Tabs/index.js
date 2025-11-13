@@ -16,7 +16,7 @@ import { ZkAccountContext, PoolContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 
 import Skeleton from 'components/Skeleton';
-import { ZkAvatar } from 'components/ZkAccountIdentifier';
+import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import BalanceDisplay from 'components/BalanceDisplay';
 import PrivateAddress from 'components/PrivateAddress';
 
@@ -84,7 +84,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
           <WalletHeader>
             <ZkAvatar seed={zkAccount} size={46} />
             <WalletInfo>
-              <Address>{t('common.zkAccount')}</Address>
+              <Address><ZkName seed={zkAccount} /></Address>
               {isLoadingState ? (
                 <Skeleton width={100} height={16} />
               ) : (

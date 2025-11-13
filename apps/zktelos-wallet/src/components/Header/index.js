@@ -4,7 +4,8 @@ import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
 
 import ButtonDefault from 'components/Button';
-import { ZkAvatar } from 'components/ZkAccountIdentifier';
+import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
+
 import WalletDropdown from 'components/WalletDropdown';
 import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
@@ -124,7 +125,7 @@ export default ({ empty }) => {
       <AccountDropdownButton $refreshing={isLoadingState} data-ga-id="zkaccount-profile">
         <Row>
           <ZkAvatar seed={zkAccount} size={16} />
-          <Address>{t('common.zkAccount')}</Address>
+          <Address><ZkName seed={zkAccount} /></Address>
           {isLoadingState ? (
             <BalanceSkeleton isMobile={isMobile} />
           ) : (

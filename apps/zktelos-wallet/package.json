@@ -19,6 +19,8 @@
     "@dicebear/avatars": "^4.10.2",
     "@dicebear/avatars-bottts-sprites": "^4.10.2",
     "@dicebear/avatars-identicon-sprites": "^4.10.2",
+    "@dicebear/core": "^9.0.0",
+    "@dicebear/glass": "^9.2.4",
     "@dicebear/pixel-art": "^4.10.2",
     "@lifi/sdk": "^2.2.3",
     "@lifi/widget": "^2.1.2",
