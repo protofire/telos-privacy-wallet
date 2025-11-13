@@ -1,0 +1,237 @@
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useContext } from 'react';
+import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
+import { ethers } from 'ethers';
+
+import { ReactComponent as MenuDepositIcon } from 'assets/menu_deposit.svg';
+import { ReactComponent as MenuWithdrawIcon } from 'assets/menu_withdraw.svg';
+import { ReactComponent as MenuTransferIcon } from 'assets/menu_transfer.svg';
+import { ReactComponent as MenuTransactionsIcon } from 'assets/menu_transactions.svg';
+import { ReactComponent as MenuHomeIcon } from 'assets/menu_home.svg';
+import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
+import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
+
+import { ZkAccountContext, PoolContext } from 'contexts';
+import { useTokenMapPrices } from 'hooks';
+
+import Skeleton from 'components/Skeleton';
+import { ZkAvatar } from 'components/ZkAccountIdentifier';
+import BalanceDisplay from 'components/BalanceDisplay';
+import PrivateAddress from 'components/PrivateAddress';
+
+export default ({ tabs, activeTab, onTabClick, showBadge }) => {
+  const { t } = useTranslation();
+  const { priceMap } = useTokenMapPrices();
+  const { currentPool } = useContext(PoolContext);
+  const {
+    zkAccount, balance: poolBalance,
+    isLoadingState,
+    generateAddress,
+  } = useContext(ZkAccountContext);
+  const [shieldedAddress, setShieldedAddress] = useState('');
+
+  const usdBalance = useMemo(() => {
+    if (!poolBalance || !priceMap || !currentPool) return null;
+
+    const price = priceMap.get(currentPool.tokenSymbol);
+    if (!price) return null;
+
+    const balanceInToken = parseFloat(ethers.utils.formatUnits(poolBalance, currentPool.tokenDecimals));
+    const usdValue = balanceInToken * price;
+
+    const usdBalance = usdValue.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+
+    return Number(usdBalance).toFixed(2) < 0.01 ? '< $0.01' : usdBalance;
+
+  }, [poolBalance, priceMap, currentPool]);
+
+  const generateAndStoreAddress = useCallback(async () => {
+    const address = await generateAddress();
+    setShieldedAddress(address);
+  }, [generateAddress]);
+
+  const getRefreshIcon = () => {
+    if (isLoadingState) {
+      return <SpinnerIcon width={18} height={18} />;
+    }
+    return <RenewIcon width={18} height={18} />;
+  }
+
+  const getTabIcon = (tabName) => {
+    const iconMap = {
+      'Home': MenuHomeIcon,
+      'Deposit': MenuDepositIcon,
+      'Withdraw': MenuWithdrawIcon,
+      'Transfer': MenuTransferIcon,
+      'History': MenuTransactionsIcon,
+    };
+    return iconMap[tabName];
+  };
+
+  useEffect(() => {
+    if (!zkAccount) return;
+    generateAndStoreAddress();
+  }, [zkAccount, generateAndStoreAddress]);
+
+  return (
+    <MenuContainer>
+      {zkAccount ? (
+        <WalletContainer>
+          <WalletHeader>
+            <ZkAvatar seed={zkAccount} size={46} />
+            <WalletInfo>
+              <Address>{t('common.zkAccount')}</Address>
+              {isLoadingState ? (
+                <Skeleton width={100} height={16} />
+              ) : (
+                <UsdBalance value={usdBalance} />
+              )}
+            </WalletInfo>
+          </WalletHeader>
+
+          <AddressRow>
+            {shieldedAddress ? (
+              <PrivateAddress
+                prefixIcon={getRefreshIcon()}
+                onPrefixClick={generateAndStoreAddress}
+                $noBorder
+                $fontSize="14px"
+                $height="auto"
+                $padding="8px 16px"
+              >
+                {shieldedAddress}
+              </PrivateAddress>
+            ) : (
+              <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
+            )}
+          </AddressRow>
+        </WalletContainer>
+      ) : null}
+
+      {tabs.map((tab, index) => {
+        const TabIcon = getTabIcon(tab.name);
+        return (
+          <MenuItem
+            key={index}
+            active={activeTab === index}
+            onClick={() => onTabClick(index)}
+            $showBadge={showBadge && tab.badge}
+            data-ga-id={`tab-${tab.name.toLowerCase()}`}
+            data-tour={tab.dataTour}
+          >
+            <IconWrapper><TabIcon width={14} height={14} /></IconWrapper>
+            <MenuText>{t(tab.i18nKey)}</MenuText>
+          </MenuItem>
+        );
+      })}
+    </MenuContainer>
+  );
+}
+
+const WalletContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+`;
+
+const WalletHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+`;
+
+const WalletInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+
+const Address = styled.span`
+  font-size: 12px;
+  font-weight: ${props => props.theme.text.weight.bold};
+`;
+
+const UsdBalance = styled(BalanceDisplay)`
+  font-size: 12px;
+  font-weight: ${props => props.theme.text.weight.normal};
+`;
+
+const AddressRow = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-top: 1px solid ${props => props.theme.color.grey};
+  border-bottom: 1px solid ${props => props.theme.color.grey};
+  gap: 8px;
+`;
+
+const ShieldedAddress = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.color.black};
+  line-height: 16px;
+`;
+
+const MenuContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  width: 240px;
+  background-color: ${props => props.theme.color.white};
+  border-radius: 8px;
+  border: 2px solid ${props => props.theme.color.black};
+`;
+
+const MenuItem = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: ${props => props.active ? props.theme.color.telosGradientSoft : 'transparent'};
+  border: ${props => props.active ? `1px solid rgb(149 126 223 / 40%)` : 'none'};
+  color: ${props => props.theme.text.color[props.active ? 'primary' : 'secondary']};
+  font-weight: normal;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: ${props => props.active ? props.theme.color.telosGradientSoft : 'rgba(0, 0, 0, 0.02)'};
+    color: ${props => props.theme.text.color.primary};
+  }
+
+  &::after {
+    content: '';
+    display: ${props => props.$showBadge ? 'block' : 'none'};
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #E53E3E;
+  }
+`;
+
+const RenewIcon = styled(RenewSVGIcon)`
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+`;
+
+const MenuText = styled.span`
+  font-size: 16px;
+  white-space: nowrap;
+`;
+
+const IconWrapper = styled.div`
+  width: 16px;
+  height: 16px;
+  transition: all 0.2s ease;
+`;

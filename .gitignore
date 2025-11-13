@@ -1,7 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
+apps/zktelos-wallet/node_modules
+apps/zktelos-wallet/build
+apps/zktelos-wallet/dist
+packages/zkbob-client-js/node_modules
+packages/zkbob-client-js/lib
 /.pnp
 .pnp.js
 
@@ -22,5 +27,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# electron
+# electr
 /dist
