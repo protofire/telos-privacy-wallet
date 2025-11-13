@@ -16,6 +16,7 @@
     "electron:build:win": "yarn workspace zktelos-wallet electron:build:win",
     "electron:build:linux": "yarn workspace zktelos-wallet electron:build:linux",
     "build:zkbob": "yarn workspace zkbob-client-js build",
-    "watch:zkbob": "yarn workspace zkbob-client-js build --watch"
+    "watch:zkbob": "yarn workspace zkbob-client-js watch",
+    "dev": "concurrently \"yarn watch:zkbob\" \"yarn start\" --names \"zkbob,app\" --prefix-colors \"blue,green\""
   }
 }
