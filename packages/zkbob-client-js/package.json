@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@ethereumjs/util": "^8.0.2",
-    "@graphprotocol/client-cli": "3.0.0",
     "@metamask/eth-sig-util": "5.0.0",
     "@scure/bip32": "1.1.1",
     "@scure/bip39": "1.1.0",
@@ -43,6 +42,7 @@
     "web3-utils": "1.8.0"
   },
   "devDependencies": {
+    "@graphprotocol/client-cli": "3.0.0",
     "@types/ethereum-protocol": "^1.0.1",
     "@types/node": "^20.3.3",
     "@types/promise-retry": "^1.1.3",
