@@ -28,6 +28,18 @@ import { CommittedForcedExit, FinalizedForcedExit, ForcedExitRequest } from "../
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const ZERO_ADDRESS1 = "0x0000000000000000000000000000000000000001";
 
+// Helper function to extract base58 address (only naked addresses supported)
+// Legacy: If a prefixed address is passed by error, extract the base58 part
+function extractBase58Address(address: string): string {
+  const colonIndex = address.indexOf(":");
+  if (colonIndex === -1) {
+    // Naked address - return as is (expected format)
+    return address;
+  }
+  // Legacy: Prefixed address - return part after colon (should not happen)
+  return address.substring(colonIndex + 1);
+}
+
 export enum PoolSelector {
   Transact = "af989083",
   AppendDirectDeposit = "1dc4cb33",
@@ -550,7 +562,7 @@ export class EvmNetwork extends MultiRpcManager implements NetworkBackend, RpcMa
     zkAddress: string,
     fallbackAddress: string
   ): Promise<PreparedTransaction> {
-    const zkAddrBytes = `0x${Buffer.from(bs58.decode(zkAddress.substring(zkAddress.indexOf(":") + 1))).toString("hex")}`;
+    const zkAddrBytes = `0x${Buffer.from(bs58.decode(extractBase58Address(zkAddress))).toString("hex")}`;
     const encodedTx = await this.contractByType(ZkBobContractType.DD)
       .methods["directDeposit(address,uint256,bytes)"](fallbackAddress, amount, zkAddrBytes)
       .encodeABI();
@@ -568,7 +580,7 @@ export class EvmNetwork extends MultiRpcManager implements NetworkBackend, RpcMa
     zkAddress: string,
     fallbackAddress: string
   ): Promise<PreparedTransaction> {
-    const zkAddrBytes = `0x${Buffer.from(bs58.decode(zkAddress.substring(zkAddress.indexOf(":") + 1))).toString("hex")}`;
+    const zkAddrBytes = `0x${Buffer.from(bs58.decode(extractBase58Address(zkAddress))).toString("hex")}`;
     const encodedTx = await this.contractByType(ZkBobContractType.DD)
       .methods["directNativeDeposit(address,bytes)"](fallbackAddress, zkAddrBytes)
       .encodeABI();

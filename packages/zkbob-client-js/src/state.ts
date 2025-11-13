@@ -1,30 +1,41 @@
-import { IDepositData, IDepositPermittableData, ITransferData, IWithdrawData,
-          ParseTxsResult, ParseTxsColdStorageResult, StateUpdate,
-          DecryptedMemo, IndexedTx, TreeNode, IAddressComponents, TxMemoChunk, TxInput,
-          Account,
-          Note,
-      } from 'libzkbob-rs-wasm-web';
-import { HistoryStorage } from './history'
-import { bufToHex, forceDecimal, isRangesIntersected } from './utils';
-import { hash } from 'tweetnacl';
-import { EphemeralPool } from './ephemeral';
-import { NetworkType } from './network-type';
-import { ColdStorageConfig } from './coldstorage';
-import { InternalError } from './errors';
-import { CONSTANTS } from './constants';
-import { NetworkBackend } from './networks';
-import { ZkBobSubgraph } from './subgraph';
-import { Sequencer, TreeState } from './client-provider';
-import { GENERIC_ADDRESS_PREFIX } from './address-prefixes';
-import { TxState } from './tx';
-import { RelayerInfo } from './services/relayer';
+import {
+  IDepositData,
+  IDepositPermittableData,
+  ITransferData,
+  IWithdrawData,
+  ParseTxsResult,
+  ParseTxsColdStorageResult,
+  StateUpdate,
+  DecryptedMemo,
+  IndexedTx,
+  TreeNode,
+  IAddressComponents,
+  TxMemoChunk,
+  TxInput,
+  Account,
+  Note,
+} from "libzkbob-rs-wasm-web";
+import { HistoryStorage } from "./history";
+import { bufToHex, forceDecimal, isRangesIntersected } from "./utils";
+import { hash } from "tweetnacl";
+import { EphemeralPool } from "./ephemeral";
+import { NetworkType } from "./network-type";
+import { ColdStorageConfig } from "./coldstorage";
+import { InternalError } from "./errors";
+import { CONSTANTS } from "./constants";
+import { NetworkBackend } from "./networks";
+import { ZkBobSubgraph } from "./subgraph";
+import { Sequencer, TreeState } from "./client-provider";
+import { GENERIC_ADDRESS_PREFIX } from "./address-prefixes";
+import { TxState } from "./tx";
+import { RelayerInfo } from "./services/relayer";
 
 const OUTPLUSONE = CONSTANTS.OUT + 1; // number of leaves (account + notes) in a transaction
-const BATCH_SIZE = 1000;  // number of transactions per request during a sync state
+const BATCH_SIZE = 1000; // number of transactions per request during a sync state
 const PARTIAL_TREE_USAGE_THRESHOLD = 500; // minimum tx count in Merkle tree to partial tree update using
 const CORRUPT_STATE_ROLLBACK_ATTEMPTS = 2; // number of state restore attempts (via rollback)
 const CORRUPT_STATE_WIPE_ATTEMPTS = 5; // number of state restore attempts (via wipe)
-const COLD_STORAGE_USAGE_THRESHOLD = 1000;  // minimum number of txs to cold storage using
+const COLD_STORAGE_USAGE_THRESHOLD = 1000; // minimum number of txs to cold storage using
 const MIN_TX_COUNT_FOR_STAT = 100;
 const MIN_RESYNC_INTERVAL = 1000; // minimum interval between state resyncs (ms)
 
@@ -33,21 +44,20 @@ export const ZERO_OPTIMISTIC_STATE: StateUpdate = {
   newCommitments: [],
   newAccounts: [],
   newNotes: [],
-}
-
+};
 
 export interface BatchResult {
   txCount: number;
   maxMinedIndex: number;
   maxPendingIndex: number;
   hasOwnOptimisticTxs: boolean;
-  state: Map<number, StateUpdate>;  // key: first tx index, 
-                                    // value: StateUpdate object (notes, accounts, leafs and comminments)
+  state: Map<number, StateUpdate>; // key: first tx index,
+  // value: StateUpdate object (notes, accounts, leafs and comminments)
 }
 
 interface RawTxsBatch {
   fromIndex: number;
-  count: number
+  count: number;
   minedTxs: IndexedTx[];
   pendingTxs: IndexedTx[];
   txHashes: Record<number, string>;
@@ -56,7 +66,7 @@ interface RawTxsBatch {
 }
 
 export interface StateSyncInfo {
-  txCount: number;  // total (cold + hot)
+  txCount: number; // total (cold + hot)
   hotSyncCount: number; // hot sync only
   processedTxCount: number;
   startTimestamp: number;
@@ -64,30 +74,28 @@ export interface StateSyncInfo {
   endTimestamp?: number;
 }
 
-
 // Used to collect state synchronization statistic
 // It could be helpful to monitor average sync time
 export interface SyncStat {
-  txCount: number;  // total txs count (sequencer + CDN)
+  txCount: number; // total txs count (sequencer + CDN)
   cdnTxCnt: number; // number of transactions fetched in binary format from CDN (cold storage)
   decryptedLeafs: number; // deposit/withdrawal = 1 leaf,
-                          // transfer = 1 + notes_cnt leafs
-  fullSync: boolean;  // true in case of bulding full Merkle tree on the client
+  // transfer = 1 + notes_cnt leafs
+  fullSync: boolean; // true in case of bulding full Merkle tree on the client
 
   totalTime: number; // msec
-  timePerTx: number;  // msec
+  timePerTx: number; // msec
   writeStateTime: number; // writing database time during the hot sync (ms)
 }
 
 interface ColdSyncResult {
-  txCount: number;  // txs count
+  txCount: number; // txs count
   decryptedLeafs: number; // deposit/withdrawal = 1 leaf,
-                          // transfer = 1 + notes_cnt leafs
+  // transfer = 1 + notes_cnt leafs
   firstIndex: number; // first index of the synced range
-  nextIndex: number;  // index after synced range
+  nextIndex: number; // index after synced range
   totalTime: number; // msec
 }
-
 
 export class ZkBobState {
   public stateId: string; // should depends on pool and sk
@@ -102,20 +110,19 @@ export class ZkBobState {
   private updateStatePromise: Promise<boolean> | undefined;
   private syncStats: SyncStat[] = [];
   private skipColdStorage: boolean = false;
-  private lastSyncTimestamp: number = 0;  // it's need for frequent resyncs preventing
+  private lastSyncTimestamp: number = 0; // it's need for frequent resyncs preventing
   private lastSyncResult: boolean = true; // true: no own transactions in optimistic state during the last state sync
 
   // State self-healing
   private rollbackAttempts = 0;
   private wipeAttempts = 0;
-  
+
   // Mapping shieldedAddress -> isOwnAddress (local cache)
-  // need to decrease time in isOwnAddress() function 
+  // need to decrease time in isOwnAddress() function
   private shieldedAddressCache = new Map<string, Promise<boolean>>();
 
   // Sync info
   private lastSyncInfo?: StateSyncInfo;
-
 
   // Create regular state with the provided spending key
   // and other parameters
@@ -127,26 +134,26 @@ export class ZkBobState {
     networkName: string,
     denominator: bigint,
     poolId: number,
-    isObsoletePool: boolean,  // support for obsolete pools with old calldata format
+    isObsoletePool: boolean, // support for obsolete pools with old calldata format
     addressPrefix: string | undefined,
     tokenAddress: string,
-    worker: any,
+    worker: any
   ): Promise<ZkBobState> {
     const zpState = new ZkBobState();
     zpState.sk = new Uint8Array(sk);
     zpState.network = network;
     zpState.subgraph = subgraph;
     zpState.birthIndex = birthIndex;
-    
+
     const userId = bufToHex(hash(zpState.sk)).slice(0, 32);
-    zpState.stateId = `${networkName}.${poolId.toString(16).padStart(6, '0')}.${userId}`; // database name identifier
+    zpState.stateId = `${networkName}.${poolId.toString(16).padStart(6, "0")}.${userId}`; // database name identifier
     zpState.addressPrefix = addressPrefix;
 
     await worker.createAccount(zpState.stateId, zpState.sk, poolId, isObsoletePool);
     zpState.worker = worker;
-    
+
     zpState.history = await HistoryStorage.init(zpState.stateId, network, zpState, subgraph);
-    
+
     zpState.ephemeralAddrPool = await EphemeralPool.init(zpState.sk, tokenAddress, networkName as NetworkType, network, denominator);
 
     return zpState;
@@ -160,8 +167,8 @@ export class ZkBobState {
     network: NetworkBackend,
     networkName: string,
     poolId: number,
-    isObsoletePool: boolean,  // support for obsolete pools with old calldata format
-    worker: any,
+    isObsoletePool: boolean, // support for obsolete pools with old calldata format
+    worker: any
   ): Promise<ZkBobState> {
     const zpState = new ZkBobState();
     zpState.sk = new Uint8Array(sk);
@@ -169,7 +176,7 @@ export class ZkBobState {
     zpState.birthIndex = birthIndex;
 
     const userId = bufToHex(hash(zpState.sk)).slice(0, 32);
-    zpState.stateId = `${networkName}.${poolId.toString(16).padStart(6, '0')}.${userId}`; // database name identifier
+    zpState.stateId = `${networkName}.${poolId.toString(16).padStart(6, "0")}.${userId}`; // database name identifier
 
     await worker.createAccount(zpState.stateId, zpState.sk, poolId, isObsoletePool);
     zpState.worker = worker;
@@ -180,7 +187,7 @@ export class ZkBobState {
   // returns undefined if state sync not in progress
   public curSyncInfo(): StateSyncInfo | undefined {
     if (this.updateStatePromise && this.lastSyncInfo) {
-      return this.lastSyncInfo
+      return this.lastSyncInfo;
     }
 
     return undefined;
@@ -301,7 +308,7 @@ export class ZkBobState {
       addr = await this.worker.assembleUniversalAddress(this.stateId, forceDecimal(d), forceDecimal(p_d));
     }
 
-    return `${this.addressPrefix ?? GENERIC_ADDRESS_PREFIX}:${addr}`;
+    return addr; // Return naked address
   }
 
   // Converts zk-addresss from the old prefixless format to the new chain-specific one
@@ -317,7 +324,7 @@ export class ZkBobState {
     return await this.worker.createDepositPermittable(this.stateId, deposit);
   }
 
-  public async createTransferOptimistic(tx: ITransferData, optimisticState: any): Promise<any> { 
+  public async createTransferOptimistic(tx: ITransferData, optimisticState: any): Promise<any> {
     return await this.worker.createTransferOptimistic(this.stateId, tx, optimisticState);
   }
 
@@ -349,7 +356,7 @@ export class ZkBobState {
     sequencer: Sequencer,
     getPoolState: (index?: bigint) => Promise<TreeState>,
     coldConfig?: ColdStorageConfig,
-    coldBaseAddr?: string,
+    coldBaseAddr?: string
   ): Promise<boolean> {
     if (this.updateStatePromise == undefined) {
       this.updateStatePromise = this.updateStateOptimisticWorker(sequencer, getPoolState, coldConfig, coldBaseAddr).finally(() => {
@@ -367,13 +374,13 @@ export class ZkBobState {
     sequencer: Sequencer,
     getPoolState: (index?: bigint) => Promise<TreeState>,
     coldConfig?: ColdStorageConfig,
-    coldBaseAddr?: string,
+    coldBaseAddr?: string
   ): Promise<boolean> {
     // Skip sync if the last one was just finished
     if (Date.now() < this.lastSyncTimestamp + MIN_RESYNC_INTERVAL) {
       return this.lastSyncResult;
     }
-    this.lastSyncInfo = {txCount: 0, hotSyncCount: 0, processedTxCount: 0, startTimestamp: Date.now()}
+    this.lastSyncInfo = { txCount: 0, hotSyncCount: 0, processedTxCount: 0, startTimestamp: Date.now() };
     let startIndex = Number(await this.getNextIndex());
 
     const stateInfo = await sequencer.info().catch(async (err) => {
@@ -385,7 +392,7 @@ export class ZkBobState {
         deltaIndex: poolState.index,
         optimisticDeltaIndex: poolState.index,
         pendingDeltaIndex: poolState.index,
-      } as RelayerInfo
+      } as RelayerInfo;
     });
     const nextIndex = Number(stateInfo.deltaIndex);
     const optimisticIndex = Math.max(Number(stateInfo.optimisticDeltaIndex), Number(stateInfo.pendingDeltaIndex ?? 0n));
@@ -400,7 +407,7 @@ export class ZkBobState {
         birthindex = Number(stateInfo.deltaIndex) - OUTPLUSONE;
       }
       let siblings: TreeNode[] | undefined;
-      if (startIndex == 0 && birthindex >= (PARTIAL_TREE_USAGE_THRESHOLD * OUTPLUSONE)) {
+      if (startIndex == 0 && birthindex >= PARTIAL_TREE_USAGE_THRESHOLD * OUTPLUSONE) {
         try {
           siblings = await sequencer.siblings(birthindex);
           console.log(`🍰[PartialSync] got ${siblings.length} sibling(s) for index ${birthindex}`);
@@ -414,14 +421,14 @@ export class ZkBobState {
       const startSyncTime = Date.now();
 
       // now we got actual txs count to sync => update info
-      this.lastSyncInfo.txCount = (optimisticIndex - startIndex) /  OUTPLUSONE;
+      this.lastSyncInfo.txCount = (optimisticIndex - startIndex) / OUTPLUSONE;
 
       // Try to using the cold storage if possible
       const coldResultPromise = this.startColdSync(getPoolState, coldConfig, coldBaseAddr, startIndex);
 
       // Start the hot sync simultaneously with the cold sync
       const assumedNextIndex = this.nextIndexAfterColdSync(coldConfig, startIndex);
-      this.lastSyncInfo.hotSyncCount = (optimisticIndex - assumedNextIndex) /  OUTPLUSONE;
+      this.lastSyncInfo.hotSyncCount = (optimisticIndex - assumedNextIndex) / OUTPLUSONE;
       let hotSyncPromise = this.startHotSync(sequencer, assumedNextIndex, optimisticIndex);
 
       // Waiting while cold sync finished (local state becomes updated)
@@ -429,9 +436,11 @@ export class ZkBobState {
 
       // Check is predicted next index after the cold sync equals actual one
       if (coldResult.nextIndex != assumedNextIndex) {
-        // ... restarting the hot sync with the appropriate index otherwise 
-        console.error(`🧊[ColdSync] next index not as assumed after sync (next index = ${coldResult.nextIndex}, assumed ${assumedNextIndex}) => starting hot sync again`);
-        this.lastSyncInfo.hotSyncCount = (optimisticIndex - coldResult.nextIndex) /  OUTPLUSONE;
+        // ... restarting the hot sync with the appropriate index otherwise
+        console.error(
+          `🧊[ColdSync] next index not as assumed after sync (next index = ${coldResult.nextIndex}, assumed ${assumedNextIndex}) => starting hot sync again`
+        );
+        this.lastSyncInfo.hotSyncCount = (optimisticIndex - coldResult.nextIndex) / OUTPLUSONE;
         hotSyncPromise = this.startHotSync(sequencer, coldResult.nextIndex, optimisticIndex);
       }
 
@@ -447,7 +456,7 @@ export class ZkBobState {
 
       // Waiting while batches for hot sync are ready
       const totalState = new Map<number, StateUpdate>();
-      const initRes: BatchResult = {txCount: 0, maxMinedIndex: -1, maxPendingIndex: -1, hasOwnOptimisticTxs: false, state: totalState};
+      const initRes: BatchResult = { txCount: 0, maxMinedIndex: -1, maxPendingIndex: -1, hasOwnOptimisticTxs: false, state: totalState };
       const totalRes = (await hotSyncPromise).reduce((acc, cur) => {
         return {
           txCount: acc.txCount + cur.txCount,
@@ -455,7 +464,7 @@ export class ZkBobState {
           maxPendingIndex: Math.max(acc.maxPendingIndex, cur.maxPendingIndex),
           hasOwnOptimisticTxs: acc.hasOwnOptimisticTxs || cur.hasOwnOptimisticTxs,
           state: new Map([...Array.from(acc.state.entries()), ...Array.from(cur.state.entries())]),
-        }
+        };
       }, initRes);
 
       const startSavingTime = Date.now();
@@ -463,7 +472,7 @@ export class ZkBobState {
       console.log(`🔥[HotSync] all batches were processed. Saving...`);
       // Merging state updates into the single StateUpdate object
       const idxs = [...totalRes.state.keys()].sort((i1, i2) => i1 - i2);
-      const hotStateUpdate: StateUpdate = {newAccounts: [], newLeafs: [], newCommitments: [], newNotes: []};
+      const hotStateUpdate: StateUpdate = { newAccounts: [], newLeafs: [], newCommitments: [], newNotes: [] };
       for (const idx of idxs) {
         const oneStateUpdate = totalRes.state.get(idx);
         if (oneStateUpdate !== undefined) {
@@ -482,7 +491,7 @@ export class ZkBobState {
       try {
         await this.worker.updateState(this.stateId, hotStateUpdate, siblings);
       } catch (err) {
-        const siblingsDescr = siblings !== undefined ? ` (+ ${siblings.length} siblings)` : '';
+        const siblingsDescr = siblings !== undefined ? ` (+ ${siblings.length} siblings)` : "";
         console.warn(`🔥[HotSync] cannot update state from index ${idxs[0]}${siblingsDescr}`);
         if (siblings != undefined) {
           // if we try to update state with siblings and got an error - do not use partial sync again
@@ -513,8 +522,10 @@ export class ZkBobState {
 
       isReadyToTransact = !totalRes.hasOwnOptimisticTxs;
 
-      const syncType = coldResult.txCount > 0 ? '🧊🔥[TotalSync]' : '🔥[HotSync]'
-      console.log(`${syncType} finished in ${curStat.totalTime / 1000} sec | ${curStat.txCount} tx, avg speed ${curStat.timePerTx.toFixed(2)} ms/tx`);
+      const syncType = coldResult.txCount > 0 ? "🧊🔥[TotalSync]" : "🔥[HotSync]";
+      console.log(
+        `${syncType} finished in ${curStat.totalTime / 1000} sec | ${curStat.txCount} tx, avg speed ${curStat.timePerTx.toFixed(2)} ms/tx`
+      );
     } else {
       this.history?.setLastMinedTxIndex(nextIndex - OUTPLUSONE);
       this.history?.setLastPendingTxIndex(-1);
@@ -529,9 +540,7 @@ export class ZkBobState {
       const verified = await this.verifyState(getPoolState);
       if (!verified.correct) {
         console.log(`🚑[StateVerify] Merkle tree root at index ${verified.index} mistmatch!`);
-        if (stableIndex > 0 && stableIndex < verified.index &&
-          this.rollbackAttempts < CORRUPT_STATE_ROLLBACK_ATTEMPTS
-        ) {
+        if (stableIndex > 0 && stableIndex < verified.index && this.rollbackAttempts < CORRUPT_STATE_ROLLBACK_ATTEMPTS) {
           let realRollbackIndex = await this.rollback(stableIndex);
           console.log(`🚑[StateVerify] The user state was rollbacked to index ${realRollbackIndex} [attempt ${this.rollbackAttempts + 1}]`);
           this.rollbackAttempts++;
@@ -539,7 +548,7 @@ export class ZkBobState {
           await this.clean();
           console.log(`🚑[StateVerify] Full user state was wiped [attempt ${this.wipeAttempts + 1}]...`);
 
-          if(this.rollbackAttempts > 0) {
+          if (this.rollbackAttempts > 0) {
             // If the first wipe has no effect
             // reset account birthday if presented
             this.birthIndex = undefined;
@@ -573,12 +582,14 @@ export class ZkBobState {
   private async startHotSync(sequencer: Sequencer, fromIndex: number, toIndex: number): Promise<BatchResult[]> {
     let hotSyncPromises: Promise<BatchResult>[] = [];
     for (let i = fromIndex; i <= toIndex; i = i + BATCH_SIZE * OUTPLUSONE) {
-      hotSyncPromises.push(this.fetchBatch(sequencer, i, BATCH_SIZE).then(async (aBatch) => {
-        // batch fetched, let's parse it!
-        const res = await this.parseBatch(aBatch);
-        if (this.lastSyncInfo) this.lastSyncInfo.processedTxCount += aBatch.count;
-        return res;
-      }));
+      hotSyncPromises.push(
+        this.fetchBatch(sequencer, i, BATCH_SIZE).then(async (aBatch) => {
+          // batch fetched, let's parse it!
+          const res = await this.parseBatch(aBatch);
+          if (this.lastSyncInfo) this.lastSyncInfo.processedTxCount += aBatch.count;
+          return res;
+        })
+      );
     }
 
     return Promise.all(hotSyncPromises);
@@ -586,17 +597,18 @@ export class ZkBobState {
 
   // Get the transactions from the sequencer starting from the specified index
   private async fetchBatch(sequencer: Sequencer, fromIndex: number, count: number): Promise<RawTxsBatch> {
-    return sequencer.fetchTransactionsOptimistic(this.network, fromIndex, count)
+    return sequencer
+      .fetchTransactionsOptimistic(this.network, fromIndex, count)
       .catch((err) => {
         if (this.subgraph) {
           console.warn(`Unable to load transactions from the sequencer (${err.message}), fallbacking to subgraph`);
           return this.subgraph.getTxesMinimal(fromIndex, count);
         } else {
-          console.log(`🔥[HotSync] cannot get txs batch from index ${fromIndex}: ${err.message}`)
+          console.log(`🔥[HotSync] cannot get txs batch from index ${fromIndex}: ${err.message}`);
           throw new InternalError(`Cannot fetch txs from the sequencer: ${err.message}`);
         }
       })
-      .then( async txs => {      
+      .then(async (txs) => {
         const txHashes: Record<number, string> = {};
         const indexedTxs: IndexedTx[] = [];
         const indexedTxsPending: IndexedTx[] = [];
@@ -611,7 +623,7 @@ export class ZkBobState {
             index: tx.index,
             memo: tx.memo,
             commitment: tx.commitment,
-          }
+          };
 
           if (tx.state == TxState.Finalized) {
             indexedTxs.push(indexedTx);
@@ -632,8 +644,8 @@ export class ZkBobState {
           maxMinedIndex,
           maxPendingIndex,
           txHashes,
-        }
-    })
+        };
+      });
   }
 
   // The heaviest work: parse txs batch
@@ -643,7 +655,7 @@ export class ZkBobState {
 
     const batchState = new Map<number, StateUpdate>();
 
-    // process mined transactions 
+    // process mined transactions
     if (batch.minedTxs.length > 0) {
       const parseResult: ParseTxsResult = await this.worker.parseTxs(this.sk, batch.minedTxs);
       const decryptedMemos = parseResult.decryptedMemos;
@@ -694,18 +706,18 @@ export class ZkBobState {
 
     if (optimisticIndex > startIndex) {
       const startTime = Date.now();
-      
+
       console.log(`⬇ Fetching transactions between ${startIndex} and ${optimisticIndex}...`);
 
       const numOfTx = (optimisticIndex - startIndex) / OUTPLUSONE;
-      const stateUpdate = sequencer.fetchTransactionsOptimistic(this.network, startIndex, numOfTx).then( async txs => {
+      const stateUpdate = sequencer.fetchTransactionsOptimistic(this.network, startIndex, numOfTx).then(async (txs) => {
         console.log(`Got ${txs.length} transactions from index ${startIndex}`);
         const indexedTxs: IndexedTx[] = txs.map((tx) => {
-          return  {
+          return {
             index: tx.index,
             memo: tx.memo,
             commitment: tx.commitment,
-          }
+          };
         });
 
         const parseResult: ParseTxsResult = await this.worker.parseTxs(this.sk, indexedTxs);
@@ -721,7 +733,7 @@ export class ZkBobState {
     } else {
       console.log(`Do not need to fetch @${startIndex}`);
 
-      return {newLeafs: [], newCommitments: [], newAccounts: [], newNotes: []};
+      return { newLeafs: [], newCommitments: [], newAccounts: [], newNotes: [] };
     }
   }
 
@@ -730,7 +742,7 @@ export class ZkBobState {
       if (decryptedMemo.index > startIndex) {
         console.info(`📝 Adding hashes to state (from index ${startIndex} to index ${decryptedMemo.index - OUTPLUSONE})`);
       }
-      startIndex = decryptedMemo.index + OUTPLUSONE; 
+      startIndex = decryptedMemo.index + OUTPLUSONE;
 
       if (decryptedMemo.acc) {
         console.info(`📝 Adding account, notes, and hashes to state (at index ${decryptedMemo.index})`);
@@ -745,17 +757,14 @@ export class ZkBobState {
   }
 
   // returns common (local\pool_contract) index and consistence flag
-  private async verifyState(getPoolState: (index?: bigint) => Promise<TreeState>):
-    Promise<{index: bigint, correct: boolean}>
-  {
+  private async verifyState(getPoolState: (index?: bigint) => Promise<TreeState>): Promise<{ index: bigint; correct: boolean }> {
     const poolState = await getPoolState(); // an actual pool
     const localIndex = await this.getNextIndex();
 
     // verify roots only on the index which exist locally and on the pool contract
     const checkIndex = poolState.index < localIndex ? poolState.index : localIndex;
     // request appropriate contract root for the checkpoint
-    const poolRoot = checkIndex == poolState.index ? 
-      poolState.root : (await getPoolState(checkIndex)).root;
+    const poolRoot = checkIndex == poolState.index ? poolState.root : (await getPoolState(checkIndex)).root;
     const localRoot = await this.getRootAt(checkIndex);
 
     let correct = false;
@@ -765,21 +774,22 @@ export class ZkBobState {
       correct = true;
     }
 
-    return {index: checkIndex, correct};
+    return { index: checkIndex, correct };
   }
 
   private isColdSyncAvailable(coldConfig?: ColdStorageConfig, fromIndex?: number, toIndex?: number): boolean {
     if (coldConfig) {
       const startRange = fromIndex ?? 0;
-      const endRange = toIndex ?? (2 ** CONSTANTS.HEIGHT);
+      const endRange = toIndex ?? 2 ** CONSTANTS.HEIGHT;
       const actualRangeStart = Math.max(startRange, Number(coldConfig.index_from));
       const actualRangeEnd = Math.min(endRange, Number(coldConfig.next_index));
 
-      if (this.skipColdStorage == false &&
-          (startRange % OUTPLUSONE) == 0 && 
-          (endRange % OUTPLUSONE) == 0 &&
-          isRangesIntersected(startRange, endRange, Number(coldConfig.index_from), Number(coldConfig.next_index)) &&
-          ((actualRangeEnd - actualRangeStart) / OUTPLUSONE) >= COLD_STORAGE_USAGE_THRESHOLD
+      if (
+        this.skipColdStorage == false &&
+        startRange % OUTPLUSONE == 0 &&
+        endRange % OUTPLUSONE == 0 &&
+        isRangesIntersected(startRange, endRange, Number(coldConfig.index_from), Number(coldConfig.next_index)) &&
+        (actualRangeEnd - actualRangeStart) / OUTPLUSONE >= COLD_STORAGE_USAGE_THRESHOLD
       ) {
         return true;
       }
@@ -790,7 +800,7 @@ export class ZkBobState {
 
   private nextIndexAfterColdSync(coldConfig?: ColdStorageConfig, fromIndex?: number, toIndex?: number): number {
     if (this.isColdSyncAvailable(coldConfig, fromIndex, toIndex)) {
-      return Math.min(toIndex ?? (2 ** CONSTANTS.HEIGHT), Number(coldConfig?.next_index));
+      return Math.min(toIndex ?? 2 ** CONSTANTS.HEIGHT, Number(coldConfig?.next_index));
     }
 
     return fromIndex ?? 0;
@@ -803,8 +813,8 @@ export class ZkBobState {
     fromIndex?: number,
     toIndex?: number
   ): Promise<ColdSyncResult> {
-    const startRange = fromIndex ?? 0;  // inclusively
-    const endRange = toIndex ?? (2 ** CONSTANTS.HEIGHT);  // exclusively
+    const startRange = fromIndex ?? 0; // inclusively
+    const endRange = toIndex ?? 2 ** CONSTANTS.HEIGHT; // exclusively
 
     const syncResult: ColdSyncResult = {
       txCount: 0,
@@ -822,11 +832,11 @@ export class ZkBobState {
 
       // try get txs from the cold storage
       try {
-        if (coldConfig && coldStorageBaseAddr) { 
+        if (coldConfig && coldStorageBaseAddr) {
           console.log(`🧊[ColdSync] loading txs up to index ${coldConfig.next_index}...`);
           const promises = coldConfig.bulks
-            .filter(aBulk => {
-              return isRangesIntersected(actualRangeStart, actualRangeEnd, Number(aBulk.index_from), Number(aBulk.next_index))
+            .filter((aBulk) => {
+              return isRangesIntersected(actualRangeStart, actualRangeEnd, Number(aBulk.index_from), Number(aBulk.next_index));
             })
             .map(async (bulkInfo) => {
               let response = await fetch(`${coldStorageBaseAddr}/${bulkInfo.filename}`);
@@ -838,16 +848,19 @@ export class ZkBobState {
                   return new Uint8Array(aBulk);
                 }
 
-                throw new InternalError(`Cold storage corrupted (invalid file size: ${aBulk.byteLength})`)
+                throw new InternalError(`Cold storage corrupted (invalid file size: ${aBulk.byteLength})`);
               } else {
-                throw new InternalError(`Couldn't load cold storage (invalid response code: ${response.status})`)
+                throw new InternalError(`Couldn't load cold storage (invalid response code: ${response.status})`);
               }
             });
-          
-          let bulksData = (await Promise.all(promises)).filter(data => data.length > 0);
-          
 
-          let result: ParseTxsColdStorageResult = await this.updateStateColdStorage(bulksData, BigInt(actualRangeStart), BigInt(actualRangeEnd));
+          let bulksData = (await Promise.all(promises)).filter((data) => data.length > 0);
+
+          let result: ParseTxsColdStorageResult = await this.updateStateColdStorage(
+            bulksData,
+            BigInt(actualRangeStart),
+            BigInt(actualRangeEnd)
+          );
           result.decryptedMemos.forEach((aMemo) => {
             this.history?.saveDecryptedMemo(aMemo, false);
           });
@@ -859,20 +872,24 @@ export class ZkBobState {
           syncResult.firstIndex = actualRangeStart;
           syncResult.nextIndex = actualRangeEnd;
           syncResult.totalTime = Date.now() - startTime;
-          
+
           const verified = await this.verifyState(getPoolState);
           if (!verified.correct) {
             console.warn(`🧊[ColdSync] Merkle tree root at index ${verified.index} mistmatch! Wiping the state...`);
-            await this.clean();  // rollback to 0
+            await this.clean(); // rollback to 0
             if (this.lastSyncInfo) this.lastSyncInfo.processedTxCount = 0;
-            this.skipColdStorage = true;  // prevent cold storage usage
+            this.skipColdStorage = true; // prevent cold storage usage
 
             syncResult.txCount = 0;
             syncResult.decryptedLeafs = 0;
             syncResult.firstIndex = 0;
             syncResult.nextIndex = 0;
           } else {
-            console.log(`🧊[ColdSync] ${syncResult.txCount} txs have been loaded in ${syncResult.totalTime / 1000} secs (${syncResult.totalTime / syncResult.txCount} ms/tx)`);
+            console.log(
+              `🧊[ColdSync] ${syncResult.txCount} txs have been loaded in ${syncResult.totalTime / 1000} secs (${
+                syncResult.totalTime / syncResult.txCount
+              } ms/tx)`
+            );
             console.log(`🧊[ColdSync] Merkle root after tree update: ${await this.getRoot()} @ ${await this.getNextIndex()}`);
           }
         }

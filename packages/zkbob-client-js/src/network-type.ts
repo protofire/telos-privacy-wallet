@@ -2,17 +2,19 @@ export const ZKBOB_PURPOSE = 2448;
 
 // Using strings here for better debuggability
 export enum NetworkType {
-  ethereum = 'ethereum',
-  polygon = 'polygon',
-  optimism = 'optimism',
-  tron = 'tron',
+  ethereum = "ethereum",
+  polygon = "polygon",
+  optimism = "optimism",
+  tron = "tron",
+  telos = "telos",
   // testnets
-  sepolia = 'sepolia',
-  goerli = 'goerli',
-  goerliOptimism = 'goerli-optimism',
-  shasta = 'shasta', // TRON testnet
-  nile = 'nile',     // TRON testnet
-  localNode = 'local-node',
+  telosTestnet = "telos-testnet",
+  sepolia = "sepolia",
+  goerli = "goerli",
+  goerliOptimism = "goerli-optimism",
+  shasta = "shasta", // TRON testnet
+  nile = "nile", // TRON testnet
+  localNode = "local-node",
 }
 
 export namespace NetworkType {
@@ -40,8 +42,10 @@ export namespace NetworkType {
       case NetworkType.shasta:
       case NetworkType.nile:
       case NetworkType.localNode:
+      case NetworkType.telos:
+      case NetworkType.telosTestnet:
         return `/0'/0/${account}`;
-        
+
       default:
         return `/${account}'`;
     }
@@ -64,38 +68,42 @@ export namespace NetworkType {
       case NetworkType.shasta:
       case NetworkType.nile:
       case NetworkType.localNode:
+      case NetworkType.telos:
+      case NetworkType.telosTestnet:
         return 1;
 
       default:
         return 0;
     }
-
   }
 
   export function networkName(chainId: number): string | undefined {
     switch (chainId) {
       case 1:
-        return 'ethereum';
+        return "ethereum";
       case 137:
-        return 'polygon';
+        return "polygon";
       case 10:
-        return 'optimism';
+        return "optimism";
       case 0x2b6653dc: // 728126428
-        return 'tron';
+        return "tron";
       case 11155111:
-        return 'sepolia';
+        return "sepolia";
       case 5:
-        return 'goerli';
+        return "goerli";
       case 420:
-        return 'goerli-optimism';
-      case 0x94a9059e:  // 2494104990
-        return 'shasta';
-      case 0xcd8690dc:  //3448148188
-        return 'nile';
+        return "goerli-optimism";
+      case 0x94a9059e: // 2494104990
+        return "shasta";
+      case 0xcd8690dc: //3448148188
+        return "nile";
       case 1337:
       case 31337:
-        return 'local-node';
-
+        return "local-node";
+      case 41:
+        return "telos";
+      case 42:
+        return "telos-testnet";
       default:
         return undefined;
     }
