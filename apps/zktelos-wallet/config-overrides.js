@@ -34,6 +34,12 @@ module.exports = {
       },
     ];
 
+    // Alias para process/browser con extensión .js para módulos ESM
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'process/browser': require.resolve('process/browser.js'),
+    };
+
     config.resolve.fallback = {
       ...config.resolve.fallback,
       buffer: require.resolve('buffer/'),
@@ -43,12 +49,18 @@ module.exports = {
       https: require.resolve('https-browserify'),
       os: require.resolve('os-browserify/browser'),
       url: require.resolve('url/'),
+      zlib: require.resolve('browserify-zlib'),
+      process: require.resolve('process/browser.js'),
     };
 
     config.plugins = [
       ...config.plugins,
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
+        process: 'process/browser.js',
+      }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
       }),
     ];
 

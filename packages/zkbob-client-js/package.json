@@ -15,7 +15,7 @@
     "check": "tsc --noEmit",
     "codegen": "graphclient build --dir ./src",
     "graphql-dev": "graphclient serve-dev --dir ./src",
-    "build": "rm -rf lib/ && npx tsc && webpack --config webpack.worker.conf.js",
+    "build": "rm -rf lib/ && yarn tsc && yarn webpack --config webpack.worker.conf.js",
     "clean": "rm -rf lib/"
   },
   "dependencies": {

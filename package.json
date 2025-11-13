@@ -14,6 +14,8 @@
     "electron:build:prod": "yarn workspace zktelos-wallet electron:build:prod",
     "electron:build:mac": "yarn workspace zktelos-wallet electron:build:mac",
     "electron:build:win": "yarn workspace zktelos-wallet electron:build:win",
-    "electron:build:linux": "yarn workspace zktelos-wallet electron:build:linux"
+    "electron:build:linux": "yarn workspace zktelos-wallet electron:build:linux",
+    "build:zkbob": "yarn workspace zkbob-client-js build",
+    "watch:zkbob": "yarn workspace zkbob-client-js build --watch"
   }
 }
