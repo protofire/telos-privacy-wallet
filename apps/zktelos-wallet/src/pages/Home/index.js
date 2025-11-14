@@ -17,7 +17,7 @@ export default () => {
   const history = useHistory();
   const location = useLocation();
   const { address: account } = useContext(WalletContext);
-  const { openWalletModal } = useContext(ModalContext);
+  const { openCreateAccountModal } = useContext(ModalContext);
   const {
     history: fullHistory, zkAccount, pendingDirectDeposits,
     isLoadingZkAccount, isLoadingHistory,
