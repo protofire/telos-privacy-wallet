@@ -9,9 +9,17 @@ export const ModalContextProvider = ({ children }) => {
   const openWalletModal = () => setIsWalletModalOpen(true);
   const closeWalletModal = () => setIsWalletModalOpen(false);
 
-  const [isAccountSetUpModalOpen, setIsAccountSetUpModalOpen] = useState(false);
-  const openAccountSetUpModal = () => setIsAccountSetUpModalOpen(true);
-  const closeAccountSetUpModal = () => setIsAccountSetUpModalOpen(false);
+  const [isAccessAccountModalOpen, setIsAccessAccountModalOpen] = useState(false);
+  const openAccessAccountModal = () => setIsAccessAccountModalOpen(true);
+  const closeAccessAccountModal = () => setIsAccessAccountModalOpen(false);
+
+  const [isCreateAccountModalOpen, setIsCreateAccountModalOpen] = useState(false);
+  const openCreateAccountModal = () => setIsCreateAccountModalOpen(true);
+  const closeCreateAccountModal = () => setIsCreateAccountModalOpen(false);
+
+  // const [isAccountSetUpModalOpen, setIsAccountSetUpModalOpen] = useState(false);
+  // const openAccountSetUpModal = () => setIsAccountSetUpModalOpen(true);
+  // const closeAccountSetUpModal = () => setIsAccountSetUpModalOpen(false);
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const openPasswordModal = () => setIsPasswordModalOpen(true);
@@ -83,7 +91,9 @@ export const ModalContextProvider = ({ children }) => {
 
   const closeAllModals = () => {
     closeWalletModal();
-    closeAccountSetUpModal();
+    // closeAccountSetUpModal();
+    closeAccessAccountModal();
+    closeCreateAccountModal();
     closeChangePasswordModal();
     closeSwapModal();
     closeConfirmLogoutModal();
@@ -102,7 +112,10 @@ export const ModalContextProvider = ({ children }) => {
     <ModalContext.Provider
       value={{
         isWalletModalOpen, openWalletModal, closeWalletModal,
-        isAccountSetUpModalOpen, openAccountSetUpModal, closeAccountSetUpModal,
+        // isAccountSetUpModalOpen, openAccountSetUpModal, closeAccountSetUpModal,
+        // accountSetUpModalMode, openAccessAccountModal, openCreateAccountModal,
+        isAccessAccountModalOpen, openAccessAccountModal, closeAccessAccountModal,
+        isCreateAccountModalOpen, openCreateAccountModal, closeCreateAccountModal,
         isPasswordModalOpen, openPasswordModal, closePasswordModal,
         isChangePasswordModalOpen, openChangePasswordModal, closeChangePasswordModal,
         isTermsModalOpen, openTermsModal, closeTermsModal,

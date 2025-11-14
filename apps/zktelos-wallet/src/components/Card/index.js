@@ -27,7 +27,7 @@ const Card = styled.div`
 
 const Title = styled.span`
   color: ${props => props.theme.card.title.color};
-  font-weight: ${props => props.theme.text.weight.normal};
+  font-weight: ${props => props.theme.text.weight.bold};
   padding: 0 10px;
 `;
 

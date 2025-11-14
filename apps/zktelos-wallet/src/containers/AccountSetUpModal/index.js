@@ -5,18 +5,19 @@ import AccountSetUpModal from 'components/AccountSetUpModal';
 
 export default () => {
   const {
-    isAccountSetUpModalOpen,
-    closeAccountSetUpModal,
-    closePasswordModal,
+    isAccessAccountModalOpen,
+    isCreateAccountModalOpen,
+    closeAccessAccountModal,
+    closeCreateAccountModal,
   } = useContext(ModalContext);
   const { saveZkAccountMnemonic } = useContext(ZkAccountContext);
 
   return (
     <AccountSetUpModal
-      isOpen={isAccountSetUpModalOpen}
-      onClose={closeAccountSetUpModal}
+      isOpen={isAccessAccountModalOpen || isCreateAccountModalOpen}
+      mode={isAccessAccountModalOpen ? 'access' : isCreateAccountModalOpen ? 'create' : null}
+      onClose={isAccessAccountModalOpen ? closeAccessAccountModal : closeCreateAccountModal}
       saveZkAccountMnemonic={saveZkAccountMnemonic}
-      closePasswordModal={closePasswordModal}
     />
   );
 }

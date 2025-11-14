@@ -51,7 +51,7 @@ export default ({ empty }) => {
     zkAccount, isLoadingZkAccount, balance: poolBalance,
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
-  const { openWalletModal, openAccountSetUpModal, openSwapModal } = useContext(ModalContext);
+  const { openWalletModal, openAccessAccountModal, openSwapModal } = useContext(ModalContext);
   const { currentPool } = useContext(PoolContext);
 
   const refresh = useCallback(e => {
@@ -147,11 +147,11 @@ export default ({ empty }) => {
       loading={isLoadingZkAccount}
       contrast
       disabled={isLoadingZkAccount}
-      onClick={openAccountSetUpModal}
+      onClick={openAccessAccountModal}
       data-ga-id="zkaccount-header"
       className="create-zkaccount"
     >
-      {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.zkAccount')}
+      {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.accessPrivateAccount')}
     </Button>
   );
 
@@ -163,10 +163,10 @@ export default ({ empty }) => {
         </LogoSection>
         <AccountSection>
           {!isMobile && networkDropdown}
-          <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
+          {/* <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
-          </BridgeButton>
-          {!isMobile && walletDropdown}
+          </BridgeButton> */}
+          {/* {!isMobile && walletDropdown} */}
           {!isMobile && zkAccountDropdown}
           {(zkAccount && !isMobile) && (
             <RefreshButtonContainer onClick={refresh}>

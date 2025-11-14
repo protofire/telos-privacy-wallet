@@ -26,7 +26,9 @@
     "totalAssetBalance": "Soma dos ativos mantidos em sua carteira pública e zkAccount, mostrados em USD.",
     "shieldedAddress": "Endereço protegido: ",
     "shieldedBalance": "Saldo protegido: ",
-    "generatingAddress": "Gerando endereço..."
+    "generatingAddress": "Gerando endereço...",
+    "accessPrivateAccount": "Acessar Conta Privada",
+    "createPrivateAccount": "Criar Conta Privada"
   },
   "buttonText": {
     "connectWallet": "Conectar carteira",
@@ -76,9 +78,10 @@
   },
   "home": {
     "title": "Início",
+    "titleOffline": "Crie sua Conta Privada",
     "portfolio": "Meu portfólio",
     "latestTransactions": "Últimas transações",
-    "connectWalletToViewPortfolio": "Conecte sua carteira para visualizar seu portfólio"
+    "description": "Gere uma conta privada segura e desbloqueie transferências com preservação de privacidade."
   },
   "portfolio": {
     "asset": "Ativo",
@@ -214,44 +217,42 @@
     "description": "Você pode fechar esta janela e voltar mais tarde para ver os resultados. Deseja fechar a janela?"
   },
   "accountSetupModal": {
-    "start": {
-      "title": "zkAccount",
-      "description": "Para começar a usar o zkTelos, você precisa de uma conta zkAccount",
-      "button1": "Criar nova conta zkAccount",
-      "button2": "Já tenho uma conta zkAccount"
+    "access": {
+      "title": "Acessar Conta Privada",
+      "sectionTitle": "Escolha como você deseja acessar:",
+      "metaMaskDescription": "Assine uma mensagem para criar ou desbloquear sua Conta Privada.",
+      "walletConnectDescription": "Conecte qualquer carteira compatível para acessar sua Conta Privada.",
+      "dividerText": "Ou restaurar usando frase secreta:",
+      "seedphraseTitle": "Digite a Frase Secreta",
+      "seedphraseDescription": "Restaurar uma Conta Privada existente."
     },
-    "createOptions": {
-      "title": "Escolha como você deseja criar sua conta",
-      "description": "Ao criar uma conta zkAccount, você concorda e aceita os <1>Termos de Serviço</1> do zkTelos",
-      "button1": "Usar minha carteira Web3",
-      "button2": "Conta instantânea zkTelos"
+    "create": {
+      "title": "Criar Conta Privada",
+      "sectionTitle": "Escolha como você deseja gerar sua conta privada:",
+      "metaMaskDescription": "Use uma assinatura simples da carteira para criar sua conta privada.",
+      "walletConnectDescription": "Use qualquer carteira compatível para criar sua conta privada.",
+      "dividerText": "Ou criar uma Conta Instantânea:",
+      "instantTitle": "Conta Instantânea (frase secreta)",
+      "instantDescription": "Gere uma nova frase secreta. Você precisará guardá-la com segurança."
     },
-    "restoreOptions": {
-      "title": "Como você criou sua conta?",
-      "button1": "Usei uma carteira Web3",
-      "button2": "Usei a frase secreta do zkTelos"
+    "signToAccess": {
+      "title": "Assinar para Acessar"
     },
-    "createWithWallet": {
-      "title": "Criar nova conta zkAccount",
-      "description": "Escolha a carteira que será associada à sua conta zkAccount"
+    "signToCreate": {
+      "title": "Assinar para Criar"
+    },
+    "restoreWithSecret": {
+      "title": "Restaurar com Frase Secreta",
+      "description": "Digite sua frase secreta salva para restaurar uma conta existente"
     },
     "createWithSecret": {
-      "title": "Criar nova conta zkAccount",
+      "title": "Salve sua Frase Secreta",
       "description": "Anote ou copie estas palavras na ordem correta e guarde-as em um local seguro",
       "warning": "Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
       "copy": "Copiar frase secreta"
     },
-    "restoreWithWallet": {
-      "title": "Acessar sua conta zkAccount",
-      "description": "Selecione a carteira que você usou para criar sua conta zkAccount",
-      "warning": "As carteiras MetaMask e Wallet Connect serão usadas apenas para restaurar o acesso à sua conta anterior zkTelos"
-    },
-    "restoreWithSecret": {
-      "title": "Restaurar conta zkAccount",
-      "description": "Digite sua frase secreta salva para restaurar uma conta existente"
-    },
     "confirmSecret": {
-      "title": "Confirmar frase secreta",
+      "title": "Confirme sua Frase Secreta",
       "description": "Digite sua frase secreta para verificá-la.<br/> Clique em uma palavra para removê-la"
     },
     "signMessageToCreate": {
@@ -261,14 +262,6 @@
     "signMessageToRestore": {
       "title": "Assine a mensagem para acessar sua conta zkAccount",
       "description": "Acessando sua conta zkAccount com sua carteira conectada."
-    },
-    "createPasswordPrompt": {
-      "title": "Configurar senha?",
-      "description": "Você pode criar uma senha segura que será solicitada cada vez que você entrar na sua conta zkAccount"
-    },
-    "createPassword": {
-      "title": "Criar senha",
-      "description": "Para aumentar a segurança, a entrada de senha é necessária cada vez que uma página é recarregada."
     }
   },
   "password": {

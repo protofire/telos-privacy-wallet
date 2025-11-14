@@ -26,7 +26,9 @@
     "totalAssetBalance": "您公共钱包和zk账户中资产的总价值，以USD显示。",
     "shieldedAddress": "隐私地址: ",
     "shieldedBalance": "隐私余额: ",
-    "generatingAddress": "生成隐私地址..."
+    "generatingAddress": "生成隐私地址...",
+    "accessPrivateAccount": "访问私密账户",
+    "createPrivateAccount": "创建私密账户"
   },
   "buttonText": {
     "connectWallet": "连接钱包",
@@ -76,9 +78,10 @@
   },
   "home": {
     "title": "首页",
+    "titleOffline": "创建您的私密账户",
     "portfolio": "我的投资组合",
     "latestTransactions": "最新交易",
-    "connectWalletToViewPortfolio": "连接您的钱包以查看您的投资组合"
+    "description": "生成安全的私密账户并开启隐私保护转账。"
   },
   "portfolio": {
     "asset": "资产",
@@ -214,44 +217,42 @@
     "description": "您可以关闭此窗口并稍后返回页面以查看结果。是否关闭窗口？"
   },
   "accountSetupModal": {
-    "start": {
-      "title": "zk账户",
-      "description": "您需要一个zk账户以开始使用zkTelos",
-      "button1": "创建新的zk账户",
-      "button2": "已有zk账户"
+    "access": {
+      "title": "访问私密账户",
+      "sectionTitle": "选择您的访问方式：",
+      "metaMaskDescription": "签署消息以创建或解锁您的私密账户。",
+      "walletConnectDescription": "连接任何兼容的钱包以访问您的私密账户。",
+      "dividerText": "或使用助记词恢复：",
+      "seedphraseTitle": "输入助记词",
+      "seedphraseDescription": "恢复现有的私密账户。"
     },
-    "createOptions": {
-      "title": "选择您创建账户的方式",
-      "description": "创建zk账户，即表示您同意并接受zkTelos<1>服务条款</1>",
-      "button1": "使用Web3钱包",
-      "button2": "即时zkTelos账户"
+    "create": {
+      "title": "创建私密账户",
+      "sectionTitle": "选择您的账户生成方式：",
+      "metaMaskDescription": "使用简单的钱包签名创建您的私密账户。",
+      "walletConnectDescription": "使用任何兼容的钱包创建您的私密账户。",
+      "dividerText": "或创建即时账户：",
+      "instantTitle": "即时账户（助记词）",
+      "instantDescription": "生成新的助记词。您需要安全地保存它。"
     },
-    "restoreOptions": {
-      "title": "您通过何种方式创建账户？",
-      "button1": "我用的是Web3钱包",
-      "button2": "我用的是zkTelos助记词"
+    "signToAccess": {
+      "title": "签名以访问"
     },
-    "createWithWallet": {
-      "title": "创建新的zk账户",
-      "description": "选择将与您的zk账户连接的钱包"
+    "signToCreate": {
+      "title": "签名以创建"
+    },
+    "restoreWithSecret": {
+      "title": "使用助记词恢复",
+      "description": "输入您保存的助记词以恢复现有账户"
     },
     "createWithSecret": {
-      "title": "创建新的zk账户",
+      "title": "保存您的助记词",
       "description": "请按正确的顺序抄写或复制助记词，并妥善保存",
       "warning": "请勿与任何人分享您的助记词，<br/>请妥善保存！",
       "copy": "复制助记词"
     },
-    "restoreWithWallet": {
-      "title": "登入zk账户",
-      "description": "请选择您用于创建zk账户的钱包地址",
-      "warning": "MetaMask和Wallet Connect钱包仅用于恢复对您之前的zkTelos账户的访问权限"
-    },
-    "restoreWithSecret": {
-      "title": "恢复zk账户",
-      "description": "输入助记词以恢复已有帐户"
-    },
     "confirmSecret": {
-      "title": "确认助记词",
+      "title": "确认您的助记词",
       "description": "请输入您的助记词并进行验证。<br/>点击某个单词即可将其删除"
     },
     "signMessageToCreate": {
@@ -261,14 +262,6 @@
     "signMessageToRestore": {
       "title": "完成签名，登入您的zk账户",
       "description": "使用已连接的钱包登入您的zk账户。"
-    },
-    "createPasswordPrompt": {
-      "title": "设置密码？",
-      "description": "您可以创建安全密码。每当您登录zk账户时，我们都会向您询问该密码。"
-    },
-    "createPassword": {
-      "title": "创建密码",
-      "description": "为增强安全性，每次重新加载页面时都需要您重新输入密码。"
     }
   },
   "password": {

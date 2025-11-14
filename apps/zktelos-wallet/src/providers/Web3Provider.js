@@ -72,7 +72,7 @@ const client = createClient({
   autoConnect: true,
   provider,
   webSocketProvider,
-  connectors: [injected, walletConnect],
+  connectors: [injected, /*walletConnect*/],
 });
 
 export default ({ children }) => (

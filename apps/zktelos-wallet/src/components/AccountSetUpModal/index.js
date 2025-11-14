@@ -1,170 +1,162 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 import md5 from 'js-md5';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import Modal from 'components/Modal';
-import Button from 'components/Button';
-import Link from 'components/Link';
+import WalletConnectors from 'components/WalletConnectors';
 
 import { WalletContext } from 'contexts';
 
 import Create from './Create';
 import Confirm from './Confirm';
 import Restore from './Restore';
-import Generate from './Generate';
-import Password from './Password';
-import Sign from './Sign';
 
 const STEP = {
-  START: 1,
-  CREATE_OPTIONS: 2,
-  RESTORE_OPTIONS: 3,
-  CREATE_WITH_WALLET: 4,
-  CREATE_WITH_SECRET: 5,
-  RESTORE_WITH_WALLET: 6,
-  RESTORE_WITH_SECRET: 7,
-  CONFIRM_SECRET: 8,
-  SING_MESSAGE_TO_CREATE: 9,
-  SING_MESSAGE_TO_RESTORE: 10,
-  CREATE_PASSWORD_PROMPT: 11,
-  CREATE_PASSWORD: 12,
+  ACCESS_ACCOUNT: 1,
+  CREATE_ACCOUNT: 2,
+  ENTER_SEEDPHRASE: 3,
+  CREATE_INSTANT: 4,
+  CONFIRM_INSTANT: 5,
 };
 
-const Start = ({ setStep }) => {
+const AccessAccount = ({ setStep, generate }) => {
   const { t } = useTranslation();
+
+  const walletDescriptions = {
+    'MetaMask': t('accountSetupModal.access.metaMaskDescription'),
+    'WalletConnect': t('accountSetupModal.access.walletConnectDescription'),
+  };
+
   return (
     <Container>
-      <Description>
-        {t('accountSetupModal.start.description')}
-      </Description>
-      <Button onClick={() => setStep(STEP.CREATE_OPTIONS)} data-ga-id="signup-start">
-        {t('accountSetupModal.start.button1')}
-      </Button>
-      <SecondButton onClick={() => setStep(STEP.RESTORE_OPTIONS)} data-ga-id="login-start">
-        {t('accountSetupModal.start.button2')}
-      </SecondButton>
+      <SectionTitle>{t('accountSetupModal.access.sectionTitle')}</SectionTitle>
+
+      <WalletConnectors
+        callback={generate}
+        gaIdPrefix="access-"
+        descriptions={walletDescriptions}
+      />
+
+      <Divider>
+        <DividerLine />
+        <DividerText>{t('accountSetupModal.access.dividerText')}</DividerText>
+        <DividerLine />
+      </Divider>
+
+      <OptionCard onClick={() => setStep(STEP.ENTER_SEEDPHRASE)}>
+        <OptionContent>
+          <OptionTitle>{t('accountSetupModal.access.seedphraseTitle')}</OptionTitle>
+          <OptionDescription>
+            {t('accountSetupModal.access.seedphraseDescription')}
+          </OptionDescription>
+        </OptionContent>
+      </OptionCard>
     </Container>
   );
 };
 
-const CreateOptions = ({ setStep }) => {
+const CreateAccount = ({ setStep, generate }) => {
   const { t } = useTranslation();
+
+  const walletDescriptions = {
+    'MetaMask': t('accountSetupModal.create.metaMaskDescription'),
+    'WalletConnect': t('accountSetupModal.create.walletConnectDescription'),
+  };
+
   return (
     <Container>
-      <Button onClick={() => setStep(STEP.CREATE_WITH_WALLET)} data-ga-id="signup-web3-wallet">
-        {t('accountSetupModal.createOptions.button1')}
-      </Button>
-      <SecondButton onClick={() => setStep(STEP.CREATE_WITH_SECRET)} data-ga-id="signup-secret-phrase">
-        {t('accountSetupModal.createOptions.button2')}
-      </SecondButton>
-      <Description>
-        <Trans
-          i18nKey="accountSetupModal.createOptions.description"
-          components={{ 1: <Link href="https://docs.zkbob.com/zkbob-overview/compliance-and-security" /> }}
-        />
-      </Description>
+      <SectionTitle>{t('accountSetupModal.create.sectionTitle')}</SectionTitle>
+
+      <WalletConnectors
+        callback={generate}
+        gaIdPrefix="create-"
+        descriptions={walletDescriptions}
+      />
+
+      <Divider>
+        <DividerLine />
+        <DividerText>{t('accountSetupModal.create.dividerText')}</DividerText>
+        <DividerLine />
+      </Divider>
+
+      <OptionCard onClick={() => setStep(STEP.CREATE_INSTANT)}>
+        <OptionContent>
+          <OptionTitle>{t('accountSetupModal.create.instantTitle')}</OptionTitle>
+          <OptionDescription>
+            {t('accountSetupModal.create.instantDescription')}
+          </OptionDescription>
+        </OptionContent>
+      </OptionCard>
     </Container>
   );
 };
 
-const RestoreOptions = ({ setStep }) => {
-  const { t } = useTranslation();
-  return (
-    <Container>
-      <Button onClick={() => setStep(STEP.RESTORE_WITH_WALLET)} data-ga-id="login-web3-wallet">
-        {t('accountSetupModal.restoreOptions.button1')}
-      </Button>
-      <SecondButton onClick={() => setStep(STEP.RESTORE_WITH_SECRET)} data-ga-id="login-secret-phrase">
-        {t('accountSetupModal.restoreOptions.button2')}
-      </SecondButton>
-    </Container>
-  );
-};
-
-const PasswordPrompt = ({ setStep, close }) => {
-  const { t } = useTranslation();
-  return (
-    <Container>
-      <Description>
-        {t('accountSetupModal.createPasswordPrompt.description')}
-      </Description>
-      <Button onClick={() => setStep(STEP.CREATE_PASSWORD)} data-ga-id="password-set">
-        {t('buttonText.setPassword')}
-      </Button>
-      <SecondButton onClick={close} data-ga-id="password-skip">
-        {t('buttonText.skip')}
-      </SecondButton>
-    </Container>
-  );
-};
-
-export default ({ isOpen, onClose, saveZkAccountMnemonic, closePasswordModal }) => {
+export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => {
   const { t } = useTranslation();
   const evmWallet = useContext(WalletContext);
-  const [step, setStep] = useState(STEP.START);
+  const initialStep = mode === 'create' ? STEP.CREATE_ACCOUNT : STEP.ACCESS_ACCOUNT;
+  const [step, setStep] = useState(initialStep);
   const [newMnemonic, setNewMnemonic] = useState();
-  const [confirmedMnemonic, setConfirmedMnemonic] = useState();
 
   const closeModal = useCallback(() => {
-    setStep(STEP.START);
+    setStep(initialStep);
     setNewMnemonic(null);
     onClose();
-  }, [onClose]);
+  }, [onClose, initialStep]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setStep(initialStep);
+      setNewMnemonic(null);
+    }
+  }, [isOpen, mode, initialStep]);
 
   const setNextStep = useCallback(nextStep => {
-    if (nextStep === STEP.CREATE_WITH_SECRET) {
-      let newMnemonic = null;
-      newMnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
-      setNewMnemonic(newMnemonic);
-      setConfirmedMnemonic(newMnemonic);
+    if (nextStep === STEP.CREATE_INSTANT) {
+      const mnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
+      setNewMnemonic(mnemonic);
     }
     setStep(nextStep);
   }, []);
 
   const confirmMnemonic = useCallback(() => {
-    setConfirmedMnemonic(newMnemonic);
-    setStep(STEP.CREATE_PASSWORD_PROMPT);
-  }, [newMnemonic]);
+    const isNewAccount = true;
+    saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
+    closeModal();
+  }, [newMnemonic, saveZkAccountMnemonic, closeModal]);
 
   const restore = useCallback(mnemonic => {
-    setConfirmedMnemonic(mnemonic);
-    setStep(STEP.CREATE_PASSWORD_PROMPT);
-  }, []);
+    const isNewAccount = false;
+    saveZkAccountMnemonic(mnemonic, null, isNewAccount);
+    closeModal();
+  }, [saveZkAccountMnemonic, closeModal]);
 
   const generate = useCallback(async () => {
-    const { signMessage } = evmWallet;
-    const message = 'Only sign this message for a trusted client!';
-    let signedMessage = await signMessage(message);
-    if (!window.location.host.includes(process.env.REACT_APP_LEGACY_SIGNATURE_DOMAIN)) {
-      // Metamask with ledger returns V=0/1 here too, we need to adjust it to be ethereum's valid value (27 or 28)
-      const MIN_VALID_V_VALUE = 27;
-      let sigV = parseInt(signedMessage.slice(-2), 16);
-      if (sigV < MIN_VALID_V_VALUE) {
-        sigV += MIN_VALID_V_VALUE;
+    try {
+      const { signMessage } = evmWallet;
+      const message = 'Access zkTelos account.\n\nOnly sign this message for a trusted client';
+      let signedMessage = await signMessage(message);
+      if (!window.location.host.includes(process.env.REACT_APP_LEGACY_SIGNATURE_DOMAIN)) {
+        // Metamask with ledger returns V=0/1 here too, we need to adjust it to be ethereum's valid value (27 or 28)
+        const MIN_VALID_V_VALUE = 27;
+        let sigV = parseInt(signedMessage.slice(-2), 16);
+        if (sigV < MIN_VALID_V_VALUE) {
+          sigV += MIN_VALID_V_VALUE;
+        }
+        signedMessage = signedMessage.slice(0, -2) + sigV.toString(16);
       }
-      signedMessage = signedMessage.slice(0, -2) + sigV.toString(16);
-    }
-    const newMnemonic = ethers.utils.entropyToMnemonic(md5.array(signedMessage));
-    setConfirmedMnemonic(newMnemonic);
-    setStep(STEP.CREATE_PASSWORD_PROMPT);
-  }, [evmWallet]);
+      const newMnemonic = ethers.utils.entropyToMnemonic(md5.array(signedMessage));
+      const isNewAccount = !!newMnemonic;
+      saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
 
-  const confirmPassword = useCallback(password => {
-    const isNewAccount = !!newMnemonic;
-    saveZkAccountMnemonic(confirmedMnemonic, password, isNewAccount);
-    closePasswordModal();
-    closeModal();
-  }, [newMnemonic, confirmedMnemonic, saveZkAccountMnemonic, closeModal, closePasswordModal]);
-
-  const tryToClose = useCallback(() => {
-    if ([STEP.CREATE_PASSWORD, STEP.CREATE_PASSWORD_PROMPT].includes(step)) {
-      confirmPassword(null);
-      return;
+    } catch (error) {
+      console.error('Error generating account from signature:', error);
+    } finally {
+      closeModal();
     }
-    closeModal();
-  }, [step, closeModal, confirmPassword]);
+  }, [evmWallet, saveZkAccountMnemonic, closeModal]);
 
   let title = null;
   let component = null;
@@ -172,85 +164,37 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, closePasswordModal }) 
 
   switch (step) {
     default:
-    case STEP.START:
-      title = t('accountSetupModal.start.title');
-      component = <Start setStep={setStep} />;
+    case STEP.ACCESS_ACCOUNT:
+      title = t('accountSetupModal.access.title');
+      component = <AccessAccount setStep={setStep} generate={generate} />;
       prevStep = null;
       break;
-    case STEP.CREATE_OPTIONS:
-      title = t('accountSetupModal.createOptions.title');
-      component = <CreateOptions setStep={setNextStep} />;
-      prevStep = STEP.START;
+    case STEP.CREATE_ACCOUNT:
+      title = t('accountSetupModal.create.title');
+      component = <CreateAccount setStep={setNextStep} generate={generate} />;
+      prevStep = null;
       break;
-    case STEP.RESTORE_OPTIONS:
-      title = t('accountSetupModal.restoreOptions.title');
-      component = <RestoreOptions setStep={setStep} />;
-      prevStep = STEP.START;
-      break;
-    case STEP.CREATE_WITH_WALLET:
-      title = t('accountSetupModal.createWithWallet.title');
-      component = (
-        <Generate
-          isCreation
-          next={connector => {
-            setStep(STEP.SING_MESSAGE_TO_CREATE);
-          }}
-        />
-      );
-      prevStep = STEP.CREATE_OPTIONS;
-      break;
-    case STEP.CREATE_WITH_SECRET:
-      title = t('accountSetupModal.createWithSecret.title');
-      component = <Create mnemonic={newMnemonic} next={() => setStep(STEP.CONFIRM_SECRET)} />;
-      prevStep = STEP.CREATE_OPTIONS;
-      break;
-    case STEP.RESTORE_WITH_WALLET:
-      title = t('accountSetupModal.restoreWithWallet.title');
-      component = (
-        <Generate
-          next={() => {
-            setStep(STEP.SING_MESSAGE_TO_RESTORE);
-          }}
-        />
-      );
-      prevStep = STEP.RESTORE_OPTIONS;
-      break;
-    case STEP.RESTORE_WITH_SECRET:
+    case STEP.ENTER_SEEDPHRASE:
       title = t('accountSetupModal.restoreWithSecret.title');
       component = <Restore restore={restore} />;
-      prevStep = STEP.RESTORE_OPTIONS;
+      prevStep = STEP.ACCESS_ACCOUNT;
       break;
-    case STEP.CONFIRM_SECRET:
+    case STEP.CREATE_INSTANT:
+      title = t('accountSetupModal.createWithSecret.title');
+      component = <Create mnemonic={newMnemonic} next={() => setStep(STEP.CONFIRM_INSTANT)} />;
+      prevStep = STEP.CREATE_ACCOUNT;
+      break;
+    case STEP.CONFIRM_INSTANT:
       title = t('accountSetupModal.confirmSecret.title');
       component = <Confirm mnemonic={newMnemonic} confirmMnemonic={confirmMnemonic} />;
-      prevStep = STEP.CREATE_WITH_SECRET;
-      break;
-    case STEP.SING_MESSAGE_TO_CREATE:
-      title = t('accountSetupModal.signMessageToCreate.title');
-      component = <Sign isCreation sign={generate} />;
-      prevStep = STEP.CREATE_WITH_WALLET;
-      break;
-    case STEP.SING_MESSAGE_TO_RESTORE:
-      title = t('accountSetupModal.signMessageToRestore.title');
-      component = <Sign sign={generate} />;
-      prevStep = STEP.RESTORE_WITH_WALLET;
-      break;
-    case STEP.CREATE_PASSWORD_PROMPT:
-      title = t('accountSetupModal.createPasswordPrompt.title');
-      component = <PasswordPrompt setStep={setStep} close={tryToClose} />;
-      prevStep = null;
-      break;
-    case STEP.CREATE_PASSWORD:
-      title = t('accountSetupModal.createPassword.title');
-      component = <Password confirmPassword={confirmPassword} />;
-      prevStep = null;
+      prevStep = STEP.CREATE_INSTANT;
       break;
   }
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={tryToClose}
+      onClose={closeModal}
       onBack={prevStep ? () => setStep(prevStep) : null}
       title={title}
     >
@@ -271,16 +215,67 @@ const Container = styled.div`
   }
 `;
 
-const Description = styled.span`
-  text-align: center;
+const SectionTitle = styled.h3`
   font-size: 14px;
-  color: ${({ theme }) => theme.text.color.secondary};
   font-weight: ${({ theme }) => theme.text.weight.normal};
-  line-height: 20px;
+  color: ${({ theme }) => theme.text.color.secondary};
+  margin: 0 0 8px 0;
 `;
 
-const SecondButton = styled(Button)`
-  background: transparent;
-  border: 1px solid ${props => props.theme.button.primary.background.default};
-  color: ${props => props.theme.button.primary.background.default};
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 8px 0;
+`;
+
+const DividerLine = styled.div`
+  flex: 1;
+  height: 1px;
+  background: ${({ theme }) => theme.text.color.secondary}33;
+`;
+
+const DividerText = styled.span`
+  font-size: 12px;
+  color: ${({ theme }) => theme.text.color.secondary};
+  padding: 0 12px;
+  white-space: nowrap;
+`;
+
+const OptionCard = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  border: 1px solid ${({ theme }) => theme.walletConnectorOption.border.default};
+  border-radius: 16px;
+  width: 100%;
+  min-height: 76px;
+  padding: 16px 24px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: ${({ theme }) => theme.walletConnectorOption.background.hover};
+    border: 1px solid ${({ theme }) => theme.walletConnectorOption.border.hover};
+  }
+`;
+
+const OptionContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const OptionTitle = styled.span`
+  font-size: 16px;
+  color: ${({ theme }) => theme.text.color.primary};
+  font-weight: ${({ theme }) => theme.text.weight.semibold};
+`;
+
+const OptionDescription = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.text.color.secondary};
+  line-height: 18px;
 `;
