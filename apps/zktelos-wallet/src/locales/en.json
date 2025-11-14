@@ -26,7 +26,9 @@
     "totalAssetBalance": "Sum of assets held in your public wallet and zkAccount, shown in USD.",
     "shieldedAddress": "Shielded address: ",
     "shieldedBalance": "Shielded balance: ",
-    "generatingAddress": "Generating address..."
+    "generatingAddress": "Generating address...",
+    "accessPrivateAccount": "Access Private Account",
+    "createPrivateAccount": "Create Private Account"
   },
   "buttonText": {
     "connectWallet": "Connect wallet",
@@ -76,9 +78,10 @@
   },
   "home": {
     "title": "Home",
+    "titleOffline": "Create your Private Account",
     "portfolio": "My portfolio",
     "latestTransactions": "Latest transactions",
-    "connectWalletToViewPortfolio": "Connect your wallet to view your portfolio"
+    "description": "Generate a secure private account and unlock privacy-preserving transfers."
   },
   "portfolio": {
     "asset": "Asset",
@@ -214,44 +217,42 @@
     "description": "You can close this window and return later to view the results. Do you want to close the window?"
   },
   "accountSetupModal": {
-    "start": {
-      "title": "zkAccount",
-      "description": "To start working with zkTelos you need a zkAccount",
-      "button1": "Create new zkAccount",
-      "button2": "I already have a zkAccount"
+    "access": {
+      "title": "Access Private Account",
+      "sectionTitle": "Choose how you want to access:",
+      "metaMaskDescription": "Sign a message to create or unlock your Private Account.",
+      "walletConnectDescription": "Connect any compatible wallet to access your Private Account.",
+      "dividerText": "Or restore using seedphrase:",
+      "seedphraseTitle": "Enter Seedphrase",
+      "seedphraseDescription": "Restore an existing Private Account."
     },
-    "createOptions": {
-      "title": "Choose how you would like to create your account",
-      "description": "By creating zkAccount, you hereby agree to and accept zkTelos <1>Terms of Service</1>",
-      "button1": "Use my Web3 wallet",
-      "button2": "Instant zkTelos account"
+    "create": {
+      "title": "Create Private Account",
+      "sectionTitle": "Choose how you want to generate your private account:",
+      "metaMaskDescription": "Use a simple wallet signature to create your private account.",
+      "walletConnectDescription": "Use any compatible wallet to create your private account.",
+      "dividerText": "Or create an Instant Account:",
+      "instantTitle": "Instant Account (seed phrase)",
+      "instantDescription": "Generate a new seed phrase. You'll need to store it safely."
     },
-    "restoreOptions": {
-      "title": "How did you create your account?",
-      "button1": "I used a Web3 wallet",
-      "button2": "I used zkTelos secret phrase"
+    "signToAccess": {
+      "title": "Sign to Access"
     },
-    "createWithWallet": {
-      "title": "Create new zkAccount",
-      "description": "Choose the wallet that will be associated with your zkAccount"
+    "signToCreate": {
+      "title": "Sign to Create"
+    },
+    "restoreWithSecret": {
+      "title": "Restore with Seedphrase",
+      "description": "Input your saved secret phrase to restore an existing account"
     },
     "createWithSecret": {
-      "title": "Create new zkAccount",
+      "title": "Save Your Seed Phrase",
       "description": "Write down or copy these words in the right order and save them somewhere safe",
       "warning": "Never share your secret phrase with anyone,<br/> store it securely!",
       "copy": "Copy secret phrase"
     },
-    "restoreWithWallet": {
-      "title": "Login to your zkAccount",
-      "description": "Select the wallet you used to create your zkAccount",
-      "warning": "MetaMask and Wallet Connect wallets will be used only for restoring access to your previous zkTelos account"
-    },
-    "restoreWithSecret": {
-      "title": "Restore zkAccount",
-      "description": "Input your saved secret phrase to restore an existing account"
-    },
     "confirmSecret": {
-      "title": "Confirm secret phrase",
+      "title": "Confirm Your Seed Phrase",
       "description": "Please input your secret phrase to verify it.<br/> Click on a word to remove it"
     },
     "signMessageToCreate": {
@@ -261,14 +262,6 @@
     "signMessageToRestore": {
       "title": "Sign the message to login to your zkAccount",
       "description": "Accessing your zkAccount with your connected wallet."
-    },
-    "createPasswordPrompt": {
-      "title": "Set up the password?",
-      "description": "You can create a secure password that we'll ask you every time when you log in to zkAccount"
-    },
-    "createPassword": {
-      "title": "Create password",
-      "description": "To enhance security, password entry is required each time a page reloads."
     }
   },
   "password": {

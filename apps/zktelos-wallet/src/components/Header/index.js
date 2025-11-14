@@ -151,7 +151,7 @@ export default ({ empty }) => {
       data-ga-id="zkaccount-header"
       className="create-zkaccount"
     >
-      {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.zkAccount')}
+      {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.accessPrivateAccount')}
     </Button>
   );
 
@@ -166,7 +166,7 @@ export default ({ empty }) => {
           <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton>
-          {!isMobile && walletDropdown}
+          {/* {!isMobile && walletDropdown} */}
           {!isMobile && zkAccountDropdown}
           {(zkAccount && !isMobile) && (
             <RefreshButtonContainer onClick={refresh}>

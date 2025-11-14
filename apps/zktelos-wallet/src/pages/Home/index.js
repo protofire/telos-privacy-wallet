@@ -43,11 +43,11 @@ export default () => {
         </CardsContainer>
       ) : (
         <CardsContainer>
-          <Card title={t('home.portfolio')}>
+          <Card title={t('home.titleOffline')}>
             <EmptyPortfolioContainer>
-              <EmptyPortfolioText>{t('home.connectWalletToViewPortfolio')}</EmptyPortfolioText>
-              <ConnectWalletButton onClick={openWalletModal} data-ga-id="connect-wallet-home">
-                {t('buttonText.connectWallet')}
+              <EmptyPortfolioText>{t('home.description')}</EmptyPortfolioText>
+              <ConnectWalletButton onClick={openCreateAccountModal} data-ga-id="connect-wallet-home">
+                {t('common.createPrivateAccount')}
               </ConnectWalletButton>
             </EmptyPortfolioContainer>
           </Card>
@@ -128,7 +128,7 @@ const EmptyPortfolioContainer = styled.div`
 const EmptyPortfolioText = styled.span`
   font-size: 14px;
   color: ${props => props.theme.text.color.secondary};
-  text-align: center;
+  text-align: left;
   line-height: 1.5;
 `;
 
