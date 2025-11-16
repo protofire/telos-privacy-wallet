@@ -7,6 +7,7 @@ import Card from 'components/Card';
 import Spinner from 'components/Spinner';
 import LatestTransactions from 'components/LatestTransactions';
 import Portfolio from 'components/Portfolio';
+import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
 import Button from 'components/Button';
 
@@ -35,13 +36,7 @@ export default () => {
 
   return (
     <ContentContainer>
-      {account || zkAccount ? (
-        <CardsContainer>
-          <Card title={t('home.portfolio')}>
-            <Portfolio />
-          </Card>
-        </CardsContainer>
-      ) : (
+      {(!account && !zkAccount) && (
         <CardsContainer>
           <Card title={t('home.titleOffline')}>
             <EmptyPortfolioContainer>
@@ -50,6 +45,22 @@ export default () => {
                 {t('common.createPrivateAccount')}
               </ConnectWalletButton>
             </EmptyPortfolioContainer>
+          </Card>
+        </CardsContainer>
+      )}
+
+      {zkAccount && (
+        <CardsContainer>
+          <Card title={t('home.privateAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
+            <PrivateAccount />
+          </Card>
+        </CardsContainer>
+      )}
+
+      {account && (
+        <CardsContainer>
+          <Card title={t('home.publicAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
+            <Portfolio />
           </Card>
         </CardsContainer>
       )}

@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import ButtonDefault from 'components/Button';
 import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
-
 import WalletDropdown from 'components/WalletDropdown';
 import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
@@ -13,6 +12,11 @@ import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
+
+import { ReactComponent as StyledEyeIcon } from 'assets/eye.svg';
+import { ReactComponent as StyledEyeClosedIcon } from 'assets/eye-off.svg';
+
+import { BalanceVisibilityContext } from 'contexts';
 
 import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
 import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
@@ -52,6 +56,7 @@ export default ({ empty }) => {
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
   const { openWalletModal, openAccessAccountModal, openSwapModal } = useContext(ModalContext);
+  const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { currentPool } = useContext(PoolContext);
 
   const refresh = useCallback(e => {
@@ -167,6 +172,9 @@ export default ({ empty }) => {
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton> */}
           {/* {!isMobile && walletDropdown} */}
+          {(account || zkAccount) && <IconWrapper onClick={toggleVisibility}>
+            {isVisible ? <StyledEyeIcon /> : <StyledEyeClosedIcon />}
+          </IconWrapper>}
           {!isMobile && zkAccountDropdown}
           {(zkAccount && !isMobile) && (
             <RefreshButtonContainer onClick={refresh}>
@@ -387,5 +395,20 @@ const Divider = styled.span`
     font-size: 16px;
     color: ${props => props.theme.text.color.primary};
     margin: 0 4px;
+  }
+`;
+
+const IconWrapper = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: opacity 0.2s ease;
+  width: 24px;
+  height: 24px;
+
+  &:hover {
+    opacity: 0.7;
   }
 `;

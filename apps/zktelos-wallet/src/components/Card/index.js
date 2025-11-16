@@ -13,12 +13,12 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  padding: 16px 12px 12px;
+  padding: 8px 6px 6px;
   width: 480px;
   max-width: 100%;
   box-sizing: border-box;
   & > * {
-    margin-bottom: 12px;
+    margin-bottom: 6px;
   }
   & > :last-child {
     margin-bottom: 0;

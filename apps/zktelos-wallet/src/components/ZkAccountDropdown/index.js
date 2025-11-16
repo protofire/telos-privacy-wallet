@@ -17,7 +17,7 @@ import { formatNumber } from 'utils';
 
 import { TOKENS_ICONS } from 'constants';
 
-import { ZkAccountContext, ModalContext, PoolContext, BalanceVisibilityContext } from 'contexts';
+import { ZkAccountContext, ModalContext, PoolContext, BalanceVisibilityContext, WalletContext } from 'contexts';
 
 const Content = ({
   balance, generateAddress, getSeed, setPassword,
@@ -30,6 +30,7 @@ const Content = ({
   const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { isVisible } = useContext(BalanceVisibilityContext);
+  const { disconnect } = useContext(WalletContext);
 
   const { hasPassword } = getSeed();
 
@@ -59,9 +60,9 @@ const Content = ({
     }
   }, [initializeGiftCard, close]);
 
-  const handleOptionClick = useCallback(action => {
+  const handleOptionClick = useCallback(actions => {
     close();
-    action();
+    actions.forEach(action => action());
   }, [close]);
 
   const settingsOptions = [
@@ -101,7 +102,7 @@ const Content = ({
         {settingsOptions.map((item, index) =>
           <OptionButton
             key={index}
-            onClick={() => handleOptionClick(item.action)}
+            onClick={() => handleOptionClick([item.action])}
             data-ga-id={`zkaccount-settings-${item.gaIdPostfix}`}
           >
             {item.text}
@@ -170,7 +171,7 @@ const Content = ({
       <OptionButton onClick={() => setShowSettings(true)} data-ga-id="zkaccount-settings">
         {t('common.settings')}
       </OptionButton>
-      <OptionButton onClick={() => handleOptionClick(logout)} data-ga-id="zkaccount-logout">
+      <OptionButton onClick={() => handleOptionClick([logout, disconnect])} data-ga-id="zkaccount-logout">
         {t('buttonText.logout')}
       </OptionButton>
     </Container>

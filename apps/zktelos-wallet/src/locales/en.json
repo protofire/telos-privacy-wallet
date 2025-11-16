@@ -80,7 +80,9 @@
     "title": "Home",
     "titleOffline": "Create your Private Account",
     "portfolio": "My portfolio",
-    "latestTransactions": "Latest transactions",
+    "latestTransactions": "Recent activity",
+    "privateAccount": "Private Account",
+    "publicAccount": "Public Account",
     "description": "Generate a secure private account and unlock privacy-preserving transfers."
   },
   "portfolio": {
@@ -182,7 +184,7 @@
     "noTokensFound": "No tokens found"
   },
   "history": {
-    "title": "History",
+    "title": "Activity",
     "empty": "Make your first Deposit, Transfer or Withdrawal<br/>to create your History.",
     "fee": "(fee {{amount}} {{symbol}})",
     "highFee": "This transaction required additional operations, resulting in higher fees.",

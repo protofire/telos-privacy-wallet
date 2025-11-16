@@ -6,11 +6,13 @@ import { ethers } from 'ethers';
 import { TokenBalanceContext, ZkAccountContext, PoolContext, WalletContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
-import { formatNumber } from 'utils';
+import { formatNumber, shortAddress } from 'utils';
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
+import { CONNECTORS_ICONS } from 'constants';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
+  const { t } = useTranslation();
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -42,13 +44,16 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
           <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
         )}
       </ValueCell>
+      <DepositButtonCell>
+        <PlainDepositButton>{t('buttonText.deposit')}</PlainDepositButton>
+      </DepositButtonCell>
     </Row>
   );
 };
 
 export default () => {
   const { t } = useTranslation();
-  const { address: account } = useContext(WalletContext);
+  const { address: account, connector } = useContext(WalletContext);
   const { nativeBalance, balance: publicTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { balance: zkAccountBalance, isLoadingState, zkAccount } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
@@ -75,6 +80,9 @@ export default () => {
 
   return (
     <Container>
+      <AddressRow>
+        {connector && <Address>{shortAddress(account)} · Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </Address>}
+      </AddressRow>
       <Table>
         <HeaderRow>
           <AssetHeader>{t('portfolio.asset')}</AssetHeader>
@@ -117,7 +125,7 @@ const Table = styled.div`
 
 const HeaderRow = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
   gap: 12px;
   padding: 8px 0;
   border-bottom: 1px solid ${props => props.theme.color.grey || '#E5E5E5'};
@@ -146,7 +154,7 @@ const ValueHeader = styled(AssetHeader)`
 
 const Row = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
   gap: 12px;
   padding: 8px 0;
   align-items: center;
@@ -190,3 +198,37 @@ const ValueCell = styled.div`
   font-weight: ${props => props.theme.text.weight.normal};
 `;
 
+const DepositButtonCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
+const PlainDepositButton = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  color: ${props => props.theme.text.color.primary};
+  cursor: pointer;
+  font-weight: ${props => props.theme.text.weight.normal};
+`;
+
+const AddressRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+`;
+
+const Address = styled.span`
+  font-size: 14px;
+  font-weight: ${props => props.theme.text.weight.normal};
+  color: ${props => props.theme.text.color.primary};
+`;
+
+const WalletConnectorIcon = styled.img`
+  width: 18px;
+  height: 18px;
+`;
