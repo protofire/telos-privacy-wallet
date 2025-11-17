@@ -78,10 +78,10 @@ const TransactionItem = ({ transaction, zkAccount, currentPool }) => {
               {' '}{tokenSymbol}
               {transaction.fee && !transaction.fee.isZero() && (
                 <FeeText>
-                  {' '}({t('history.fee', {
+                  {' '}{t('history.fee', {
                     amount: formatNumber(transaction.fee, currentPool.tokenDecimals),
                     symbol: tokenSymbol,
-                  })})
+                  })}
                 </FeeText>
               )}
             </Amount>

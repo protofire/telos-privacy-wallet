@@ -19,7 +19,7 @@ import { NETWORKS, TOKENS_ICONS } from 'constants';
 import { ReactComponent as DepositIcon } from 'assets/deposit.svg';
 import { ReactComponent as WithdrawIcon } from 'assets/withdraw.svg';
 import { ReactComponent as TransferIcon } from 'assets/transfer.svg';
-import { ReactComponent as IncognitoAvatar } from 'assets/incognito-avatar.svg';
+import { ReactComponent as Shield } from 'assets/shield.svg';
 import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
 
 const {
@@ -223,7 +223,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
                     <CopyToClipboard text={item.actions[0].to} onCopy={onCopy}>
                       <ZkAddress>
                         {(item.type === TransferOut && !item.actions[0].isLoopback) ? (
-                          <IncognitoAvatar />
+                          <Shield />
                         ) : (
                           <ZkAvatar seed={zkAccount} size={16} />
                         )}
@@ -241,7 +241,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
                 <ZkAddress>
                   {item.type === TransferOut ? (
                     <>
-                      <IncognitoAvatar />
+                      <Shield />
                       <Button
                         type="link"
                         onClick={() => setIsDetailsModalOpen(true)}
