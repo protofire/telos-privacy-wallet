@@ -6,13 +6,13 @@ import Modal from 'components/Modal';
 import WalletConnectors from 'components/WalletConnectors';
 
 
-export default ({ isOpen, close }) => {
+export default ({ isOpen, close, currentPool }) => {
   const { t } = useTranslation();
 
   const { title, description } = useMemo(() => ({
     title: t(`connectWalletModal.title`),
-    description: t(`connectWalletModal.description`),
-  }), [t]);
+    description: t(`connectWalletModal.description`, { symbol: currentPool.tokenSymbol }),
+  }), [t, currentPool.tokenSymbol]);
 
   return (
     <Modal

@@ -11,6 +11,10 @@ import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
 import { CONNECTORS_ICONS } from 'constants';
 import { useHistory } from 'react-router-dom';
+import PublicAccountDropdown from 'components/PublicAccountDropdown';
+import { ReactComponent as DotsIcon } from 'assets/dots.svg';
+import { ModalContext } from 'contexts';
+import Button from 'components/Button';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { t } = useTranslation();
@@ -61,23 +65,32 @@ export default () => {
   const { nativeBalance, balance: poolTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { currentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
+  const { openWalletModal } = useContext(ModalContext);
 
   const tlosPrice = priceMap?.get('TLOS') || null;
   const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
 
   const isLoading = isLoadingBalance || isLoadingPrices;
-  const hasData = account
   const isNative = currentPool.isNative;
   const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
 
-  if (!hasData) {
-    return null;
+  if (!account) {
+    return <ConnectWalletWrapper>
+      <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>;
   }
 
   return (
     <Container>
       <AddressRow>
-        {connector && <SubtitleText> Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </SubtitleText>}
+        {connector && <>
+          <SubtitleText> Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </SubtitleText>
+          <PublicAccountDropdown>
+            <DropdownButton>
+              <DotsIcon />
+            </DropdownButton>
+          </PublicAccountDropdown>
+        </>
+        }
       </AddressRow>
       <Table>
         <colgroup>
@@ -230,8 +243,7 @@ const PlainDepositButton = styled.button`
 const AddressRow = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
+  justify-content: space-between;
 `;
 
 const SubtitleText = styled.span`
@@ -244,4 +256,35 @@ const WalletConnectorIcon = styled.img`
   width: 12px;
   height: 12px;
   margin-left: 4px;
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+`;
+
+const DropdownButton = styled(Row)`
+  background-color: ${props => props.theme.networkLabel.background};
+  color: ${props => props.theme.text.color.primary};
+  font-weight: ${props => props.theme.text.weight.normal};
+  padding: 0 8px;
+  border-radius: 18px;
+  min-height: 36px;
+  box-sizing: border-box;
+  cursor: ${props => props.$refreshing ? 'not-allowed' : 'pointer'};
+  @media only screen and (max-width: 1000px) {
+    min-height: 30px;
+    border-radius: 16px;
+  }
+`;
+
+const ConnectWalletWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 16px;
 `;

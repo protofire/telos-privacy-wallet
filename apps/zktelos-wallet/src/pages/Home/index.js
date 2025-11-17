@@ -12,6 +12,7 @@ import Link from 'components/Link';
 import Button from 'components/Button';
 
 import { PoolContext, ZkAccountContext, WalletContext, ModalContext } from 'contexts';
+import Skeleton from '../../components/Skeleton';
 
 export default () => {
   const { t } = useTranslation();
@@ -49,46 +50,48 @@ export default () => {
         </CardsContainer>
       )}
 
-      {zkAccount && (
-        <CardsContainer>
-          <Card title={t('home.privateAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
-            <PrivateAccount />
-          </Card>
-        </CardsContainer>
-      )}
-
-      {account && (
-        <CardsContainer>
-          <Card title={t('home.publicAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
-            <PublicAccount />
-          </Card>
-        </CardsContainer>
+      {(isLoading && !zkAccount) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <Skeleton width="480px" height="150px" />
+          <Skeleton width="480px" height="150px" />
+          <Skeleton width="480px" height="150px" />
+        </div>
       )}
 
       {zkAccount && (
-        <CardsContainer>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('home.latestTransactions')}</CardTitle>
+        <>
+          <CardsContainer>
+            <Card title={t('home.privateAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
+              <PrivateAccount />
+            </Card>
+          </CardsContainer>
+
+          <CardsContainer>
+            <Card title={t('home.publicAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
+              <PublicAccount />
+            </Card>
+          </CardsContainer>
+
+          <CardsContainer>
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('home.latestTransactions')}</CardTitle>
+                {!isLatest5HistoryEmpty && (
+                  <ViewAllLink onClick={handleViewAll}>
+                    {t('latestAction.viewAll')}
+                  </ViewAllLink>
+                )}
+              </CardHeader>
               {!isLatest5HistoryEmpty && (
-                <ViewAllLink onClick={handleViewAll}>
-                  {t('latestAction.viewAll')}
-                </ViewAllLink>
+                <LatestTransactions
+                  transactions={last3Actions}
+                  zkAccount={zkAccount}
+                  currentPool={currentPool}
+                />
               )}
-            </CardHeader>
-            {(isLoading && isLatest5HistoryEmpty) && (
-              <Spinner size={60} />
-            )}
-            {!isLatest5HistoryEmpty && (
-              <LatestTransactions
-                transactions={last3Actions}
-                zkAccount={zkAccount}
-                currentPool={currentPool}
-              />
-            )}
-          </Card>
-        </CardsContainer>
-      )}
+            </Card>
+          </CardsContainer>
+        </>)}
     </ContentContainer>
   );
 };
