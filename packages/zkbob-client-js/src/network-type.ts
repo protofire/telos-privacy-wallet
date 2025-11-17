@@ -100,9 +100,9 @@ export namespace NetworkType {
       case 1337:
       case 31337:
         return "local-node";
-      case 41:
+      case 40:
         return "telos";
-      case 42:
+      case 41:
         return "telos-testnet";
       default:
         return undefined;
