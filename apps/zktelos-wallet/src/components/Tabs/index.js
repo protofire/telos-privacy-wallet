@@ -1,65 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ethers } from 'ethers';
 
 import { ReactComponent as MenuDepositIcon } from 'assets/menu_deposit.svg';
 import { ReactComponent as MenuWithdrawIcon } from 'assets/menu_withdraw.svg';
 import { ReactComponent as MenuTransferIcon } from 'assets/menu_transfer.svg';
 import { ReactComponent as MenuTransactionsIcon } from 'assets/menu_transactions.svg';
 import { ReactComponent as MenuHomeIcon } from 'assets/menu_home.svg';
-import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
-import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
-
-import { ZkAccountContext, PoolContext } from 'contexts';
-import { useTokenMapPrices } from 'hooks';
-
-import Skeleton from 'components/Skeleton';
-import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
-import BalanceDisplay from 'components/BalanceDisplay';
-import PrivateAddress from 'components/PrivateAddress';
 
 export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
-  const { priceMap } = useTokenMapPrices();
-  const { currentPool } = useContext(PoolContext);
-  const {
-    zkAccount, balance: poolBalance,
-    isLoadingState,
-    generateAddress,
-  } = useContext(ZkAccountContext);
-  const [shieldedAddress, setShieldedAddress] = useState('');
-
-  const usdBalance = useMemo(() => {
-    if (!poolBalance || !priceMap || !currentPool) return null;
-
-    const price = priceMap.get(currentPool.tokenSymbol);
-    if (!price) return null;
-
-    const balanceInToken = parseFloat(ethers.utils.formatUnits(poolBalance, currentPool.tokenDecimals));
-    const usdValue = balanceInToken * price;
-
-    const usdBalance = usdValue.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    });
-
-    return Number(usdBalance).toFixed(2) < 0.01 ? '< $0.01' : usdBalance;
-
-  }, [poolBalance, priceMap, currentPool]);
-
-  const generateAndStoreAddress = useCallback(async () => {
-    const address = await generateAddress();
-    setShieldedAddress(address);
-  }, [generateAddress]);
-
-  const getRefreshIcon = () => {
-    if (isLoadingState) {
-      return <SpinnerIcon width={18} height={18} />;
-    }
-    return <RenewIcon width={18} height={18} />;
-  }
 
   const getTabIcon = (tabName) => {
     const iconMap = {
@@ -72,46 +22,8 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
     return iconMap[tabName];
   };
 
-  useEffect(() => {
-    if (!zkAccount) return;
-    generateAndStoreAddress();
-  }, [zkAccount, generateAndStoreAddress]);
-
   return (
     <MenuContainer>
-      {zkAccount ? (
-        <WalletContainer>
-          <WalletHeader>
-            <ZkAvatar seed={zkAccount} size={46} />
-            <WalletInfo>
-              <Address><ZkName seed={zkAccount} /></Address>
-              {isLoadingState ? (
-                <Skeleton width={100} height={16} />
-              ) : (
-                <UsdBalance value={usdBalance} />
-              )}
-            </WalletInfo>
-          </WalletHeader>
-
-          <AddressRow>
-            {shieldedAddress ? (
-              <PrivateAddress
-                prefixIcon={getRefreshIcon()}
-                onPrefixClick={generateAndStoreAddress}
-                $noBorder
-                $fontSize="14px"
-                $height="auto"
-                $padding="8px 16px"
-              >
-                {shieldedAddress}
-              </PrivateAddress>
-            ) : (
-              <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
-            )}
-          </AddressRow>
-        </WalletContainer>
-      ) : null}
-
       {tabs.map((tab, index) => {
         const TabIcon = getTabIcon(tab.name);
         return (
@@ -131,52 +43,6 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
     </MenuContainer>
   );
 }
-
-const WalletContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-`;
-
-const WalletHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px;
-`;
-
-const WalletInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-
-const Address = styled.span`
-  font-size: 12px;
-  font-weight: ${props => props.theme.text.weight.bold};
-`;
-
-const UsdBalance = styled(BalanceDisplay)`
-  font-size: 12px;
-  font-weight: ${props => props.theme.text.weight.normal};
-`;
-
-const AddressRow = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  border-top: 1px solid ${props => props.theme.color.grey};
-  border-bottom: 1px solid ${props => props.theme.color.grey};
-  gap: 8px;
-`;
-
-const ShieldedAddress = styled.span`
-  font-size: 14px;
-  color: ${props => props.theme.color.black};
-  line-height: 16px;
-`;
 
 const MenuContainer = styled.div`
   display: flex;
@@ -219,10 +85,6 @@ const MenuItem = styled.div`
     border-radius: 50%;
     background-color: #E53E3E;
   }
-`;
-
-const RenewIcon = styled(RenewSVGIcon)`
-  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
 `;
 
 const MenuText = styled.span`

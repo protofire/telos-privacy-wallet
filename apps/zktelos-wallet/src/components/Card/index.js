@@ -13,12 +13,12 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  padding: 16px 12px 12px;
+  padding: 16px;
   width: 480px;
   max-width: 100%;
   box-sizing: border-box;
   & > * {
-    margin-bottom: 12px;
+    margin-bottom: 6px;
   }
   & > :last-child {
     margin-bottom: 0;
@@ -28,7 +28,6 @@ const Card = styled.div`
 const Title = styled.span`
   color: ${props => props.theme.card.title.color};
   font-weight: ${props => props.theme.text.weight.bold};
-  padding: 0 10px;
 `;
 
 const Note = styled.span`
