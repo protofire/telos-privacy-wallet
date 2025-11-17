@@ -5,8 +5,6 @@ import { ethers } from 'ethers';
 
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
-import { ReactComponent as EyeIcon } from 'assets/eye.svg';
-import { ReactComponent as EyeClosedIcon } from 'assets/eye-off.svg';
 import { ReactComponent as ShieldSVGIcon } from 'assets/shield.svg';
 import { ZkAccountContext, PoolContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
@@ -140,28 +138,6 @@ const AccountDetails = styled.div`
   gap: 4px;
 `;
 
-const IconWrapper = styled.div`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.7;
-  }
-`;
-
-const StyledEyeIcon = styled(EyeIcon)`
-  width: 20px;
-  height: 20px;
-`;
-
-const StyledEyeClosedIcon = styled(EyeClosedIcon)`
-  width: 20px;
-  height: 20px;
-`;
 
 const UsdBalance = styled(BalanceDisplay)`
   font-size: 16px;

@@ -14,7 +14,7 @@ import { NETWORKS, TOKENS_ICONS } from 'constants';
 import { useDateFromNow, useHistoricalTokenSymbol } from 'hooks';
 import { actions, getSign } from 'components/HistoryItem';
 
-import { ReactComponent as IncognitoAvatar } from 'assets/incognito-avatar.svg';
+import { ReactComponent as Shield } from 'assets/shield.svg';
 
 const {
   Deposit,
@@ -118,7 +118,7 @@ const TransactionItem = ({ transaction, zkAccount, currentPool }) => {
                   <CopyToClipboard text={displayAddress} onCopy={onCopy}>
                     <ZkAddress>
                       {isTransferOut && !transaction.actions[0]?.isLoopback ? (
-                        <IncognitoAvatar />
+                        <Shield width={16} height={16} />
                       ) : (
                         <ZkAvatar seed={zkAccount} size={14} />
                       )}

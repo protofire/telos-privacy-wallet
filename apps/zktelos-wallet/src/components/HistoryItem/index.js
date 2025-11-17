@@ -223,7 +223,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
                     <CopyToClipboard text={item.actions[0].to} onCopy={onCopy}>
                       <ZkAddress>
                         {(item.type === TransferOut && !item.actions[0].isLoopback) ? (
-                          <Shield />
+                          <Shield width={16} height={16} />
                         ) : (
                           <ZkAvatar seed={zkAccount} size={16} />
                         )}
@@ -241,7 +241,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
                 <ZkAddress>
                   {item.type === TransferOut ? (
                     <>
-                      <Shield />
+                      <Shield width={16} height={16} />
                       <Button
                         type="link"
                         onClick={() => setIsDetailsModalOpen(true)}

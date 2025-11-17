@@ -8,7 +8,7 @@ import Modal from 'components/Modal';
 import Tooltip from 'components/Tooltip';
 import { ZkAvatar } from 'components/ZkAccountIdentifier';
 
-import { ReactComponent as IncognitoAvatar } from 'assets/incognito-avatar.svg';
+import { ReactComponent as Shield } from 'assets/shield.svg';
 
 import { formatNumber, shortAddress } from 'utils';
 import { TOKENS_ICONS } from 'constants';
@@ -30,7 +30,7 @@ const ListItem = ({ index, data, zkAccount, currentPool }) => {
       {data.isLoopback ? (
         <ZkAvatar seed={zkAccount} size={16} />
       ) : (
-        <IncognitoAvatar />
+        <Shield width={16} height={16} />
       )}
       <Tooltip
         content={data.address}
