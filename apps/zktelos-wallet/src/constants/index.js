@@ -20,22 +20,6 @@ export const TX_STATUSES = {
 };
 
 export const NETWORKS = {
-  11155111: {
-    name: 'Sepolia',
-    icon: require('assets/sepolia.svg').default,
-    blockExplorerUrls: {
-      address: 'https://sepolia.etherscan.io/address/%s',
-      tx: 'https://sepolia.etherscan.io/tx/%s',
-    },
-  },
-  137: {
-    name: 'Polygon',
-    icon: require('assets/polygon.svg').default,
-    blockExplorerUrls: {
-      address: 'https://polygonscan.com/address/%s',
-      tx: 'https://polygonscan.com/tx/%s',
-    },
-  },
   40: {
     name: 'Telos',
     icon: require('assets/telos.svg').default,

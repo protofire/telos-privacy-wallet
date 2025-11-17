@@ -3,16 +3,18 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
 
-import { TokenBalanceContext, ZkAccountContext, PoolContext, WalletContext } from 'contexts';
+import { TokenBalanceContext, PoolContext, WalletContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
-import { formatNumber, shortAddress } from 'utils';
+import { formatNumber } from 'utils';
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
 import { CONNECTORS_ICONS } from 'constants';
+import { useHistory } from 'react-router-dom';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { t } = useTranslation();
+  const history = useHistory();
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -22,9 +24,11 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
   const formattedBalance = balance ? formatNumber(balance, tokenDecimals, 2) : '0';
   const formattedPrice = price ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--';
   const formattedValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--';
-
+  const onDepositClick = () => {
+    history.push('/deposit');
+  };
   return (
-    <Row>
+    <TableRow>
       <AssetCell>
         <TokenIcon src={icon} />
         <AssetName>{asset}</AssetName>
@@ -44,33 +48,25 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
           <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
         )}
       </ValueCell>
-      <DepositButtonCell>
-        <PlainDepositButton>{t('buttonText.deposit')}</PlainDepositButton>
-      </DepositButtonCell>
-    </Row>
+      <ValueCell>
+        <PlainDepositButton onClick={onDepositClick}>{t('buttonText.deposit')}</PlainDepositButton>
+      </ValueCell>
+    </TableRow>
   );
 };
 
 export default () => {
   const { t } = useTranslation();
   const { address: account, connector } = useContext(WalletContext);
-  const { nativeBalance, balance: publicTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
-  const { balance: zkAccountBalance, isLoadingState, zkAccount } = useContext(ZkAccountContext);
+  const { nativeBalance, balance: poolTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { currentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
 
   const tlosPrice = priceMap?.get('TLOS') || null;
   const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
 
-  const totalErc20Balance = useMemo(() => {
-    if (!publicTokenBalance && !zkAccountBalance) return ethers.constants.Zero;
-    const publicBal = publicTokenBalance || ethers.constants.Zero;
-    const privateBal = zkAccountBalance || ethers.constants.Zero;
-    return publicBal.add(privateBal);
-  }, [publicTokenBalance, zkAccountBalance]);
-
-  const isLoading = isLoadingBalance || isLoadingState || isLoadingPrices;
-  const hasData = account || zkAccount;
+  const isLoading = isLoadingBalance || isLoadingPrices;
+  const hasData = account
   const isNative = currentPool.isNative;
   const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
 
@@ -81,31 +77,43 @@ export default () => {
   return (
     <Container>
       <AddressRow>
-        {connector && <Address>{shortAddress(account)} · Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </Address>}
+        {connector && <SubtitleText> Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </SubtitleText>}
       </AddressRow>
       <Table>
-        <HeaderRow>
-          <AssetHeader>{t('portfolio.asset')}</AssetHeader>
-          <PriceHeader>{t('portfolio.price')}</PriceHeader>
-          <BalanceHeader>{t('portfolio.balance')}</BalanceHeader>
-          <ValueHeader>{t('portfolio.value')}</ValueHeader>
-        </HeaderRow>
-        <PortfolioRow
-          asset="TLOS"
-          icon={TOKENS_ICONS['TLOS']}
-          balance={nativeBalance}
-          price={tlosPrice}
-          tokenDecimals={18}
-          isLoading={isLoading}
-        />
-        <PortfolioRow
-          asset={tokenSymbol}
-          icon={TOKENS_ICONS[tokenSymbol]}
-          balance={totalErc20Balance}
-          price={poolTokenPrice}
-          tokenDecimals={currentPool?.tokenDecimals || 18}
-          isLoading={isLoading}
-        />
+        <colgroup>
+          <Col style={{ width: '25%' }} />
+          <Col style={{ width: '18%' }} />
+          <Col style={{ width: '18%' }} />
+          <Col style={{ width: '18%' }} />
+          <Col style={{ width: '21%' }} />
+        </colgroup>
+        <thead>
+          <HeaderRow>
+            <AssetHeader scope="col">{t('portfolio.asset')}</AssetHeader>
+            <PriceHeader scope="col">{t('portfolio.price')}</PriceHeader>
+            <BalanceHeader scope="col">{t('portfolio.balance')}</BalanceHeader>
+            <ValueHeader scope="col">{t('portfolio.value')}</ValueHeader>
+            <ActionHeader scope="col"></ActionHeader>
+          </HeaderRow>
+        </thead>
+        <tbody>
+          <PortfolioRow
+            asset="TLOS"
+            icon={TOKENS_ICONS['TLOS']}
+            balance={nativeBalance}
+            price={tlosPrice}
+            tokenDecimals={18}
+            isLoading={isLoading}
+          />
+          <PortfolioRow
+            asset={tokenSymbol}
+            icon={TOKENS_ICONS[tokenSymbol]}
+            balance={poolTokenBalance}
+            price={poolTokenPrice}
+            tokenDecimals={currentPool?.tokenDecimals || 18}
+            isLoading={isLoading}
+          />
+        </tbody>
       </Table>
     </Container>
   );
@@ -117,27 +125,25 @@ const Container = styled.div`
   width: 100%;
 `;
 
-const Table = styled.div`
-  display: flex;
-  flex-direction: column;
+const Table = styled.table`
   width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 `;
 
-const HeaderRow = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 12px;
-  padding: 8px 0;
+const Col = styled.col``;
+
+const HeaderRow = styled.tr`
   border-bottom: 1px solid ${props => props.theme.color.grey || '#E5E5E5'};
-  margin-bottom: 8px;
 `;
 
-const AssetHeader = styled.span`
+const AssetHeader = styled.th`
   font-size: 12px;
   font-weight: ${props => props.theme.text.weight.bold};
   color: ${props => props.theme.text.color.primary};
   text-transform: uppercase;
   text-align: left;
+  padding: 8px 8px 8px 0;
 `;
 
 const PriceHeader = styled(AssetHeader)`
@@ -152,18 +158,19 @@ const ValueHeader = styled(AssetHeader)`
   text-align: right;
 `;
 
-const Row = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 12px;
-  padding: 8px 0;
-  align-items: center;
+const ActionHeader = styled(AssetHeader)`
+  text-align: right;
 `;
 
-const AssetCell = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
+const TableRow = styled.tr`
+  &:not(:last-child) {
+    border-bottom: 1px solid ${props => props.theme.color.grey || '#E5E5E5'};
+  }
+`;
+
+const AssetCell = styled.td`
+  padding: 8px 12px;
+  vertical-align: middle;
 `;
 
 const TokenIcon = styled.img`
@@ -177,42 +184,47 @@ const AssetName = styled.span`
   font-weight: ${props => props.theme.text.weight.normal};
   color: ${props => props.theme.text.color.primary};
   text-transform: uppercase;
+  position: relative;
+  bottom: 5px;
+  margin-left: 8px;
 `;
 
-const PriceCell = styled.div`
+const PriceCell = styled.td`
   font-size: 14px;
   color: ${props => props.theme.text.color.primary};
   text-align: center;
+  padding: 8px 12px;
+  vertical-align: middle;
 `;
 
-const BalanceCell = styled.div`
+const BalanceCell = styled.td`
   font-size: 14px;
   color: ${props => props.theme.text.color.primary};
   text-align: center;
+  padding: 8px 12px;
+  vertical-align: middle;
 `;
 
-const ValueCell = styled.div`
+const ValueCell = styled.td`
   font-size: 14px;
   color: ${props => props.theme.text.color.primary};
   text-align: right;
   font-weight: ${props => props.theme.text.weight.normal};
+  padding: 8px 12px;
+  vertical-align: middle;
 `;
 
-const DepositButtonCell = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-`;
 
 const PlainDepositButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
+  background: ${props => props.theme.color.telosGradientSoft};
+  border: 1px solid ${props => props.theme.color.black};
+  font-weight: ${props => props.theme.text.weight.bold};
+  padding: 8px;
+  border-radius: 8px;
   font-size: 14px;
-  color: ${props => props.theme.text.color.primary};
+  color: ${props => props.theme.text.color.black};
+  box-shadow: ${props => props.theme.color.black} 2px 2px 0 0;
   cursor: pointer;
-  font-weight: ${props => props.theme.text.weight.normal};
 `;
 
 const AddressRow = styled.div`
@@ -222,13 +234,14 @@ const AddressRow = styled.div`
   gap: 8px;
 `;
 
-const Address = styled.span`
+const SubtitleText = styled.span`
   font-size: 14px;
   font-weight: ${props => props.theme.text.weight.normal};
   color: ${props => props.theme.text.color.primary};
 `;
 
 const WalletConnectorIcon = styled.img`
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
 `;

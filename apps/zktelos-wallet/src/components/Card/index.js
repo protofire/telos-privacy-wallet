@@ -13,7 +13,7 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  padding: 8px 6px 6px;
+  padding: 16px;
   width: 480px;
   max-width: 100%;
   box-sizing: border-box;
@@ -28,7 +28,6 @@ const Card = styled.div`
 const Title = styled.span`
   color: ${props => props.theme.card.title.color};
   font-weight: ${props => props.theme.text.weight.bold};
-  padding: 0 10px;
 `;
 
 const Note = styled.span`

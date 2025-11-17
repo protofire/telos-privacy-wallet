@@ -6,7 +6,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import Card from 'components/Card';
 import Spinner from 'components/Spinner';
 import LatestTransactions from 'components/LatestTransactions';
-import Portfolio from 'components/Portfolio';
+import PublicAccount from 'components/PublicAccount';
 import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
 import Button from 'components/Button';
@@ -60,7 +60,7 @@ export default () => {
       {account && (
         <CardsContainer>
           <Card title={t('home.publicAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
-            <Portfolio />
+            <PublicAccount />
           </Card>
         </CardsContainer>
       )}
@@ -97,13 +97,13 @@ const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
   margin-bottom: 8px;
 `;
 
 const CardTitle = styled.span`
   color: ${props => props.theme.card.title.color};
   font-size: 16px;
+  font-weight: bold;
 `;
 
 const ViewAllLink = styled(Link)`
@@ -119,7 +119,6 @@ const CardsContainer = styled.div`
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
   border: 2px solid ${props => props.theme.color.black};
-  padding: 16px 12px;
 
   @media only screen and (max-width: 560px) {
     margin: 30px 0;
