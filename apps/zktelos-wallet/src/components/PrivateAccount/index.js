@@ -57,7 +57,9 @@ export default () => {
   const generateAndStoreAddress = useCallback(async () => {
     const address = await generateAddress();
     setShieldedAddress(address);
-  }, [generateAddress]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [generateAddress, currentPool]);
 
   const getRefreshIcon = () => {
     if (isLoadingState) {
