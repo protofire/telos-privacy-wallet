@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import { ToastContainer } from 'react-toastify';
-import { injectStyle } from "react-toastify/dist/inject-style";
-
-injectStyle();
+import 'react-toastify/dist/ReactToastify.css';
 
 export default () =>
   <ToastContainerStyled
