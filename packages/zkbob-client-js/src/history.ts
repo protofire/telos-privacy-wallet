@@ -2,7 +2,7 @@ import { openDB, IDBPDatabase } from 'idb';
 import { Account, Note, TxMemoChunk, IndexedTx, ParseTxsResult, TxInput } from 'libzkbob-rs-wasm-web';
 import { DDBatchTxDetails, PoolTxDetails, PoolTxType, RegularTxDetails, RegularTxType } from './tx';
 import { HexStringWriter, hexToBuf, removeDuplicates } from './utils';
-import { CONSTANTS } from './constants';
+import { CONSTANTS, DB_PREFIX } from './constants';
 import { InternalError } from './errors';
 import { ZkBobState } from './state';
 import { NetworkBackend } from './networks';
@@ -277,7 +277,7 @@ export class HistoryStorage {
 
   static async init(db_id: string, network: NetworkBackend, state: ZkBobState, subgraph?: ZkBobSubgraph): Promise<HistoryStorage> {
     let isNewDB = false;
-    const db = await openDB(`zkb.${db_id}.history`, 4, {
+    const db = await openDB(`${DB_PREFIX}.${db_id}.history`, 4, {
       upgrade(db, oldVersion, newVersions) {
         if (oldVersion < 2) {
           db.createObjectStore(TX_TABLE);   // table holds parsed history transactions

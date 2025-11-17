@@ -35,7 +35,8 @@ import { wrap } from "comlink";
 import { PreparedTransaction } from "./networks";
 import { Privkey } from "hdwallet-babyjub";
 import { IDBPDatabase, openDB } from "idb";
-import { GENERIC_ADDRESS_PREFIX, PREFIXED_ADDR_REGEX, NAKED_ADDR_REGEX } from "./address-prefixes";
+import { NAKED_ADDR_REGEX } from "./address-prefixes";
+import { DB_PREFIX } from "./constants";
 
 const OUTPLUSONE = CONSTANTS.OUT + 1; // number of leaves (account + notes) in a transaction
 const PARTIAL_TREE_USAGE_THRESHOLD = 500; // minimum tx count in Merkle tree to partial tree update using
@@ -219,7 +220,7 @@ export class ZkBobClient extends ZkBobProvider {
       callback(ClientState.Initializing);
     }
 
-    const commonDb = await openDB(`zkb.common`, 1, {
+    const commonDb = await openDB(`${DB_PREFIX}.common`, 1, {
       upgrade(db) {
         db.createObjectStore(SYNC_PERFORMANCE); // table holds state synchronization measurements
       },
