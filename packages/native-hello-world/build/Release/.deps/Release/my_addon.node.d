@@ -1,0 +1,1 @@
+cmd_Release/my_addon.node := c++ -bundle -undefined dynamic_lookup -Wl,-search_paths_first -mmacosx-version-min=10.14 -arch arm64 -L./Release -stdlib=libc++  -o Release/my_addon.node Release/obj.target/my_addon/src/my_addon.o Release/obj.target/my_addon/src/cpp_code.o Release/nothing.a 
