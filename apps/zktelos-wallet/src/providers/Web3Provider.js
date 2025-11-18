@@ -64,7 +64,10 @@ const walletConnect = new WalletConnectConnector({
     qrcode: true,
     projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID,
     name: 'zkTelos',
-    relayUrl: 'wss://relay.walletconnect.org'
+    relayUrl: 'wss://relay.walletconnect.org',
+    metadata: {
+      projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID,
+    }
   },
 });
 
