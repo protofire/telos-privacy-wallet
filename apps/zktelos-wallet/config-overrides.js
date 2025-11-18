@@ -5,6 +5,12 @@ module.exports = {
   webpack: function (config, env) {
     config.devtool = env === 'production' ? 'source-map' : 'cheap-module-source-map';
 
+    config.ignoreWarnings = [
+      {
+        module: /node_modules/,
+      },
+    ];
+
     config.experiments = {
       asyncWebAssembly: true,
       topLevelAwait: true,
@@ -34,7 +40,6 @@ module.exports = {
       },
     ];
 
-    // Alias para process/browser con extensión .js para módulos ESM
     config.resolve.alias = {
       ...config.resolve.alias,
       'process/browser': require.resolve('process/browser.js'),
@@ -50,7 +55,6 @@ module.exports = {
       os: require.resolve('os-browserify/browser'),
       url: require.resolve('url/'),
       zlib: require.resolve('browserify-zlib'),
-      process: require.resolve('process/browser.js'),
     };
 
     config.plugins = [
@@ -58,9 +62,6 @@ module.exports = {
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
         process: 'process/browser.js',
-      }),
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
       }),
     ];
 
@@ -86,7 +87,6 @@ module.exports = {
         ...config.headers,
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'credentialless',
-        // 'Cross-Origin-Embedder-Policy': 'require-corp',
       };
 
       return config;
