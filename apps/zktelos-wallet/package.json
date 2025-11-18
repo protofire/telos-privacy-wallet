@@ -66,7 +66,8 @@
     "wagmi": "^0.12.1",
     "web-vitals": "^1.0.1",
     "webpack": "^5.70.0",
-    "zkbob-client-js": "*"
+    "zkbob-client-js": "*",
+    "my-native-addon": "*"
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.20.0",
@@ -90,12 +91,13 @@
       "electron/assets/**",
       "build/assets/**",
       "**/*.wasm",
-      "**/*.bin"
+      "**/*.bin",
+      "**/*.node"
     ],
     "files": [
       "build/**/*",
       "electron/**/*",
-      "!**/node_modules/**"
+      "node_modules/my-native-addon/**/*"
     ],
     "asar": true,
     "npmRebuild": false,

@@ -1,5 +1,6 @@
 const { app, BrowserWindow, session, shell, protocol, net, nativeImage } = require('electron');
 const { join } = require('path');
+const myNativeAddon = require('my-native-addon');
 
 let mainWindow;
 
@@ -134,6 +135,8 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  const result = myNativeAddon.helloWorld('Hola desde Electron!');
+  console.log(result);
   await registerAppProtocolHandler();
   installSecurityHooks();
   createWindow();

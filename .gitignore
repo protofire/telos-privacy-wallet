@@ -2,11 +2,18 @@
 
 # dependencies
 node_modules
+
 apps/zktelos-wallet/node_modules
 apps/zktelos-wallet/build
 apps/zktelos-wallet/dist
+
 packages/zkbob-client-js/node_modules
 packages/zkbob-client-js/lib
+
+packages/my-native-addon/node_modules
+packages/my-native-addon/build
+packages/my-native-addon/bin
+
 /.pnp
 .pnp.js
 
@@ -15,6 +22,7 @@ packages/zkbob-client-js/lib
 
 # production
 /build
+
 .vscode
 # misc
 .DS_Store
