@@ -14,6 +14,7 @@ import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import AddressWithCopy from 'components/AdressWithCopy';
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
+import Tooltip from 'components/Tooltip';
 
 const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const value = useMemo(() => {
@@ -24,7 +25,14 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
 
   const formattedBalance = balance ? formatNumber(balance, tokenDecimals, 2) : '0';
   const formattedPrice = price ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--';
-  const formattedValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--';
+
+  const formattedValue = useMemo(() => {
+    if (value == null) return '--';
+    if (value < 0.01 && value > 0) return '< $0.01';
+    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }, [value]);
+
+  const fullValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}` : '--';
 
   if (!balance || balance.isZero()) {
     return null;
@@ -48,7 +56,12 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
         {isLoading ? (
           <Skeleton width={70} height={16} />
         ) : (
-          <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+
+          <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
+            <div data-tip data-for={`value-tooltip-${asset}`}>
+              <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+            </div>
+          </Tooltip>
         )}
       </ValueCell>
       <ValueCell>
