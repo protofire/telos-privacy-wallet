@@ -1,9 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export default ({ title, note, children, style, titleStyle }) => (
+export default ({ title, icon, note, children, style, titleStyle }) => (
   <Card style={style}>
-    {title && <Title style={titleStyle}>{title}</Title>}
+    {(title || icon) && (
+      <Header>
+        {icon && <Icon src={icon} />}
+        {title && <Title style={titleStyle}>{title}</Title>}
+      </Header>
+    )}
     {children}
     {note && <Note>{note}</Note>}
   </Card>
@@ -23,6 +28,19 @@ const Card = styled.div`
   & > :last-child {
     margin-bottom: 0;
   }
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+
+const Icon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
 `;
 
 const Title = styled.span`

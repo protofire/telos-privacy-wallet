@@ -3,10 +3,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { ReactComponent as EyeIcon } from 'assets/eye.svg';
-import { ReactComponent as EyeClosedIcon } from 'assets/eye-off.svg';
 
-import { TokenBalanceContext, ZkAccountContext, PoolContext, BalanceVisibilityContext, WalletContext } from 'contexts';
+import { TokenBalanceContext, ZkAccountContext, PoolContext, WalletContext } from 'contexts';
 
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
@@ -16,7 +14,6 @@ import { useTokenMapPrices } from 'hooks';
 
 export default () => {
   const { address: account } = useContext(WalletContext)
-  const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { balance } = useContext(TokenBalanceContext);
   const { balance: zkAccountBalance, isLoadingState, zkAccount } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
@@ -47,9 +44,6 @@ export default () => {
       <Label>Total asset value</Label>
       <ValueRow>
         {isLoadingState ? <Skeleton width={100} height={48} /> : (<>
-          <IconWrapper onClick={toggleVisibility}>
-            {isVisible ? <StyledEyeIcon /> : <StyledEyeClosedIcon />}
-          </IconWrapper>
           <Tooltip content={t('common.totalAssetBalance')} delay={0.3}>
             <span>
               <Value value={totalUsdValue} hiddenPlaceholder="••••••••" />
@@ -86,29 +80,6 @@ const Value = styled(BalanceDisplay)`
   font-weight: ${props => props.theme.text.weight.bold};
   color: ${props => props.theme.text.color.primary};
   line-height: 1.2;
-`;
-
-const IconWrapper = styled.div`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.7;
-  }
-`;
-
-const StyledEyeIcon = styled(EyeIcon)`
-  width: 32px;
-  height: 32px;
-`;
-
-const StyledEyeClosedIcon = styled(EyeClosedIcon)`
-  width: 32px;
-  height: 32px;
 `;
 
 const Separator = styled.div`

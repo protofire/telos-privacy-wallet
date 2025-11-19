@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-// import TotalAssetBalance from 'containers/TotalAssetBalance'
+import TotalAssetBalance from 'containers/TotalAssetBalance'
 
 export default ({ header, footer, children }) => {
   const [menu, content] = React.Children.toArray(children);
@@ -9,7 +9,7 @@ export default ({ header, footer, children }) => {
       <Layout>
         {header}
         <PageContainer>
-          {/* <TotalAssetBalance /> */}
+          <TotalAssetBalance />
           <MenuAndPageContainer>
             {menu}
             <ContentContainer>

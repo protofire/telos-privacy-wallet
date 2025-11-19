@@ -27,7 +27,7 @@
     "shieldedAddress": "Защищенный адрес: ",
     "shieldedBalance": "Защищенный баланс: ",
     "generatingAddress": "Генерация адреса...",
-    "accessPrivateAccount": "Доступ к Приватному Аккаунту",
+    "accessPrivateAccount": "Подключить кошелек",
     "createPrivateAccount": "Создать Приватный Аккаунт"
   },
   "buttonText": {
@@ -219,8 +219,8 @@
   },
   "accountSetupModal": {
     "access": {
-      "title": "Доступ к Приватному Аккаунту",
-      "sectionTitle": "Выберите способ доступа:",
+      "title": "Подключить кошелек",
+      "sectionTitle": "Выберите способ подключения:",
       "metaMaskDescription": "Подпишите сообщение, чтобы создать или разблокировать ваш Приватный Аккаунт.",
       "walletConnectDescription": "Подключите любой совместимый кошелек для доступа к вашему Приватному Аккаунту.",
       "dividerText": "Или восстановите с помощью секретной фразы:",
