@@ -36,6 +36,18 @@ const EMBED_TYPES = new Set([
 ]);
 
 function installSecurityHooks() {
+  // Set origin header for WalletConnect compatibility
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    const { url, requestHeaders } = details;
+
+    // Override origin for WalletConnect relay connections
+    if (url.includes('relay.walletconnect.com') || url.includes('walletconnect')) {
+      requestHeaders['Origin'] = 'https://privacy.telos.protofire.io';
+    }
+
+    callback({ requestHeaders });
+  });
+
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const { url, responseHeaders, resourceType } = details;
     let headers = { ...responseHeaders };
