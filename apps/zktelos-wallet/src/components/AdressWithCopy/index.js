@@ -18,6 +18,7 @@ export default ({
   $fontSize,
   $height,
   $padding,
+  $maxWidth,
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -45,6 +46,7 @@ export default ({
       $fontSize={$fontSize}
       $height={$height}
       $padding={$padding}
+      $maxWidth={$maxWidth}
       {...rest}
     >
       {prefixIcon && (
@@ -100,6 +102,7 @@ const PrivateAddressContainer = styled.div`
   box-sizing: border-box;
   padding: ${props => props.$padding || '0 24px'};
   outline: none;
+  max-width: ${props => props.$maxWidth || '100%'};
   
   &::placeholder {
     color: ${props => props.theme.text.color.secondary};

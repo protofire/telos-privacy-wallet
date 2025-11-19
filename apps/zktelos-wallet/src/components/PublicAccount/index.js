@@ -13,8 +13,10 @@ import { CONNECTORS_ICONS } from 'constants';
 import { useHistory } from 'react-router-dom';
 import PublicAccountDropdown from 'components/PublicAccountDropdown';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
+import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ModalContext } from 'contexts';
 import Button from 'components/Button';
+import AddressWithCopy from 'components/AdressWithCopy';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { t } = useTranslation();
@@ -31,6 +33,11 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
   const onDepositClick = () => {
     history.push('/deposit');
   };
+
+  if (!balance || balance.isZero()) {
+    return null;
+  }
+
   return (
     <TableRow>
       <AssetCell>
@@ -74,6 +81,14 @@ export default () => {
   const isNative = currentPool.isNative;
   const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
 
+  const getRefreshIcon = () => {
+    return <RenewIcon width={18} height={18} />;
+  }
+
+  const handleChangeWallet = () => {
+    openWalletModal();
+  }
+
   if (!account) {
     return <ConnectWalletWrapper>
       <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>;
@@ -81,17 +96,32 @@ export default () => {
 
   return (
     <Container>
-      <AddressRow>
-        {connector && <>
-          <SubtitleText> Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </SubtitleText>
-          <PublicAccountDropdown>
-            <DropdownButton>
-              <DotsIcon />
-            </DropdownButton>
-          </PublicAccountDropdown>
-        </>
-        }
-      </AddressRow>
+      <HeaderContainer>
+        {connector && <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} />}
+        <HeaderContent>
+          <HeaderTitle>
+            <AccountName>{connector?.name}</AccountName>
+            <PublicAccountDropdown>
+              <DropdownButton>
+                <DotsIcon />
+              </DropdownButton>
+            </PublicAccountDropdown>
+          </HeaderTitle>
+          <AddressWithCopy
+            prefixIcon={getRefreshIcon()}
+            onPrefixClick={handleChangeWallet}
+            $noBorder
+            $fontSize="14px"
+            $height="auto"
+            $borderRadius="0"
+            $maxWidth="300px"
+            $padding="0"
+            $background="transparent"
+          >
+            {account}
+          </AddressWithCopy>
+        </HeaderContent>
+      </HeaderContainer>
       <Table>
         <colgroup>
           <Col style={{ width: '25%' }} />
@@ -131,6 +161,7 @@ export default () => {
     </Container>
   );
 };
+
 
 const Container = styled.div`
   display: flex;
@@ -240,22 +271,9 @@ const PlainDepositButton = styled.button`
   cursor: pointer;
 `;
 
-const AddressRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const SubtitleText = styled.span`
-  font-size: 14px;
-  font-weight: ${props => props.theme.text.weight.normal};
-  color: ${props => props.theme.text.color.primary};
-`;
-
 const WalletConnectorIcon = styled.img`
-  width: 12px;
-  height: 12px;
-  margin-left: 4px;
+  width: 46px;
+  height: 46px;
 `;
 
 const Row = styled.div`
@@ -287,4 +305,36 @@ const ConnectWalletWrapper = styled.div`
   justify-content: center;
   padding: 24px;
   gap: 16px;
+`;
+
+const RenewIcon = styled(RenewSVGIcon)`
+  cursor: pointer;
+`;
+
+const HeaderContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+`;
+
+const HeaderContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+`;
+
+const HeaderTitle = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const AccountName = styled.span`
+  font-size: 16px;
+  color: ${props => props.theme.text.color.primary};
 `;
