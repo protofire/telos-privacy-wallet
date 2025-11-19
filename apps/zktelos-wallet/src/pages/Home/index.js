@@ -4,15 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import Card from 'components/Card';
-import Spinner from 'components/Spinner';
 import LatestTransactions from 'components/LatestTransactions';
 import PublicAccount from 'components/PublicAccount';
 import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
 import Button from 'components/Button';
+import Skeleton from 'components/Skeleton';
 
 import { PoolContext, ZkAccountContext, WalletContext, ModalContext } from 'contexts';
-import Skeleton from '../../components/Skeleton';
+
+import shieldIcon from 'assets/shield.svg';
+import globeIcon from 'assets/globe.svg';
 
 export default () => {
   const { t } = useTranslation();
@@ -61,13 +63,21 @@ export default () => {
       {zkAccount && (
         <>
           <CardsContainer>
-            <Card title={t('home.privateAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
+            <Card
+              title={t('home.privateAccount')}
+              icon={shieldIcon}
+              titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
+            >
               <PrivateAccount />
             </Card>
           </CardsContainer>
 
           <CardsContainer>
-            <Card title={t('home.publicAccount')} titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}>
+            <Card
+              title={t('home.publicAccount')}
+              icon={globeIcon}
+              titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
+            >
               <PublicAccount />
             </Card>
           </CardsContainer>

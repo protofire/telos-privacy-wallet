@@ -7,7 +7,7 @@ import Dropdown from 'components/Dropdown';
 import Tooltip from 'components/Tooltip';
 import OptionButton from 'components/OptionButton';
 import Button from 'components/Button';
-import PrivateAddress from 'components/PrivateAddress';
+import PrivateAddress from 'components/AdressWithCopy';
 import QRCodeReader from 'components/QRCodeReader';
 import BalanceDisplay from 'components/BalanceDisplay';
 

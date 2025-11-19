@@ -1,24 +1,27 @@
 import React, { useContext, useMemo } from 'react';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { TokenBalanceContext, PoolContext, WalletContext } from 'contexts';
-import { useTokenMapPrices } from 'hooks';
-import { TOKENS_ICONS } from 'constants';
-import { formatNumber } from 'utils';
-import Skeleton from 'components/Skeleton';
+import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import BalanceDisplay from 'components/BalanceDisplay';
-import { CONNECTORS_ICONS } from 'constants';
-import { useHistory } from 'react-router-dom';
-import PublicAccountDropdown from 'components/PublicAccountDropdown';
-import { ReactComponent as DotsIcon } from 'assets/dots.svg';
-import { ModalContext } from 'contexts';
 import Button from 'components/Button';
+import AddressWithCopy from 'components/AdressWithCopy';
+import OptionButtonDefault from 'components/OptionButton';
+import Skeleton from 'components/Skeleton';
+import Tooltip from 'components/Tooltip';
+
+import { CONNECTORS_ICONS } from 'constants';
+import { TOKENS_ICONS } from 'constants';
+import { TokenBalanceContext, PoolContext, WalletContext, ModalContext, BalanceVisibilityContext } from 'contexts';
+import { useTokenMapPrices } from 'hooks';
+import { formatNumber } from 'utils';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { t } = useTranslation();
   const history = useHistory();
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -27,10 +30,23 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
 
   const formattedBalance = balance ? formatNumber(balance, tokenDecimals, 2) : '0';
   const formattedPrice = price ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--';
-  const formattedValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--';
+
+  const formattedValue = useMemo(() => {
+    if (value == null) return '--';
+    if (value < 0.01 && value > 0) return '< $0.01';
+    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }, [value]);
+
+  const fullValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}` : '--';
+
   const onDepositClick = () => {
     history.push('/deposit');
   };
+
+  if (!balance || balance.isZero()) {
+    return null;
+  }
+
   return (
     <TableRow>
       <AssetCell>
@@ -49,7 +65,17 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
         {isLoading ? (
           <Skeleton width={70} height={16} />
         ) : (
-          <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+          isVisible ? (
+            <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
+              <span>
+                <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+              </span>
+            </Tooltip>
+          ) : (
+            <span>
+              <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+            </span>
+          )
         )}
       </ValueCell>
       <ValueCell>
@@ -74,6 +100,14 @@ export default () => {
   const isNative = currentPool.isNative;
   const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
 
+  const getRefreshIcon = () => {
+    return <RenewIcon width={18} height={18} />;
+  }
+
+  const handleChangeWallet = () => {
+    openWalletModal();
+  }
+
   if (!account) {
     return <ConnectWalletWrapper>
       <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>;
@@ -81,17 +115,30 @@ export default () => {
 
   return (
     <Container>
-      <AddressRow>
-        {connector && <>
-          <SubtitleText> Connected via {connector.name} <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} /> </SubtitleText>
-          <PublicAccountDropdown>
-            <DropdownButton>
-              <DotsIcon />
-            </DropdownButton>
-          </PublicAccountDropdown>
-        </>
-        }
-      </AddressRow>
+      <HeaderContainer>
+        {connector && <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} />}
+        <HeaderContent>
+          <HeaderTitle>
+            <AccountName>{connector?.name}</AccountName>
+            <OptionButton>
+              {t('buttonText.logout')}
+            </OptionButton>
+          </HeaderTitle>
+          <AddressWithCopy
+            prefixIcon={getRefreshIcon()}
+            onPrefixClick={handleChangeWallet}
+            $noBorder
+            $fontSize="14px"
+            $height="auto"
+            $borderRadius="0"
+            $maxWidth="300px"
+            $padding="0"
+            $background="transparent"
+          >
+            {account}
+          </AddressWithCopy>
+        </HeaderContent>
+      </HeaderContainer>
       <Table>
         <colgroup>
           <Col style={{ width: '25%' }} />
@@ -131,6 +178,7 @@ export default () => {
     </Container>
   );
 };
+
 
 const Container = styled.div`
   display: flex;
@@ -240,44 +288,9 @@ const PlainDepositButton = styled.button`
   cursor: pointer;
 `;
 
-const AddressRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const SubtitleText = styled.span`
-  font-size: 14px;
-  font-weight: ${props => props.theme.text.weight.normal};
-  color: ${props => props.theme.text.color.primary};
-`;
-
 const WalletConnectorIcon = styled.img`
-  width: 12px;
-  height: 12px;
-  margin-left: 4px;
-`;
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-`;
-
-const DropdownButton = styled(Row)`
-  background-color: ${props => props.theme.networkLabel.background};
-  color: ${props => props.theme.text.color.primary};
-  font-weight: ${props => props.theme.text.weight.normal};
-  padding: 0 8px;
-  border-radius: 18px;
-  min-height: 36px;
-  box-sizing: border-box;
-  cursor: ${props => props.$refreshing ? 'not-allowed' : 'pointer'};
-  @media only screen and (max-width: 1000px) {
-    min-height: 30px;
-    border-radius: 16px;
-  }
+  width: 46px;
+  height: 46px;
 `;
 
 const ConnectWalletWrapper = styled.div`
@@ -287,4 +300,45 @@ const ConnectWalletWrapper = styled.div`
   justify-content: center;
   padding: 24px;
   gap: 16px;
+`;
+
+const RenewIcon = styled(RenewSVGIcon)`
+  cursor: pointer;
+`;
+
+const HeaderContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+`;
+
+const HeaderContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+`;
+
+const HeaderTitle = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const AccountName = styled.span`
+  font-size: 16px;
+  color: ${props => props.theme.text.color.primary};
+`;
+
+
+const OptionButton = styled(OptionButtonDefault)`
+  padding: 6px;
+  margin: 0;
+  height: auto;
+  font-size: 14px;
+  width: auto;
 `;

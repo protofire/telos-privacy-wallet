@@ -22,7 +22,6 @@ import ChangePasswordModal from 'components/ChangePasswordModal';
 import DisablePasswordModal from 'components/DisablePasswordModal';
 import ToastContainer from 'components/ToastContainer';
 import Footer from 'components/Footer';
-import RestrictionModal from 'components/RestrictionModal';
 import Layout from 'components/Layout';
 import PaymentLinkModal from 'components/PaymentLinkModal';
 
@@ -35,8 +34,6 @@ import Payment from 'pages/Payment';
 import Home from 'pages/Home';
 
 import ContextsProvider, { ZkAccountContext } from 'contexts';
-
-import { useRestriction } from 'hooks';
 
 const SentryRoute = Sentry.withSentryRouting(Route);
 
@@ -107,19 +104,12 @@ const MainApp = () => {
   const { zkAccount, isLoadingZkAccount, isDemo, lockAccount } = useContext(ZkAccountContext);
   const location = useLocation();
   const showWelcome = (!zkAccount && !isLoadingZkAccount && !window.localStorage.getItem('seed')) || isDemo;
-  const isRestricted = useRestriction();
   useIdleTimer({
     timeout: Number(process.env.REACT_APP_LOCK_TIMEOUT) || (1000 * 60 * 15),
     onIdle: () => lockAccount(),
   });
 
-  if (isRestricted) {
-    return (
-      <Layout header={<Header empty />}>
-        <RestrictionModal />
-      </Layout>
-    );
-  }
+
   return (
     <>
       {/* {isDemo && <DemoBanner />} */}
