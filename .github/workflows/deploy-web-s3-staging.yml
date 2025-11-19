@@ -72,8 +72,15 @@ jobs:
               --include "transfer_params_22022023.bin" \
               --include "transfer_verification_key_22022023.json"
 
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id E3AC0KPV26090S \
+            --paths "/*"
+
       - name: Deployment summary
         run: |
           echo "✅ Deployment successful!"
           echo "📦 Bucket: s3://telos-privacy-ui-staging"
-          echo "🌍 Region: us-east-2"
+          echo "🌐 URL: https://privacy-staging.telos.protofire.io"
+          echo "🔄 CloudFront cache invalidated"
