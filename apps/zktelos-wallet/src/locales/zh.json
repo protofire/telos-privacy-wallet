@@ -27,7 +27,7 @@
     "shieldedAddress": "隐私地址: ",
     "shieldedBalance": "隐私余额: ",
     "generatingAddress": "生成隐私地址...",
-    "accessPrivateAccount": "访问私密账户",
+    "accessPrivateAccount": "连接钱包",
     "createPrivateAccount": "创建私密账户"
   },
   "buttonText": {
@@ -218,8 +218,8 @@
   },
   "accountSetupModal": {
     "access": {
-      "title": "访问私密账户",
-      "sectionTitle": "选择您的访问方式：",
+      "title": "连接钱包",
+      "sectionTitle": "选择您的连接方式：",
       "metaMaskDescription": "签署消息以创建或解锁您的私密账户。",
       "walletConnectDescription": "连接任何兼容的钱包以访问您的私密账户。",
       "dividerText": "或使用助记词恢复：",

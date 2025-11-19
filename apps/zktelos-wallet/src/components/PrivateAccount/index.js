@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
-import { ZkAccountContext, PoolContext } from 'contexts';
+import { ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
 import { formatNumber } from 'utils';
@@ -17,6 +17,7 @@ import BalanceDisplay from 'components/BalanceDisplay';
 import Tooltip from 'components/Tooltip';
 
 const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -56,12 +57,17 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
         {isLoading ? (
           <Skeleton width={70} height={16} />
         ) : (
-
-          <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
-            <div data-tip data-for={`value-tooltip-${asset}`}>
+          isVisible ? (
+            <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
+              <span>
+                <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+              </span>
+            </Tooltip>
+          ) : (
+            <span>
               <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
-            </div>
-          </Tooltip>
+            </span>
+          )
         )}
       </ValueCell>
       <ValueCell>

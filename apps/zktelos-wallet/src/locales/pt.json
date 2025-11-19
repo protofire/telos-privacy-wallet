@@ -27,7 +27,7 @@
     "shieldedAddress": "Endereço protegido: ",
     "shieldedBalance": "Saldo protegido: ",
     "generatingAddress": "Gerando endereço...",
-    "accessPrivateAccount": "Acessar Conta Privada",
+    "accessPrivateAccount": "Conectar carteira",
     "createPrivateAccount": "Criar Conta Privada"
   },
   "buttonText": {
@@ -218,8 +218,8 @@
   },
   "accountSetupModal": {
     "access": {
-      "title": "Acessar Conta Privada",
-      "sectionTitle": "Escolha como você deseja acessar:",
+      "title": "Conectar carteira",
+      "sectionTitle": "Escolha como você deseja conectar:",
       "metaMaskDescription": "Assine uma mensagem para criar ou desbloquear sua Conta Privada.",
       "walletConnectDescription": "Conecte qualquer carteira compatível para acessar sua Conta Privada.",
       "dividerText": "Ou restaurar usando frase secreta:",

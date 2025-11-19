@@ -14,13 +14,14 @@ import Tooltip from 'components/Tooltip';
 
 import { CONNECTORS_ICONS } from 'constants';
 import { TOKENS_ICONS } from 'constants';
-import { TokenBalanceContext, PoolContext, WalletContext, ModalContext } from 'contexts';
+import { TokenBalanceContext, PoolContext, WalletContext, ModalContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { formatNumber } from 'utils';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { t } = useTranslation();
   const history = useHistory();
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -64,11 +65,17 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
         {isLoading ? (
           <Skeleton width={70} height={16} />
         ) : (
-          <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
-            <div data-tip data-for={`value-tooltip-${asset}`}>
+          isVisible ? (
+            <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
+              <span>
+                <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+              </span>
+            </Tooltip>
+          ) : (
+            <span>
               <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
-            </div>
-          </Tooltip>
+            </span>
+          )
         )}
       </ValueCell>
       <ValueCell>

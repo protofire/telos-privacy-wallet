@@ -27,7 +27,7 @@
     "shieldedAddress": "Shielded address: ",
     "shieldedBalance": "Shielded balance: ",
     "generatingAddress": "Generating address...",
-    "accessPrivateAccount": "Access Private Account",
+    "accessPrivateAccount": "Connect wallet",
     "createPrivateAccount": "Create Private Account"
   },
   "buttonText": {
@@ -220,8 +220,8 @@
   },
   "accountSetupModal": {
     "access": {
-      "title": "Access Private Account",
-      "sectionTitle": "Choose how you want to access:",
+      "title": "Connect wallet",
+      "sectionTitle": "Choose how you want to connect:",
       "metaMaskDescription": "Sign a message to create or unlock your Private Account.",
       "walletConnectDescription": "Connect any compatible wallet to access your Private Account.",
       "dividerText": "Or restore using seedphrase:",

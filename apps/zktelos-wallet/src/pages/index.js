@@ -35,8 +35,6 @@ import Home from 'pages/Home';
 
 import ContextsProvider, { ZkAccountContext } from 'contexts';
 
-
-
 const SentryRoute = Sentry.withSentryRouting(Route);
 
 const history = createBrowserHistory();
