@@ -12,7 +12,6 @@ import Tooltip from 'components/Tooltip';
 
 import { formatNumber } from 'utils';
 
-import { ReactComponent as BobTokenDefault } from 'assets/bob.svg';
 import { ReactComponent as CheckCircleIconDefault } from 'assets/check-circle.svg';
 import { ReactComponent as CrossIconDefault } from 'assets/cross-circle.svg';
 import { ReactComponent as CopyIconDefault } from 'assets/copy.svg';
@@ -113,7 +112,6 @@ const StartScreen = ({ giftCard, redeem, isLoadingZkAccount, tokenDecimals }) =>
         {t('reedeemGifCardModal.start.description')}
       </Description>
       <BalanceContainer>
-        <BobToken />
         <Amount>{formatNumber(giftCard?.parsedBalance || BigNumber.from('0'), tokenDecimals)}</Amount>
       </BalanceContainer>
       {isLoadingZkAccount ? (
@@ -259,10 +257,10 @@ export default ({
     <Modal
       isOpen={isOpen}
       onClose={step === FAILED ? clearStateAndClose : null}
-      style={{ background: step === START ? gradient : '#FFF'}}
+      style={{ background: step === START ? gradient : '#FFF' }}
     >
       {(() => {
-        switch(step) {
+        switch (step) {
           case LOADING:
             return <LoadingScreen />;
           case CREATE_ACCOUNT:
@@ -324,11 +322,6 @@ const Amount = styled.span`
   text-fill-color: transparent;
 `;
 
-const BobToken = styled(BobTokenDefault)`
-  width: 60px;
-  height: 60px;
-  margin-right: 10px;
-`;
 
 const StatusTitle = styled.span`
   font-size: 20px;
