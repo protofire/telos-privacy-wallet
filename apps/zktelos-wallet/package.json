@@ -67,7 +67,6 @@
     "web-vitals": "^1.0.1",
     "webpack": "^5.70.0",
     "zkbob-client-js": "*",
-    "my-native-addon": "*",
     "my-rust-addon": "*"
   },
   "devDependencies": {
@@ -98,7 +97,6 @@
     "files": [
       "build/**/*",
       "electron/**/*",
-      "node_modules/my-native-addon/**/*",
       "node_modules/my-rust-addon/**/*"
     ],
     "asar": true,
@@ -117,8 +115,17 @@
     },
     "win": {
       "target": [
-        "nsis"
-      ]
+        {
+          "target": "nsis",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}",
+      "icon": "public/logo512.png"
     },
     "linux": {
       "target": [
