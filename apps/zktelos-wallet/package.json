@@ -67,7 +67,8 @@
     "web-vitals": "^1.0.1",
     "webpack": "^5.70.0",
     "zkbob-client-js": "*",
-    "my-native-addon": "*"
+    "my-native-addon": "*",
+    "my-rust-addon": "*"
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.20.0",
@@ -97,7 +98,8 @@
     "files": [
       "build/**/*",
       "electron/**/*",
-      "node_modules/my-native-addon/**/*"
+      "node_modules/my-native-addon/**/*",
+      "node_modules/my-rust-addon/**/*"
     ],
     "asar": true,
     "npmRebuild": false,

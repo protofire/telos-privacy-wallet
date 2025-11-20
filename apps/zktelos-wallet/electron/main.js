@@ -1,6 +1,7 @@
 const { app, BrowserWindow, session, shell, protocol, net, nativeImage } = require('electron');
 const { join } = require('path');
 const myNativeAddon = require('my-native-addon');
+const myRustAddon = require('my-rust-addon');
 
 let mainWindow;
 
@@ -147,8 +148,14 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  const result = myNativeAddon.helloWorld('Hola desde Electron!');
-  console.log(result);
+  // Test C++ addon
+  const cppResult = myNativeAddon.helloWorld('Hola desde Electron!');
+  console.log('[C++ Addon]', cppResult);
+
+  // Test Rust addon
+  const rustResult = myRustAddon.helloWorld('Hola desde Electron!');
+  console.log('[Rust Addon]', rustResult);
+
   await registerAppProtocolHandler();
   installSecurityHooks();
   createWindow();
