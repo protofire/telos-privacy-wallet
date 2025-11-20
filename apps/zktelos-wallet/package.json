@@ -95,7 +95,7 @@
     "files": [
       "build/**/*",
       "electron/**/*",
-      "!**/node_modules/**"
+      "node_modules/*"
     ],
     "asar": true,
     "npmRebuild": false,
@@ -113,8 +113,21 @@
     },
     "win": {
       "target": [
-        "nsis"
-      ]
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
+      "icon": "public/logo512.png",
+      "executableName": "zkTelos Wallet"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
     },
     "linux": {
       "target": [
