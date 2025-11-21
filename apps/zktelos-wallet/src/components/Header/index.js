@@ -55,7 +55,7 @@ export default ({ empty }) => {
     zkAccount, isLoadingZkAccount, balance: poolBalance,
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
-  const { openWalletModal, openAccessAccountModal, openSwapModal } = useContext(ModalContext);
+  const { openWalletModal, openAccessAccountModal } = useContext(ModalContext);
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { currentPool } = useContext(PoolContext);
 
@@ -195,7 +195,7 @@ export default ({ empty }) => {
       {isMobile && (
         <OnlyMobile>
           {networkDropdown}
-          {walletDropdown}
+          {/* {walletDropdown} */}
           {zkAccountDropdown}
         </OnlyMobile>
       )}
