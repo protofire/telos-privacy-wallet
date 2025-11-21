@@ -23,7 +23,7 @@
     "recipient": "Recipient",
     "link": "Link",
     "payment": "Payment",
-    "totalAssetBalance": "Sum of assets held in your public wallet and zkAccount, shown in USD.",
+    "totalAssetBalance": "Sum of assets held in your public and private accounts, shown in USD.",
     "shieldedAddress": "Shielded address: ",
     "shieldedBalance": "Shielded balance: ",
     "generatingAddress": "Generating address...",

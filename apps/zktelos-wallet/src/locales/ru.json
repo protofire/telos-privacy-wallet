@@ -23,7 +23,7 @@
     "recipient": "Получатель",
     "link": "Ссылка",
     "payment": "Платеж",
-    "totalAssetBalance": "Сумма активов, хранящихся в вашем публичном кошельке и zkAccount, показана в USD.",
+    "totalAssetBalance": "Сумма активов, хранящихся на ваших публичном и приватном аккаунтах, показана в USD.",
     "shieldedAddress": "Защищенный адрес: ",
     "shieldedBalance": "Защищенный баланс: ",
     "generatingAddress": "Генерация адреса...",

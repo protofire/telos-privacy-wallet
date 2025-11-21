@@ -23,7 +23,7 @@
     "recipient": "收款人",
     "link": "链接",
     "payment": "支付",
-    "totalAssetBalance": "您公共钱包和zk账户中资产的总价值，以USD显示。",
+    "totalAssetBalance": "您公共账户和私密账户中持有的资产总和，以USD显示。",
     "shieldedAddress": "隐私地址: ",
     "shieldedBalance": "隐私余额: ",
     "generatingAddress": "生成隐私地址...",
