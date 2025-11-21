@@ -104,6 +104,7 @@
     "removePackageScripts": true,
     "mac": {
       "identity": null,
+      "icon": "public/icon.icns",
       "target": [
         "dmg",
         "zip"
@@ -121,7 +122,7 @@
         }
       ],
       "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
-      "icon": "public/logo512.png",
+      "icon": "public/favicon.ico",
       "executableName": "zkTelos Wallet"
     },
     "nsis": {
@@ -134,6 +135,7 @@
         "AppImage",
         "deb"
       ],
+      "icon": "public/logo512.png",
       "category": "Finance"
     }
   },
