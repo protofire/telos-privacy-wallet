@@ -11,6 +11,7 @@ const tokens = [
   { address: "0x0000000000000000000000000000000000000000", symbol: "ETH" },
   { address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", symbol: "USDC" },
   { address: "0x193f4A4a6ea24102F49b931DEeeb931f6E32405d", symbol: "TLOS" },
+  { address: "0x193f4A4a6ea24102F49b931DEeeb931f6E32405d", symbol: "WTLOS" },
 ];
 const baseUrl = "https://li.quest/v1/token";
 const refreshInterval = 30_000;

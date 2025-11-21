@@ -37,9 +37,9 @@ const config = {
     }
   },
   dev: {
-    defaultPool: 'tlos_testnet',
+    defaultPool: 'tlos_testnet_native',
     pools: {
-      'tlos_testnet': {
+      'tlos_testnet_pusd': {
         chainId: 41,
         poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
         tokenAddress: '0x28d1BCc58E6Cd0270F45b63e4FFd13b3fF5E98af',
@@ -55,18 +55,18 @@ const config = {
       },
       'tlos_testnet_native': {
         chainId: 41,
-        poolAddress: '0x468585bfAeb2D2d84DD5b27750dD55CF65F3347f',
+        poolAddress: '0x2926B9D70096dd63eAE804511FAe6dD053cb3695',
         tokenAddress: '0xaE85Bf723A9e74d6c663dd226996AC1b8d075AA9',
         relayerUrls: ['http://3.150.201.113/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: '',
-        tokenSymbol: 'TLOS',
+        tokenSymbol: 'WTLOS',
         tokenDecimals: 18,
         feeDecimals: 2,
         depositScheme: 'approve',
         addressPrefix: '',
         parameters: 'staging',
-        isNative: true,
+        isNative: false,
       }
     },
     "snarkParamsSet": {
