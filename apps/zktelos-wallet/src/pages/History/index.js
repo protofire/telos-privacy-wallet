@@ -54,7 +54,7 @@ export default () => {
           item.from,
           item.txHash,
           actions[item.type].name,
-          item.state == 2 ? "finalized" : "pending",
+          item.state === 2 ? "finalized" : "pending",
           item.failureReason,
           item.timestamp
         ].join(',')
