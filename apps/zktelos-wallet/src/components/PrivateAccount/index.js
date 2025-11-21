@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useHistory, useLocation } from 'react-router-dom';
 import { ethers } from 'ethers';
 
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
 import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
+import { ReactComponent as DotsIconDefault } from 'assets/dots.svg';
 import { ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
@@ -15,9 +17,16 @@ import AddressWithCopy from 'components/AdressWithCopy';
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
 import Tooltip from 'components/Tooltip';
+import Dropdown from 'components/Dropdown';
+import OptionButtonDefault from 'components/OptionButton';
 
 const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { isVisible } = useContext(BalanceVisibilityContext);
+  const { t } = useTranslation();
+  const history = useHistory();
+  const location = useLocation();
+  const [isActionDropdownOpen, setIsActionDropdownOpen] = useState(false);
+
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -34,6 +43,17 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
   }, [value]);
 
   const fullValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}` : '--';
+
+
+  const handleWithdraw = useCallback(() => {
+    setIsActionDropdownOpen(false);
+    history.push('/withdraw' + location.search);
+  }, [history, location]);
+
+  const handleTransfer = useCallback(() => {
+    setIsActionDropdownOpen(false);
+    history.push('/transfer' + location.search);
+  }, [history, location]);
 
   if (!balance || balance.isZero()) {
     return null;
@@ -70,8 +90,30 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
           )
         )}
       </ValueCell>
-      <ValueCell>
-        <TBDText>TBD</TBDText>
+      <ValueCell style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Dropdown
+          width={180}
+          style={{ padding: '12px' }}
+          isOpen={isActionDropdownOpen}
+          open={() => setIsActionDropdownOpen(true)}
+          close={() => setIsActionDropdownOpen(false)}
+          fullscreen={false}
+          placement="bottomRight"
+          content={() => (
+            <ActionDropdownContainer>
+              <OptionButton onClick={handleWithdraw}>
+                {t('withdraw.title')}
+              </OptionButton>
+              <OptionButton onClick={handleTransfer}>
+                {t('transfer.title')}
+              </OptionButton>
+            </ActionDropdownContainer>
+          )}
+        >
+          <ActionButton>
+            <DotsIcon />
+          </ActionButton>
+        </Dropdown>
       </ValueCell>
     </TableRow>
   );
@@ -310,8 +352,36 @@ const ValueCell = styled.td`
   vertical-align: middle;
 `;
 
-const TBDText = styled.span`
-  font-size: 14px;
-  color: ${props => props.theme.text.color.secondary};
+const ActionButton = styled.button`
+  background: ${props => props.theme.color.telosGradientSoft};
+  border: 1px solid ${props => props.theme.color.black};
   font-weight: ${props => props.theme.text.weight.bold};
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: ${props => props.theme.text.color.black};
+  box-shadow: ${props => props.theme.color.black} 2px 2px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
+
+const DotsIcon = styled(DotsIconDefault)`
+  width: 16px;
+  height: 16px;
+`;
+
+const ActionDropdownContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  & > :last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const OptionButton = styled(OptionButtonDefault)`
+  height: 48px;
+  padding: 0 16px;
+  margin-bottom: 0;
 `;
