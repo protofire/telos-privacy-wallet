@@ -20,9 +20,7 @@ export const useMaxAmountExceeded = (amount, maxWithdrawable, limit = ethers.con
 };
 
 const NATIVE_TOKENS = {
-  'BOB2USDC-optimism': 'ETH',
-  'BOB2USDC-goerli': 'ETH',
-  'BOB2USDC-polygon': 'MATIC',
+  'tlos_testnet_native': 'TLOS',
 };
 
 const POOL_CONTRACT_ABI = ['function tokenSeller() pure returns (address)'];
