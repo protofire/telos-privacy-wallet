@@ -5,7 +5,7 @@ console.log('🔧 Testing Rust Native Addon\n');
 
 try {
   console.log('🦀 Loading Rust addon...');
-  const rustAddon = require('./my-rust-addon');
+  const rustProver = require('./libzkbob-rs-node');
 
   console.log('✅ Addon loaded successfully\n');
 

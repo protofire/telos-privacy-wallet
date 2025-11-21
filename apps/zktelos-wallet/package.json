@@ -10,6 +10,7 @@
     "build": "NODE_OPTIONS=--max-old-space-size=8192 react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
+    "electron:dev": "electron .",
     "electron:build:prod": "yarn build && electron-builder",
     "electron:build:mac": "yarn electron:build:prod --mac",
     "electron:build:win": "yarn electron:build:prod --win",
@@ -67,7 +68,7 @@
     "web-vitals": "^1.0.1",
     "webpack": "^5.70.0",
     "zkbob-client-js": "*",
-    "my-rust-addon": "*"
+    "libzkbob-rs-node": "*"
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.20.0",
@@ -117,11 +118,16 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "${productName}-${version}-win-${arch}.${ext}",
