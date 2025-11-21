@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import ButtonDefault from 'components/Button';
 import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
-import WalletDropdown from 'components/WalletDropdown';
 import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
 import MoreDropdown from 'components/MoreDropdown';
@@ -23,8 +22,8 @@ import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
 
-import { shortAddress, formatNumber } from 'utils';
-import { NETWORKS, CONNECTORS_ICONS, TOKENS_ICONS } from 'constants';
+import { formatNumber } from 'utils';
+import { NETWORKS, TOKENS_ICONS } from 'constants';
 import { useWindowDimensions } from 'hooks';
 
 import {
@@ -49,13 +48,13 @@ const BalanceSkeleton = isMobile => (
 
 export default ({ empty }) => {
   const { t } = useTranslation();
-  const { address: account, connector } = useContext(WalletContext);
-  const { balance, nativeBalance, updateBalance, isLoadingBalance } = useContext(TokenBalanceContext);
+  const { address: account } = useContext(WalletContext);
+  const { updateBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const {
     zkAccount, isLoadingZkAccount, balance: poolBalance,
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
-  const { openWalletModal, openAccessAccountModal } = useContext(ModalContext);
+  const { openAccessAccountModal } = useContext(ModalContext);
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { currentPool } = useContext(PoolContext);
 
@@ -94,36 +93,36 @@ export default ({ empty }) => {
     </NetworkDropdown>
   );
 
-  const walletDropdown = account ? (
-    <WalletDropdown>
-      <AccountDropdownButton $refreshing={isLoadingBalance}>
-        <Row>
-          {connector && <Icon src={CONNECTORS_ICONS[connector.name]} />}
-          <Address>{shortAddress(account)}</Address>
-          {isLoadingBalance ? (
-            <BalanceSkeleton isMobile={isMobile} />
-          ) : (
-            <>
-              <Balance>
-                <BalanceDisplay
-                  value={`${formatBalance(
-                    currentPool.isNative ? nativeBalance.add(balance) : balance,
-                    currentPool.tokenDecimals,
-                    isMobile
-                  )} ${currentPool.tokenSymbol}${currentPool.isNative ? '*' : ''}`}
-                />
-              </Balance>
-              <DropdownIcon />
-            </>
-          )}
-        </Row>
-      </AccountDropdownButton>
-    </WalletDropdown>
-  ) : (
-    <Button small onClick={openWalletModal} data-ga-id="wallet-header" data-tour="create-zkaccount">
-      {t('buttonText.connectWallet')}
-    </Button>
-  );
+  // const walletDropdown = account ? (
+  //   <WalletDropdown>
+  //     <AccountDropdownButton $refreshing={isLoadingBalance}>
+  //       <Row>
+  //         {connector && <Icon src={CONNECTORS_ICONS[connector.name]} />}
+  //         <Address>{shortAddress(account)}</Address>
+  //         {isLoadingBalance ? (
+  //           <BalanceSkeleton isMobile={isMobile} />
+  //         ) : (
+  //           <>
+  //             <Balance>
+  //               <BalanceDisplay
+  //                 value={`${formatBalance(
+  //                   currentPool.isNative ? nativeBalance.add(balance) : balance,
+  //                   currentPool.tokenDecimals,
+  //                   isMobile
+  //                 )} ${currentPool.tokenSymbol}${currentPool.isNative ? '*' : ''}`}
+  //               />
+  //             </Balance>
+  //             <DropdownIcon />
+  //           </>
+  //         )}
+  //       </Row>
+  //     </AccountDropdownButton>
+  //   </WalletDropdown>
+  // ) : (
+  //   <Button small onClick={openWalletModal} data-ga-id="wallet-header" data-tour="create-zkaccount">
+  //     {t('buttonText.connectWallet')}
+  //   </Button>
+  // );
 
   const zkAccountDropdown = zkAccount ? (
     <ZkAccountDropdown>
@@ -321,10 +320,10 @@ const AccountDropdownButton = styled(NetworkDropdownButton)`
   }
 `;
 
-const Icon = styled.img`
-  width: 18px;
-  height: 16px;
-`;
+// const Icon = styled.img`
+//   width: 18px;
+//   height: 16px;
+// `;
 
 const Address = styled.span`
   margin-left: 8px;
@@ -377,12 +376,12 @@ const Button = styled(ButtonDefault)`
   }
 `;
 
-const BridgeButton = styled(Button)`
-  background: ${props => props.theme.button.link.text.color};
-  @media only screen and (max-width: 800px) {
-    padding: 8px 12px;
-  }
-`;
+// const BridgeButton = styled(Button)`
+//   background: ${props => props.theme.button.link.text.color};
+//   @media only screen and (max-width: 800px) {
+//     padding: 8px 12px;
+//   }
+// `;
 
 const NetworkIcon = styled.img`
   width: 24px;
