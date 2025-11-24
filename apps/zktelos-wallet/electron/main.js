@@ -187,7 +187,6 @@ function setupRustIpcHandler() {
       const bin = fs.readFileSync(join(__dirname, 'assets', 'transfer_params.bin'));
       const params = zp.readParamsFromBinary(bin, false)
       const result = zp.proveTx(params, inputData[0], inputData[1])
-      console.log('ELECTRON RESULT', result)
 
       return result
     } catch (error) {

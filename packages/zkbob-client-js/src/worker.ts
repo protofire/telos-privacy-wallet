@@ -55,6 +55,17 @@ const obj = {
     console.info('Web worker init complete.');
   },
 
+  async proveTx(paramsName: string, pub, sec) {
+    const params = txParams[paramsName];
+    if (params === undefined) {
+      throw new InternalError(`Cannot find snark parameters set \'${paramsName}\'`);
+    }
+
+    console.debug('Web worker: proveTx');
+    let snarkParams = await params.getParams(wasm);
+    return wasm.Proof.tx(snarkParams, pub, sec);
+  },
+
   async loadTxParams(paramsName: string, expectedHash?: string) {
     const params = txParams[paramsName];
     if (params === undefined) {
@@ -71,8 +82,6 @@ const obj = {
     }
 
     return await params.getParams(wasm);
-    //return await (window as any).nativeProver.proveTx([snarkParams, pub, sec])
-    //return wasm.Proof.tx(snarkParams, pub, sec);
   },
 
   async verifyTxProof(paramsName: string, inputs: string[], proof: SnarkProof): Promise<boolean> {
@@ -279,9 +288,8 @@ export const initParamsRafael = async (
   }
 }
 
-export const proveTxRafael = async (pub: any, sec: any) => {
+export const proveTxNativeHardware = async (pub: any, sec: any) => {
   return await (window as any).nativeProver.nativeProveTx([pub, sec])
-  //return wasm.Proof.tx(snarkParams, pub, sec);
 }
 
 expose(obj);

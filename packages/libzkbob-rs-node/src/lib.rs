@@ -57,33 +57,6 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     )?;
     cx.export_function("verify", proof::verify_proof)?;
 
-    //cx.export_function("merkleNew", merkle::merkle_new)?;
-    //cx.export_function("merkleGetRoot", merkle::merkle_get_root)?;
-    //cx.export_function("merkleGetNextIndex", merkle::merkle_get_next_index)?;
-    //cx.export_function("merkleGetNode", merkle::merkle_get_node)?;
-    //cx.export_function("merkleAddHash", merkle::merkle_add_hash)?;
-    //cx.export_function("merkleAddCommitment", merkle::merkle_add_commitment)?;
-    //cx.export_function("merkleAppendHash", merkle::merkle_append_hash)?;
-    //cx.export_function("merkleGetProof", merkle::merkle_get_leaf_proof)?;
-    //cx.export_function(
-    //"merkleGetCommitmentProof",
-    //merkle::merkle_get_commitment_proof,
-    //)?;
-    //cx.export_function("merkleGetAllNodes", merkle::merkle_get_all_nodes)?;
-    //cx.export_function("merkleGetVirtualNode", merkle::merkle_get_virtual_node)?;
-    //cx.export_function("merkleRollback", merkle::merkle_rollback)?;
-    //cx.export_function("merkleWipe", merkle::merkle_wipe)?;
-    //cx.export_function("merkleGetLeftSiblings", merkle::merkle_get_left_siblings)?;
-    //cx.export_function("merkleGetLastStableIndex", merkle::merkle_get_last_stable_index)?;
-    //cx.export_function("merkleSetLastStableIndex", merkle::merkle_set_last_stable_index)?;
-    //cx.export_function("merkleGetRootAt", merkle::merkle_get_root_at)?;
-
-    //cx.export_function("txStorageNew", storage::tx_storage_new)?;
-    //cx.export_function("txStorageAdd", storage::tx_storage_add)?;
-    //cx.export_function("txStorageDelete", storage::tx_storage_delete)?;
-    //cx.export_function("txStorageGet", storage::tx_storage_get)?;
-    //cx.export_function("txStorageCount", storage::tx_storage_count)?;
-
     cx.export_function("helpersOutCommitment", helpers::out_commitment)?;
     cx.export_function("helpersParseDelta", helpers::parse_delta_string)?;
     cx.export_function("helpersNumToStr", helpers::num_to_str)?;

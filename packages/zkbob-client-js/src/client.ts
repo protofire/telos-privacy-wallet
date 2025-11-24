@@ -1,6 +1,6 @@
 import {Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx} from "libzkbob-rs-wasm-web";
 import {Chains, Pools, Parameters, ClientConfig, AccountConfig, accountId, ProverMode, DepositType, ZkAddressPrefix} from "./config";
-import {truncateHexPrefix, toTwosComplementHex, bigintToArrayLe} from "./utils";
+import {truncateHexPrefix, toTwosComplementHex, bigintToArrayLe, isDesktop} from "./utils";
 import {SyncStat, ZkBobState, ZERO_OPTIMISTIC_STATE} from "./state";
 import {DirectDeposit, RegularTxType, TxCalldataVersion, txTypeToString} from "./tx";
 import {CONSTANTS} from "./constants";
@@ -37,7 +37,7 @@ import {Privkey} from "hdwallet-babyjub";
 import {IDBPDatabase, openDB} from "idb";
 import {NAKED_ADDR_REGEX} from "./address-prefixes";
 import {DB_PREFIX} from "./constants";
-import {proveTxRafael} from "./worker";
+import {proveTxNativeHardware} from "./worker";
 
 const OUTPLUSONE = CONSTANTS.OUT + 1; // number of leaves (account + notes) in a transaction
 const PARTIAL_TREE_USAGE_THRESHOLD = 500; // minimum tx count in Merkle tree to partial tree update using
@@ -1739,12 +1739,12 @@ export class ZkBobClient extends ZkBobProvider {
       }
     }
 
-    const txProof = await proveTxRafael(pub, sec)
-    console.log('CLIENT TX PROOF', JSON.stringify(txProof))
-    //const txValid = await this.worker.verifyTxProof(this.snarkParamsAlias(), txProof.inputs, txProof.proof);
-    //if (!txValid) {
-    //throw new TxProofError();
-    //}
+    const txProof = isDesktop() ? await proveTxNativeHardware(pub, sec) : await this.worker.proveTx(this.snarkParamsAlias(), pub, sec);
+    const txValid = await this.worker.verifyTxProof(this.snarkParamsAlias(), txProof.inputs, txProof.proof);
+
+    if (!txValid) {
+      throw new TxProofError();
+    }
 
     return txProof;
   }
