@@ -1,6 +1,6 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
@@ -11,17 +11,27 @@ import AddressWithCopy from 'components/AdressWithCopy';
 import OptionButtonDefault from 'components/OptionButton';
 import Skeleton from 'components/Skeleton';
 import Tooltip from 'components/Tooltip';
+import Dropdown from 'components/Dropdown';
+import { ReactComponent as DotsIconDefault } from 'assets/dots.svg';
 
 import { CONNECTORS_ICONS } from 'constants';
 import { TOKENS_ICONS } from 'constants';
 import { TokenBalanceContext, PoolContext, WalletContext, ModalContext, BalanceVisibilityContext } from 'contexts';
-import { useTokenMapPrices } from 'hooks';
+import { useTokenMapPrices, useWrapToken } from 'hooks';
 import { formatNumber, shortAddress } from 'utils';
 
-const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
+const PortfolioRow = ({
+  asset,
+  icon,
+  balance,
+  price,
+  tokenDecimals,
+  isLoading,
+  actions,
+}) => {
   const { t } = useTranslation();
-  const history = useHistory();
   const { isVisible } = useContext(BalanceVisibilityContext);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const value = useMemo(() => {
     if (!balance || !price) return null;
     const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, tokenDecimals));
@@ -39,13 +49,11 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
 
   const fullValue = value ? `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}` : '--';
 
-  const onDepositClick = () => {
-    history.push('/deposit');
-  };
-
   if (!balance || balance.isZero()) {
     return null;
   }
+
+  const renderedActions = actions?.filter(action => !action.hidden) || [];
 
   return (
     <TableRow>
@@ -78,8 +86,40 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
           )
         )}
       </ValueCell>
-      <ValueCell>
-        <PlainDepositButton onClick={onDepositClick}>{t('buttonText.deposit')}</PlainDepositButton>
+      <ValueCell style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        {renderedActions.length > 0 ? (
+          <Dropdown
+            width={180}
+            style={{ padding: '12px' }}
+            isOpen={isDropdownOpen}
+            open={() => setIsDropdownOpen(true)}
+            close={() => setIsDropdownOpen(false)}
+            fullscreen={false}
+            placement="bottomRight"
+            content={() => (
+              <ActionDropdownContainer>
+                {renderedActions.map(action => (
+                  <DropdownOptionButton
+                    key={action.id}
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      action.onClick?.();
+                    }}
+                    disabled={action.disabled}
+                  >
+                    {action.label}
+                  </DropdownOptionButton>
+                ))}
+              </ActionDropdownContainer>
+            )}
+          >
+            <ActionButton disabled={renderedActions.every(item => item.disabled)}>
+              <DotsIcon />
+            </ActionButton>
+          </Dropdown>
+        ) : (
+          <PlainDepositButton disabled>{t('buttonText.deposit')}</PlainDepositButton>
+        )}
       </ValueCell>
     </TableRow>
   );
@@ -92,6 +132,16 @@ export default () => {
   const { currentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
   const { openWalletModal } = useContext(ModalContext);
+  const history = useHistory();
+  const location = useLocation();
+  const {
+    supportsWrap,
+    supportsUnwrap,
+    wrap,
+    unwrap,
+    isWrapping,
+    isUnwrapping,
+  } = useWrapToken();
 
   const tlosPrice = priceMap?.get('TLOS') || null;
   const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
@@ -111,6 +161,28 @@ export default () => {
   const handleLogout = () => {
     disconnect();
   }
+
+  const goToDeposit = useCallback(() => {
+    history.push('/deposit' + location.search);
+  }, [history, location]);
+
+  const handleWrap = useCallback(async () => {
+    if (!supportsWrap || !nativeBalance || nativeBalance.isZero()) return;
+    try {
+      await wrap(nativeBalance);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [supportsWrap, nativeBalance, wrap]);
+
+  const handleUnwrap = useCallback(async () => {
+    if (!supportsUnwrap || !poolTokenBalance || poolTokenBalance.isZero()) return;
+    try {
+      await unwrap(poolTokenBalance);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [supportsUnwrap, poolTokenBalance, unwrap]);
 
   if (!account) {
     return <ConnectWalletWrapper>
@@ -168,6 +240,19 @@ export default () => {
             price={tlosPrice}
             tokenDecimals={18}
             isLoading={isLoading}
+            actions={[
+              {
+                id: 'deposit',
+                label: t('buttonText.deposit'),
+                onClick: goToDeposit,
+              },
+              supportsWrap ? {
+                id: 'wrap',
+                label: t('buttonText.wrap'),
+                onClick: handleWrap,
+                disabled: isWrapping || nativeBalance?.isZero(),
+              } : { id: 'wrap-disabled', hidden: true },
+            ]}
           />
           <PortfolioRow
             asset={tokenSymbol}
@@ -176,6 +261,19 @@ export default () => {
             price={poolTokenPrice}
             tokenDecimals={currentPool?.tokenDecimals || 18}
             isLoading={isLoading}
+            actions={[
+              {
+                id: 'deposit',
+                label: t('buttonText.deposit'),
+                onClick: goToDeposit,
+              },
+              supportsUnwrap ? {
+                id: 'unwrap',
+                label: t('buttonText.unwrap'),
+                onClick: handleUnwrap,
+                disabled: isUnwrapping || poolTokenBalance?.isZero(),
+              } : { id: 'unwrap-disabled', hidden: true },
+            ]}
           />
         </tbody>
       </Table>
@@ -290,6 +388,8 @@ const PlainDepositButton = styled.button`
   color: ${props => props.theme.text.color.black};
   box-shadow: ${props => props.theme.color.black} 2px 2px 0 0;
   cursor: pointer;
+  opacity: ${props => props.disabled ? 0.5 : 1};
+  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
 `;
 
 const WalletConnectorIcon = styled.img`
@@ -345,4 +445,35 @@ const OptionButton = styled(OptionButtonDefault)`
   height: auto;
   font-size: 14px;
   width: auto;
+`;
+
+const ActionButton = styled.button`
+  background: ${props => props.theme.color.telosGradientSoft};
+  border: 1px solid ${props => props.theme.color.black};
+  font-weight: ${props => props.theme.text.weight.bold};
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: ${props => props.theme.text.color.black};
+  box-shadow: ${props => props.theme.color.black} 2px 2px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
+
+const ActionDropdownContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const DropdownOptionButton = styled(OptionButtonDefault)`
+  height: 48px;
+  padding: 0 16px;
+  margin-bottom: 0;
+`;
+
+const DotsIcon = styled(DotsIconDefault)`
+  width: 16px;
+  height: 16px;
 `;

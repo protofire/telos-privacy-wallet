@@ -59,6 +59,8 @@
     "max": "Max",
     "changeWallet": "Change wallet",
     "disconnect": "Disconnect",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "Show secret phrase",
     "setPassword": "Set password",
     "disablePassword": "Disable password",

@@ -59,6 +59,8 @@
     "max": "Máximo",
     "changeWallet": "Mudar carteira",
     "disconnect": "Desconectar",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "Mostrar frase secreta",
     "setPassword": "Definir senha",
     "disablePassword": "Desativar senha",

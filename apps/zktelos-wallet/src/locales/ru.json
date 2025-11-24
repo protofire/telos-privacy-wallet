@@ -59,6 +59,8 @@
     "max": "Макс",
     "changeWallet": "Переключить кошелек",
     "disconnect": "Отключиться",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "Показать секретную фразу",
     "setPassword": "Установить пароль",
     "disablePassword": "Отключить пароль",

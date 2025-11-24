@@ -59,6 +59,8 @@
     "max": "最大",
     "changeWallet": "切换钱包",
     "disconnect": "中断连接",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "显示助记词",
     "setPassword": "设置密码",
     "disablePassword": "停用密码",
