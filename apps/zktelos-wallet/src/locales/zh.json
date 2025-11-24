@@ -219,6 +219,15 @@
     "title": "兑换进行中",
     "description": "您可以关闭此窗口并稍后返回页面以查看结果。是否关闭窗口？"
   },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "金额",
+    "available": "可用：{{amount}} {{symbol}}",
+    "invalidAmount": "请输入有效金额",
+    "exceedsBalance": "金额超出可用余额",
+    "processing": "正在处理..."
+  },
   "accountSetupModal": {
     "access": {
       "title": "连接钱包",

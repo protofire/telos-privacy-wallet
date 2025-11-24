@@ -17,7 +17,7 @@ import { ReactComponent as DotsIconDefault } from 'assets/dots.svg';
 import { CONNECTORS_ICONS } from 'constants';
 import { TOKENS_ICONS } from 'constants';
 import { TokenBalanceContext, PoolContext, WalletContext, ModalContext, BalanceVisibilityContext } from 'contexts';
-import { useTokenMapPrices, useWrapToken } from 'hooks';
+import { useTokenMapPrices } from 'hooks';
 import { formatNumber, shortAddress } from 'utils';
 
 const PortfolioRow = ({
@@ -131,17 +131,9 @@ export default () => {
   const { nativeBalance, balance: poolTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { currentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
-  const { openWalletModal } = useContext(ModalContext);
+  const { openWalletModal, openWrapModal } = useContext(ModalContext);
   const history = useHistory();
   const location = useLocation();
-  const {
-    supportsWrap,
-    supportsUnwrap,
-    wrap,
-    unwrap,
-    isWrapping,
-    isUnwrapping,
-  } = useWrapToken();
 
   const tlosPrice = priceMap?.get('TLOS') || null;
   const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
@@ -149,6 +141,9 @@ export default () => {
   const isLoading = isLoadingBalance || isLoadingPrices;
   const isNative = currentPool.isNative;
   const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
+  const supportsWrapping = isNative;
+  const wrapDisabled = !nativeBalance || nativeBalance.isZero();
+  const unwrapDisabled = !poolTokenBalance || poolTokenBalance.isZero();
 
   const getRefreshIcon = () => {
     return <RenewIcon width={18} height={18} />;
@@ -165,24 +160,6 @@ export default () => {
   const goToDeposit = useCallback(() => {
     history.push('/deposit' + location.search);
   }, [history, location]);
-
-  const handleWrap = useCallback(async () => {
-    if (!supportsWrap || !nativeBalance || nativeBalance.isZero()) return;
-    try {
-      await wrap(nativeBalance);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [supportsWrap, nativeBalance, wrap]);
-
-  const handleUnwrap = useCallback(async () => {
-    if (!supportsUnwrap || !poolTokenBalance || poolTokenBalance.isZero()) return;
-    try {
-      await unwrap(poolTokenBalance);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [supportsUnwrap, poolTokenBalance, unwrap]);
 
   if (!account) {
     return <ConnectWalletWrapper>
@@ -246,11 +223,11 @@ export default () => {
                 label: t('buttonText.deposit'),
                 onClick: goToDeposit,
               },
-              supportsWrap ? {
+              supportsWrapping ? {
                 id: 'wrap',
                 label: t('buttonText.wrap'),
-                onClick: handleWrap,
-                disabled: isWrapping || nativeBalance?.isZero(),
+                onClick: () => openWrapModal('wrap'),
+                disabled: wrapDisabled,
               } : { id: 'wrap-disabled', hidden: true },
             ]}
           />
@@ -267,11 +244,11 @@ export default () => {
                 label: t('buttonText.deposit'),
                 onClick: goToDeposit,
               },
-              supportsUnwrap ? {
+              supportsWrapping ? {
                 id: 'unwrap',
                 label: t('buttonText.unwrap'),
-                onClick: handleUnwrap,
-                disabled: isUnwrapping || poolTokenBalance?.isZero(),
+                onClick: () => openWrapModal('unwrap'),
+                disabled: unwrapDisabled,
               } : { id: 'unwrap-disabled', hidden: true },
             ]}
           />

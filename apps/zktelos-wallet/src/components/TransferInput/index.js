@@ -16,14 +16,31 @@ import { TOKENS_ICONS } from 'constants';
 import { BalanceVisibilityContext } from 'contexts';
 
 export default ({
-  amount, onChange, balance, nativeBalance, isLoadingBalance, fee,
-  shielded, setMax, maxAmountExceeded, isLoadingFee, currentPool,
-  isNativeSelected, setIsNativeSelected, isNativeTokenUsed, gaIdPostfix,
+  amount,
+  onChange,
+  balance,
+  nativeBalance,
+  isLoadingBalance,
+  fee,
+  shielded,
+  setMax,
+  maxAmountExceeded,
+  isLoadingFee,
+  currentPool,
+  isNativeSelected,
+  setIsNativeSelected,
+  isNativeTokenUsed,
+  gaIdPostfix,
+  hideFeeRow = false,
+  disableNativeSelect = false,
+  tokenSymbolOverride,
 }) => {
   const { t } = useTranslation();
   const displayedFee = useDisplayedFee(currentPool, fee);
   const [showTooltip, setShowTooltip] = useState(false);
   const { isVisible } = useContext(BalanceVisibilityContext);
+  const displayedSymbol = tokenSymbolOverride || currentPool.tokenSymbol;
+  const tokenIconSrc = TOKENS_ICONS[displayedSymbol] || TOKENS_ICONS[currentPool.tokenSymbol];
 
   const handleAmountChange = useCallback(value => {
     if (!value || /^\d*(?:[.]\d*)?$/.test(value)) {
@@ -43,7 +60,7 @@ export default ({
           value={amount}
           onChange={e => handleAmountChange(e.target.value)}
         />
-        {(!shielded && currentPool.isNative) ? (
+        {(!shielded && currentPool.isNative && !disableNativeSelect) ? (
           <Select
             tokenSymbol={currentPool.tokenSymbol}
             isNativeSelected={isNativeSelected}
@@ -51,20 +68,22 @@ export default ({
           />
         ) : (
           <TokenContainer>
-            <TokenIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
-            {currentPool.tokenSymbol}
+            <TokenIcon src={tokenIconSrc} />
+            {displayedSymbol}
           </TokenContainer>
         )}
       </Row>
       <Row>
-        <RowWrap style={{ marginRight: 20 }}>
-          <Text style={{ marginRight: 4 }}>{t('common.relayerFee')}:</Text>
-          {isLoadingFee ? (
-            <Skeleton width={40} />
-          ) : (
-            <Text>{displayedFee}</Text>
-          )}
-        </RowWrap>
+        {!hideFeeRow && (
+          <RowWrap style={{ marginRight: 20 }}>
+            <Text style={{ marginRight: 4 }}>{t('common.relayerFee')}:</Text>
+            {isLoadingFee ? (
+              <Skeleton width={40} />
+            ) : (
+              <Text>{displayedFee}</Text>
+            )}
+          </RowWrap>
+        )}
         {(balance || isLoadingBalance) && (
           <RowFlexEnd>
             <Text style={{ marginRight: 4 }}>
@@ -76,7 +95,7 @@ export default ({
               <Row style={{ visibility: isVisible ? 'visible' : 'hidden' }}>
                 <Text>
                   {formatNumber(isNativeTokenUsed ? nativeBalance : balance, currentPool.tokenDecimals)}{' '}
-                  {currentPool.tokenSymbol}
+                  {displayedSymbol}
                 </Text>
                 <MaxButton
                   type="link"
@@ -87,7 +106,7 @@ export default ({
                   {t('buttonText.max')}
                 </MaxButton>
                 <Tooltip
-                  content={t('maxButton.tooltip', { symbol: currentPool.tokenSymbol })}
+                  content={t('maxButton.tooltip', { symbol: displayedSymbol })}
                   placement="right"
                   delay={0}
                   width={180}

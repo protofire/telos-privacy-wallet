@@ -220,6 +220,15 @@
     "title": "Обмен в процессе",
     "description": "Вы можете закрыть это окно и вернуться позже, чтобы посмотреть результаты. Вы хотите закрыть окно?"
   },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "Сумма",
+    "available": "Доступно: {{amount}} {{symbol}}",
+    "invalidAmount": "Введите корректную сумму",
+    "exceedsBalance": "Сумма превышает доступный баланс",
+    "processing": "Обработка..."
+  },
   "accountSetupModal": {
     "access": {
       "title": "Подключить кошелек",

@@ -6,6 +6,7 @@ import { PoolContext, WalletContext } from 'contexts';
 const WRAPPED_NATIVE_ABI = [
   'function deposit() payable',
   'function withdraw(uint256 wad)',
+  'function balanceOf(address owner) view returns (uint256)',
 ];
 
 export default () => {
@@ -68,6 +69,7 @@ export default () => {
     isWrapping,
     isUnwrapping,
     contractAddress,
+    contractAbi: WRAPPED_NATIVE_ABI,
   };
 };
 

@@ -221,6 +221,15 @@
     "title": "The swap is in progress",
     "description": "You can close this window and return later to view the results. Do you want to close the window?"
   },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "Amount",
+    "available": "Available: {{amount}} {{symbol}}",
+    "invalidAmount": "Enter a valid amount",
+    "exceedsBalance": "Amount exceeds available balance",
+    "processing": "Processing..."
+  },
   "accountSetupModal": {
     "access": {
       "title": "Connect wallet",

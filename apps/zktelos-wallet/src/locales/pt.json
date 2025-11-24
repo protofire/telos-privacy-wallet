@@ -219,6 +219,15 @@
     "title": "A troca está em andamento",
     "description": "Você pode fechar esta janela e voltar mais tarde para ver os resultados. Deseja fechar a janela?"
   },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "Quantidade",
+    "available": "Disponível: {{amount}} {{symbol}}",
+    "invalidAmount": "Insira um valor válido",
+    "exceedsBalance": "O valor excede o saldo disponível",
+    "processing": "Processando..."
+  },
   "accountSetupModal": {
     "access": {
       "title": "Conectar carteira",
