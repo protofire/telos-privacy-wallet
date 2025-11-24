@@ -187,34 +187,36 @@ export default () => {
         </HeaderContent>
       </HeaderContainer>
 
-      <Table>
-        <colgroup>
-          <Col style={{ width: '25%' }} />
-          <Col style={{ width: '18%' }} />
-          <Col style={{ width: '18%' }} />
-          <Col style={{ width: '18%' }} />
-          <Col style={{ width: '21%' }} />
-        </colgroup>
-        <thead>
-          <HeaderRow>
-            <AssetHeader scope="col">{t('portfolio.asset')}</AssetHeader>
-            <PriceHeader scope="col">{t('portfolio.price')}</PriceHeader>
-            <BalanceHeader scope="col">{t('portfolio.balance')}</BalanceHeader>
-            <ValueHeader scope="col">{t('portfolio.value')}</ValueHeader>
-            <ActionHeader scope="col"></ActionHeader>
-          </HeaderRow>
-        </thead>
-        <tbody>
-          <PrivatePortfolioRow
-            asset={tokenSymbol}
-            icon={TOKENS_ICONS[tokenSymbol]}
-            balance={poolBalance}
-            price={poolTokenPrice}
-            tokenDecimals={currentPool?.tokenDecimals || 18}
-            isLoading={isLoading}
-          />
-        </tbody>
-      </Table>
+      {poolBalance && poolBalance.gt(0) && (
+        <Table>
+          <colgroup>
+            <Col style={{ width: '25%' }} />
+            <Col style={{ width: '18%' }} />
+            <Col style={{ width: '18%' }} />
+            <Col style={{ width: '18%' }} />
+            <Col style={{ width: '21%' }} />
+          </colgroup>
+          <thead>
+            <HeaderRow>
+              <AssetHeader scope="col">{t('portfolio.asset')}</AssetHeader>
+              <PriceHeader scope="col">{t('portfolio.price')}</PriceHeader>
+              <BalanceHeader scope="col">{t('portfolio.balance')}</BalanceHeader>
+              <ValueHeader scope="col">{t('portfolio.value')}</ValueHeader>
+              <ActionHeader scope="col"></ActionHeader>
+            </HeaderRow>
+          </thead>
+          <tbody>
+            <PrivatePortfolioRow
+              asset={tokenSymbol}
+              icon={TOKENS_ICONS[tokenSymbol]}
+              balance={poolBalance}
+              price={poolTokenPrice}
+              tokenDecimals={currentPool?.tokenDecimals || 18}
+              isLoading={isLoading}
+            />
+          </tbody>
+        </Table>
+      )}
     </Container>
   );
 };
