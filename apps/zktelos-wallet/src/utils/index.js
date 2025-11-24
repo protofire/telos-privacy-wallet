@@ -13,7 +13,13 @@ export const shortAddress = (string, length = 10) => {
   if (!string) {
     return string;
   }
-  return string.substring(0, length - 4) + '...' + string.substring(string.length - 4);
+  if (string.length <= length) {
+    return string;
+  }
+  // Simétrica: (length - 3) para dividir entre dos, dejando espacio para '...'
+  const left = Math.floor((length - 3) / 2);
+  const right = Math.ceil((length - 3) / 2);
+  return string.substring(0, left) + '...' + string.substring(string.length - right);
 }
 
 export const formatNumber = (wei, tokenDecimals, customNumberDecimals) => {

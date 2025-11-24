@@ -121,7 +121,8 @@
     "note": "{{symbol}} will be withdrawn from zkTelos and deposited into the provided wallet address.",
     "addressInputPlaceholder": "Enter {{network}} address of receiver",
     "convertion": "Convert some {{from}} to {{to}} on withdrawal",
-    "convertionDetails": "You will get <strong>{{amount1}} {{symbol1}}</strong> and <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": "You will get <strong>{{amount1}} {{symbol1}}</strong> and <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "Add current wallet: {{address}} as receiver"
   },
   "limits": {
     "deposit": {

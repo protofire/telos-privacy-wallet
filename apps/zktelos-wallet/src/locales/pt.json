@@ -119,7 +119,8 @@
     "note": "{{symbol}} será retirado do zkTelos e depositado no endereço da carteira fornecido.",
     "addressInputPlaceholder": "Inserir endereço {{network}} do destinatário",
     "convertion": "Converter parte de {{from}} para {{to}} na retirada",
-    "convertionDetails": "Você receberá <strong>{{amount1}} {{symbol1}}</strong> e <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": "Você receberá <strong>{{amount1}} {{symbol1}}</strong> e <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "Adicionar carteira atual: {{address}} como destinatário"
   },
   "limits": {
     "deposit": {

@@ -119,7 +119,8 @@
     "note": "{{symbol}}将会从zkTelos中取出并存入到您提供的钱包地址",
     "addressInputPlaceholder": "输入收款人的{{network}}地址",
     "convertion": "提款时将一部分 {{from}} 转化为 {{to}}",
-    "convertionDetails": " 您将收到 <strong>{{amount1}} {{symbol1}}</strong> 和 <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": " 您将收到 <strong>{{amount1}} {{symbol1}}</strong> 和 <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "将当前钱包 {{address}} 设为收款地址"
   },
   "limits": {
     "deposit": {

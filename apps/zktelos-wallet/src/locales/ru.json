@@ -119,7 +119,8 @@
     "note": "{{symbol}} будет выведен из zkTelos и зачислен на указанный адрес кошелька.",
     "addressInputPlaceholder": "Введите {{network}} адрес получателя",
     "convertion": "Конвертировать часть {{from}} в {{to}} при выводе",
-    "convertionDetails": "Вы получите <strong>{{amount1}} {{symbol1}}</strong> и <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": "Вы получите <strong>{{amount1}} {{symbol1}}</strong> и <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "Добавить текущий кошелек {{address}} как получателя"
   },
   "limits": {
     "deposit": {
