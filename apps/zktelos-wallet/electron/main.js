@@ -4,6 +4,7 @@ const fs = require('fs')
 const zp = require('libzkbob-rs-node');
 
 let mainWindow;
+let proofParamsBuffer = null;
 
 app.commandLine.appendSwitch('enable-logging');
 
@@ -148,11 +149,27 @@ function createWindow() {
   });
 }
 
+function loadProofParameters() {
+  try {
+    const binPath = join(__dirname, 'assets', 'transfer_params.bin');
+    console.log(`[Startup] Loading ZK proof parameters from: ${binPath}`);
+
+    const bin = fs.readFileSync(binPath);
+
+    proofParamsBuffer = zp.readParamsFromBinary(bin, false);
+
+    console.log('[Startup] ZK proof parameters successfully pre-loaded.');
+  } catch (error) {
+    console.error('[Startup Error] Failed to load ZK proof parameters:', error);
+  }
+}
+
 app.whenReady().then(async () => {
   await registerAppProtocolHandler();
   installSecurityHooks();
   setupRustIpcHandler();
   createWindow();
+  loadProofParameters()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -180,12 +197,11 @@ function setupRustIpcHandler() {
   const channel = 'prove-tx';
 
   // Handle synchronous request from the Renderer
-  ipcMain.handle(channel, async (event, inputData) => {
+  ipcMain.handle(channel, async (_, inputData) => {
     try {
       console.log(`[IPC Main] Received request on ${channel} with data:`, inputData);
 
-      const bin = fs.readFileSync(join(__dirname, 'assets', 'transfer_params.bin'));
-      const params = zp.readParamsFromBinary(bin, false)
+      const params = proofParamsBuffer
       const result = zp.proveTx(params, inputData[0], inputData[1])
 
       return result
