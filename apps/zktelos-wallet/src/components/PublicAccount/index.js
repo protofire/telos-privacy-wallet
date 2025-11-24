@@ -87,7 +87,7 @@ const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading })
 
 export default () => {
   const { t } = useTranslation();
-  const { address: account, connector } = useContext(WalletContext);
+  const { address: account, connector, disconnect } = useContext(WalletContext);
   const { nativeBalance, balance: poolTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { currentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
@@ -108,6 +108,10 @@ export default () => {
     openWalletModal();
   }
 
+  const handleLogout = () => {
+    disconnect();
+  }
+
   if (!account) {
     return <ConnectWalletWrapper>
       <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>;
@@ -120,7 +124,7 @@ export default () => {
         <HeaderContent>
           <HeaderTitle>
             <AccountName>{connector?.name}</AccountName>
-            <OptionButton>
+            <OptionButton onClick={handleLogout}>
               {t('buttonText.logout')}
             </OptionButton>
           </HeaderTitle>

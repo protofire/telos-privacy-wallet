@@ -10,7 +10,8 @@ import config from '../config'
 const getRpcByPriority = (priority) => {
 
   return (chain) => {
-    if (!Object.keys(config.chains).find((chainId) => chainId === chain.id)) {
+    // eslint-disable-next-line eqeqeq
+    if (!Object.keys(config.chains).find((chainId) => chainId == chain.id)) {
       return publicProvider(chain);
     }
 

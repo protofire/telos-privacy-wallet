@@ -83,11 +83,11 @@ module.exports = {
     return function (proxy, allowedHost) {
       const config = configFunction(proxy, allowedHost);
 
-      config.headers = {
-        ...config.headers,
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy': 'credentialless',
-      };
+      // config.headers = {
+      //   ...config.headers,
+      //   'Cross-Origin-Opener-Policy': 'same-origin',
+      //   'Cross-Origin-Embedder-Policy': 'credentialless',
+      // };
 
       return config;
     };
