@@ -31,6 +31,13 @@ import { useDepositLimit, useMaxAmountExceeded } from './hooks';
 
 import { formatNumber, minBigNumber } from 'utils';
 
+const HARD_CODED_FEE_BPS = 10; // 0.1%
+
+const useHardcodedFee = amount => useMemo(
+  () => amount.mul(HARD_CODED_FEE_BPS).div(10_000),
+  [amount],
+);
+
 export default () => {
   const { t } = useTranslation();
   const { address: account } = useContext(WalletContext);
@@ -59,6 +66,15 @@ export default () => {
   const usedFee = useMemo(
     () => isNativeTokenUsed ? directDepositFee : fee,
     [isNativeTokenUsed, directDepositFee, fee],
+  );
+  const hardcodedNativeFee = useHardcodedFee(amount);
+  const shouldUseHardcodedFee = useMemo(
+    () => isNativeTokenUsed && directDepositFee.isZero(),
+    [isNativeTokenUsed, directDepositFee],
+  );
+  const displayedFeeValue = useMemo(
+    () => (shouldUseHardcodedFee ? hardcodedNativeFee : usedFee),
+    [shouldUseHardcodedFee, hardcodedNativeFee, usedFee],
   );
   const { isApproved, approve } = useApproval(currentPool, currentPool.tokenAddress, amount.add(fee), balance, currentPool.depositScheme);
   const depositLimit = useDepositLimit(limits, isNativeTokenUsed);
@@ -101,7 +117,7 @@ export default () => {
           amount={displayAmount}
           onChange={setDisplayAmount}
           shielded={false}
-          fee={usedFee}
+          fee={displayedFeeValue}
           isLoadingFee={isLoadingFee}
           setMax={setMax}
           maxAmountExceeded={maxAmountExceeded}
