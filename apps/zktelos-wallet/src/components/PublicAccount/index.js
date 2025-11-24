@@ -16,7 +16,7 @@ import { CONNECTORS_ICONS } from 'constants';
 import { TOKENS_ICONS } from 'constants';
 import { TokenBalanceContext, PoolContext, WalletContext, ModalContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
-import { formatNumber } from 'utils';
+import { formatNumber, shortAddress } from 'utils';
 
 const PortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { t } = useTranslation();
@@ -135,11 +135,11 @@ export default () => {
             $fontSize="14px"
             $height="auto"
             $borderRadius="0"
-            $maxWidth="300px"
+            $maxWidth="250px"
             $padding="0"
             $background="transparent"
           >
-            {account}
+            {shortAddress(account, 25)}
           </AddressWithCopy>
         </HeaderContent>
       </HeaderContainer>

@@ -175,7 +175,7 @@ export default () => {
               $fontSize="14px"
               $height="auto"
               $borderRadius="0"
-              $maxWidth="300px"
+              $maxWidth="250px"
               $padding="0"
               $background="transparent"
             >
