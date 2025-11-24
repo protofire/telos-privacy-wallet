@@ -202,7 +202,7 @@ function setupRustIpcHandler() {
       console.log(`[IPC Main] Received request on ${channel} with data:`, inputData);
 
       const params = proofParamsBuffer
-      const result = zp.proveTx(params, inputData[0], inputData[1])
+      const result = await zp.proveTxAsync(params, inputData[0], inputData[1])
 
       return result
     } catch (error) {
