@@ -53,8 +53,8 @@ export default () => {
     setIsConfirmModalOpen(false);
     setDisplayAmount('');
     setReceiver('');
-    const _amountToConvert = currentPool.isNative ? amount : amountToConvert;
-    withdraw(receiver, amount, _amountToConvert, relayerFee);
+    const requestedSwapAmount = currentPool.isNative ? ethers.constants.Zero : amountToConvert;
+    withdraw(receiver, amount, requestedSwapAmount, relayerFee);
   }, [receiver, amount, amountToConvert, withdraw, relayerFee, currentPool]);
 
   const setMax = useCallback(async () => {

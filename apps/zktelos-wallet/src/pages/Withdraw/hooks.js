@@ -37,7 +37,13 @@ export const useConvertion = (currentPool) => {
         let swapContractAddress = ethers.constants.AddressZero;
         try {
           swapContractAddress = await callContract(currentPool.poolAddress, POOL_CONTRACT_ABI, 'tokenSeller');
-        } catch (error) { }
+        } catch (err) {
+          console.warn('[useConvertion] tokenSeller unavailable', {
+            pool: currentPool.alias,
+            poolAddress: currentPool.poolAddress,
+            message: err?.message,
+          });
+        }
         const exist = swapContractAddress !== ethers.constants.AddressZero;
         setExist(exist);
         if (!exist) return;
