@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { HistoryTransactionType } from 'zkbob-client-js';
 import { useTranslation } from 'react-i18next';
@@ -14,20 +14,35 @@ import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
 
 import SingleTransfer from './SingleTransfer';
 import MultiTransfer from './MultiTransfer';
+import PoolSelector from 'components/PoolSelector';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
+import config from 'config';
 
 import { useLatestAction } from 'hooks';
 
 
 export default () => {
   const { t } = useTranslation();
-  const { isPending } = useContext(ZkAccountContext);
+  const { isPending, switchToPool } = useContext(ZkAccountContext);
   const latestAction = useLatestAction(HistoryTransactionType.TransferOut);
   const [isMulti, setIsMulti] = useState(false);
   const multitransferRef = useRef(null);
   const fileInputRef = useRef(null);
   const { currentPool } = useContext(PoolContext);
+  const poolOptions = useMemo(
+    () => Object.entries(config.pools).map(([alias, pool]) => ({
+      alias,
+      tokenSymbol: pool.tokenSymbol,
+      label: pool.tokenSymbol,
+    })),
+    [],
+  );
+
+  const handlePoolSelect = useCallback(alias => {
+    if (alias === currentPool.alias) return;
+    switchToPool(alias);
+  }, [currentPool.alias, switchToPool]);
 
   return isPending ? <PendingAction /> : (
     <ContentContainer>
@@ -60,8 +75,21 @@ export default () => {
               </Tooltip>
             </CsvButtonContainer>
           </Row>
+          <PoolSelectWrapper>
+            <PoolSelectorLabel>{t('transfer.betweenLabel')}</PoolSelectorLabel>
+            <PoolSelector
+              options={poolOptions}
+              selectedAlias={currentPool.alias}
+              onSelect={handlePoolSelect}
+            />
+          </PoolSelectWrapper>
         </TitleRow>
-        {isMulti ? <MultiTransfer ref={multitransferRef} /> : <SingleTransfer />}
+        {isMulti ? <MultiTransfer ref={multitransferRef} /> : (
+          <SingleTransfer
+            poolOptions={poolOptions}
+            onPoolSelect={handlePoolSelect}
+          />
+        )}
       </Card>
       {latestAction && (
         <LatestAction
@@ -82,6 +110,7 @@ const Row = styled.div`
 
 const TitleRow = styled(Row)`
   padding: 0 10px;
+  flex-wrap: wrap;
 `;
 
 const Title = styled.span`
@@ -123,6 +152,16 @@ const CsvButtonContainer = styled(Row)`
   `}
 `;
 
+const PoolSelectWrapper = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  @media (min-width: 600px) {
+    margin-top: 0;
+  }
+`;
+
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -135,4 +174,10 @@ const ContentContainer = styled.div`
   @media only screen and (max-width: 560px) {
     margin: 30px 0;
   }
+`;
+
+const PoolSelectorLabel = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.card.title.color};
+  margin-right: 6px;
 `;

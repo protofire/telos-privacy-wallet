@@ -95,11 +95,13 @@
   },
   "deposit": {
     "title": "Deposit",
+    "intoLabel": "Into",
     "note": "{{symbol}} will be deposited to your zkAccount. Once received, you can transfer {{symbol}} privately.",
     "ddNote": "{{symbol}} depositing can take up to 10 minutes."
   },
   "transfer": {
     "title": "Transfer",
+    "betweenLabel": "Between",
     "note": "The transfer will be performed privately. Sender, recipient and amount are never disclosed.",
     "addressInputPlaceholder": "Enter address of zkTelos receiver",
     "addressInputHint": "The address can be generated in the account modal window"
@@ -120,6 +122,7 @@
   },
   "withdraw": {
     "title": "Withdraw",
+    "fromLabel": "From",
     "note": "{{symbol}} will be withdrawn from zkTelos and deposited into the provided wallet address.",
     "addressInputPlaceholder": "Enter {{network}} address of receiver",
     "convertion": "Convert some {{from}} to {{to}} on withdrawal",

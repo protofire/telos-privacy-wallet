@@ -23,7 +23,7 @@ import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
 
 import { formatNumber } from 'utils';
-import { NETWORKS, TOKENS_ICONS } from 'constants';
+import { NETWORKS } from 'constants';
 import { useWindowDimensions } from 'hooks';
 
 import {
@@ -82,8 +82,7 @@ export default ({ empty }) => {
     <NetworkDropdown>
       <NetworkDropdownButton $refreshing={isPoolSwitching || isLoadingState} data-tour="supported-tokens">
         <NetworkIcon src={NETWORKS[currentPool.chainId].icon} />
-        <Divider />
-        <NetworkIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
+        <NetworkLabel>{NETWORKS[currentPool.chainId].name}</NetworkLabel>
         {isPoolSwitching ? (
           <Spinner size={12} style={{ marginLeft: 10 }} />
         ) : (
@@ -388,13 +387,10 @@ const NetworkIcon = styled.img`
   height: 24px;
 `;
 
-const Divider = styled.span`
-  ::before {
-    content: '/';
-    font-size: 16px;
-    color: ${props => props.theme.text.color.primary};
-    margin: 0 4px;
-  }
+const NetworkLabel = styled.span`
+  margin-left: 8px;
+  font-size: 14px;
+  color: ${props => props.theme.text.color.primary};
 `;
 
 const IconWrapper = styled.div`

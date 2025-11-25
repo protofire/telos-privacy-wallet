@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import React, { useState, useCallback, useContext, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { TxType } from 'zkbob-client-js';
 import { HistoryTransactionType } from 'zkbob-client-js';
@@ -9,6 +9,7 @@ import AccountSetUpButton from 'containers/AccountSetUpButton';
 import PendingAction from 'containers/PendingAction';
 
 import { ZkAccountContext, PoolContext, WalletContext } from 'contexts';
+import config from 'config';
 
 import TransferInput from 'components/TransferInput';
 import Card from 'components/Card';
@@ -20,6 +21,7 @@ import LatestAction from 'components/LatestAction';
 import Limits from 'components/Limits';
 import DemoCard from 'components/DemoCard';
 import ConvertOptions from 'components/ConvertOptions';
+import PoolSelector from 'components/PoolSelector';
 
 import { useFee, useParsedAmount, useLatestAction, useMaxTransferable } from 'hooks';
 
@@ -34,6 +36,7 @@ export default () => {
   const {
     zkAccount, balance, withdraw, isLoadingState,
     isPending, isDemo, limits, isLoadingLimits, minTxAmount,
+    switchToPool,
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const { isAddress, address, connector } = useContext(WalletContext);
@@ -47,6 +50,19 @@ export default () => {
   const maxWithdrawable = useMaxTransferable(TxType.Withdraw, relayerFee, amountToConvert);
   const maxAmountExceeded = useMaxAmountExceeded(amount, maxWithdrawable, limits.dailyWithdrawalLimit?.available);
   const convertionDetails = useConvertion(currentPool);
+  const poolOptions = useMemo(
+    () => Object.entries(config.pools).map(([alias, pool]) => ({
+      alias,
+      tokenSymbol: pool.tokenSymbol,
+      label: pool.tokenSymbol,
+    })),
+    [],
+  );
+
+  const handlePoolSelect = useCallback(alias => {
+    if (alias === currentPool.alias) return;
+    switchToPool(alias);
+  }, [currentPool.alias, switchToPool]);
 
 
   const onWihdrawal = useCallback(() => {
@@ -101,10 +117,19 @@ export default () => {
   }
   return isPending ? <PendingAction /> : (
     <ContentContainer>
-      <Card
-        title={t('withdraw.title')}
-        note={t('withdraw.note', { symbol: currentPool.tokenSymbol })}
-      >
+      <Card>
+        <TitleRow>
+          <Title>{t('withdraw.title')}</Title>
+          <PoolSelectorRow>
+            <PoolSelectorLabel>{t('withdraw.fromLabel')}</PoolSelectorLabel>
+            <PoolSelector
+              options={poolOptions}
+              selectedAlias={currentPool.alias}
+              onSelect={handlePoolSelect}
+            />
+          </PoolSelectorRow>
+        </TitleRow>
+        <Note>{t('withdraw.note', { symbol: currentPool.tokenSymbol })}</Note>
         <TransferInput
           balance={zkAccount ? balance : null}
           isLoadingBalance={isLoadingState}
@@ -117,6 +142,9 @@ export default () => {
           isLoadingFee={isLoadingFee}
           currentPool={currentPool}
           gaIdPostfix="withdraw"
+          poolOptions={poolOptions}
+          selectedPoolAlias={currentPool.alias}
+          onPoolSelect={handlePoolSelect}
         />
         {convertionDetails.exist && (
           <ConvertOptions
@@ -222,4 +250,38 @@ const ContentContainer = styled.div`
   @media only screen and (max-width: 560px) {
     margin: 30px 0;
   }
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const TitleRow = styled(Row)`
+  justify-content: space-between;
+  padding: 0 4px 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+const Title = styled.span`
+  font-size: 16px;
+  color: ${props => props.theme.card.title.color};
+  font-weight: ${props => props.theme.text.weight.normal};
+`;
+
+const Note = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.card.note.color};
+  margin: 0 4px 16px;
+`;
+
+const PoolSelectorRow = styled(Row)`
+  gap: 8px;
+`;
+
+const PoolSelectorLabel = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.card.title.color};
+  font-weight: ${props => props.theme.text.weight.normal};
 `;

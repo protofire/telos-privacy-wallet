@@ -93,11 +93,13 @@
   },
   "deposit": {
     "title": "存入",
+    "intoLabel": "至",
     "note": "{{symbol}}将会被存入您的zk账户。成功收款后，您可以进行{{symbol}}的隐私转账。",
     "ddNote": "存入{{symbol}}最多需要10分钟。"
   },
   "transfer": {
     "title": "转账",
+    "betweenLabel": "在",
     "note": "转账将会以隐私的方式完成。发送人，收款人，及转账金额将不会被公开。",
     "addressInputPlaceholder": "请输入zkTelos收款人地址",
     "addressInputHint": "地址可以在账户模态窗口中生成"
@@ -118,6 +120,7 @@
   },
   "withdraw": {
     "title": "提现",
+    "fromLabel": "从",
     "note": "{{symbol}}将会从zkTelos中取出并存入到您提供的钱包地址",
     "addressInputPlaceholder": "输入收款人的{{network}}地址",
     "convertion": "提款时将一部分 {{from}} 转化为 {{to}}",

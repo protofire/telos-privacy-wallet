@@ -20,11 +20,11 @@ import { useFee, useParsedAmount, useMaxTransferable } from 'hooks';
 import { formatNumber } from 'utils';
 import { useMaxAmountExceeded } from './hooks';
 
-export default () => {
+export default ({ poolOptions = [], onPoolSelect }) => {
   const { t } = useTranslation();
   const {
     zkAccount, balance, transfer, isLoadingState,
-    isPending, minTxAmount, verifyShieldedAddress,
+    isPending, minTxAmount, verifyShieldedAddress, switchToPool
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const [displayAmount, setDisplayAmount] = useState('');
@@ -46,6 +46,15 @@ export default () => {
   const setMax = useCallback(async () => {
     setDisplayAmount(ethers.utils.formatUnits(maxTransferable, currentPool.tokenDecimals));
   }, [maxTransferable, currentPool.tokenDecimals]);
+
+  const handlePoolSelect = useCallback(alias => {
+    if (alias === currentPool.alias) return;
+    if (onPoolSelect) {
+      onPoolSelect(alias);
+    } else {
+      switchToPool(alias);
+    }
+  }, [currentPool.alias, onPoolSelect, switchToPool]);
 
   useEffect(() => {
     async function checkAddress(address) {
@@ -73,7 +82,7 @@ export default () => {
     } else if (amount.gt(balance)) {
       button = <Button disabled>{t('buttonText.insufficientBalance', { symbol: currentPool.tokenSymbol })}</Button>;
     } else if (amount.gt(maxTransferable)) {
-      button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals)})}</Button>
+      button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>
     } else if (!receiver) {
       button = <Button disabled>{t('buttonText.enterAddress')}</Button>;
     } else if (!isAddressValid) {
@@ -102,6 +111,9 @@ export default () => {
         isLoadingFee={isLoadingFee}
         currentPool={currentPool}
         gaIdPostfix="transfer"
+        poolOptions={poolOptions}
+        selectedPoolAlias={currentPool.alias}
+        onPoolSelect={handlePoolSelect}
       />
       <MultilineInput
         placeholder={t('transfer.addressInputPlaceholder')}
