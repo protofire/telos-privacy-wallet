@@ -1,8 +1,79 @@
-# Manual Build Scripts
+# Build & Deployment Scripts
 
-This directory contains scripts for building and releasing zkTelos Wallet when GitHub Actions is unavailable due to billing limits.
+This directory contains scripts for building and deploying zkTelos Wallet when GitHub Actions is unavailable due to billing limits.
 
-## Quick Start
+## Available Scripts
+
+| Script | Purpose | Environment |
+|--------|---------|-------------|
+| `manual-build-and-release.sh` | Build desktop apps (Windows/Linux) | Desktop |
+| `deploy-web.sh` | Build and deploy web app to S3 | Web |
+
+---
+
+## Web Deployment (deploy-web.sh)
+
+### Quick Start
+
+```bash
+# Deploy to staging (default)
+./scripts/deploy-web.sh
+
+# Deploy to staging (explicit)
+./scripts/deploy-web.sh staging
+
+# Deploy to production
+./scripts/deploy-web.sh production
+```
+
+### Prerequisites
+
+- **Node.js 20.x**: https://nodejs.org/
+- **Yarn**: `npm install -g yarn`
+- **AWS CLI**: https://aws.amazon.com/cli/
+
+### AWS Credentials Configuration
+
+**Required environment variables:**
+
+```bash
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_REGION="us-east-2"  # Optional, defaults to us-east-2
+```
+
+Or source from a credentials file:
+```bash
+source path/to/aws-credentials.txt
+```
+
+### Deployment Targets
+
+| Environment | S3 Bucket | URL |
+|-------------|-----------|-----|
+| Staging | `telos-privacy-ui-staging` | http://telos-privacy-ui-staging.s3-website.us-east-2.amazonaws.com/ |
+| Production | `telos-privacy-ui` | http://telos-privacy-ui.s3-website.us-east-2.amazonaws.com/ |
+
+### What the Script Does
+
+1. **Checks Prerequisites** - Verifies Node.js, Yarn, AWS CLI, and credentials
+2. **Installs Dependencies** - Runs `yarn install`
+3. **Builds zkbob-client-js** - Compiles the client library
+4. **Builds Web App** - Compiles React app with correct environment config
+5. **Deploys to S3** - Syncs build files to the appropriate S3 bucket
+
+### Build Configuration
+
+| Environment | REACT_APP_CONFIG | Target |
+|-------------|------------------|--------|
+| Staging | `dev` | Development pools/endpoints |
+| Production | `prod` | Production pools/endpoints |
+
+---
+
+## Desktop Build & Release (manual-build-and-release.sh)
+
+### Quick Start
 
 ```bash
 # From repository root
