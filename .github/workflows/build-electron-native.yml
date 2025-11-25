@@ -37,10 +37,8 @@ jobs:
       - name: Build zkbob-client-js
         run: yarn workspace zkbob-client-js build
 
-      - name: Build Rust addon
-        run: |
-          cd packages/my-rust-addon
-          yarn build
+      - name: Build Rust library
+        run: yarn workspace libzkbob-rs-node build
 
       - name: Build Electron app
         env:
@@ -85,8 +83,8 @@ jobs:
       - name: Build zkbob-client-js
         run: npm run build --workspace=zkbob-client-js
 
-      - name: Build Rust addon
-        run: npm run build --workspace=my-rust-addon
+      - name: Build Rust library
+        run: yarn workspace libzkbob-rs-node build
 
       - name: Create .env file
         shell: pwsh
@@ -144,10 +142,8 @@ jobs:
       - name: Build zkbob-client-js
         run: yarn workspace zkbob-client-js build
 
-      - name: Build Rust addon
-        run: |
-          cd packages/my-rust-addon
-          yarn build
+      - name: Build Rust library
+        run: yarn workspace libzkbob-rs-node build
 
       - name: Build Electron app
         env:

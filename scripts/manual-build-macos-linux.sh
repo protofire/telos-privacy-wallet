@@ -1,21 +1,20 @@
 #!/bin/bash
 #
-# Manual Build and Release Script for zkTelos Wallet
+# Manual Build and Release Script for zkTelos Wallet (macOS + Linux)
 #
-# This script builds Electron apps locally (Windows) and on EC2 (Linux),
+# This script builds Electron apps locally (macOS) and on EC2 (Linux),
 # then uploads them to a GitHub draft release.
 #
 # Usage:
-#   ./scripts/manual-build-and-release.sh [version]
+#   ./scripts/manual-build-macos-linux.sh [version]
 #
 # Example:
-#   ./scripts/manual-build-and-release.sh v0.0.2
+#   ./scripts/manual-build-macos-linux.sh v0.0.3
 #
 # Prerequisites:
 #   - Node.js 20.x
 #   - Yarn
-#   - Rust toolchain (for Windows)
-#   - NSIS installed (for Windows)
+#   - Rust toolchain (for macOS)
 #   - gh CLI authenticated
 #   - SSH access to EC2 instance
 
@@ -23,10 +22,10 @@ set -e  # Exit on error
 
 # Configuration
 VERSION="${1:-v0.0.1}"
-EC2_HOST="${EC2_HOST:-ubuntu@3.150.55.197}"  # Set EC2_HOST environment variable to override (default is shared instance)
-EC2_KEY="${EC2_KEY}"  # REQUIRED: Set EC2_KEY environment variable to your own SSH key path
+EC2_HOST="${EC2_HOST:-ubuntu@3.150.55.197}"
+EC2_KEY="${EC2_KEY}"
 REPO="protofire/telos-privacy-wallet"
-GH_USER="${GH_USER}"  # REQUIRED: Set GH_USER environment variable to your GitHub account
+GH_USER="${GH_USER}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -68,14 +67,6 @@ check_prerequisites() {
         exit 1
     fi
 
-    # Check NSIS (Windows only)
-    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-        if ! command -v makensis &> /dev/null && [ ! -f "/c/Program Files (x86)/NSIS/makensis.exe" ]; then
-            log_error "NSIS not found. Please install NSIS: winget install NSIS.NSIS"
-            exit 1
-        fi
-    fi
-
     # Check gh CLI
     if ! command -v gh &> /dev/null; then
         log_error "GitHub CLI not found. Please install: https://cli.github.com/"
@@ -96,10 +87,9 @@ check_prerequisites() {
     fi
 
     # Check SSH key for EC2
-    if [ -z "$EC2_KEY" ] || [ "$EC2_KEY" = "$HOME/.ssh/protofire_vpn" ]; then
+    if [ -z "$EC2_KEY" ]; then
         log_error "EC2_KEY environment variable must be set to your own SSH key"
-        log_error "Example: export EC2_KEY=\"\$HOME/.ssh/my-ec2-key\""
-        log_error "Contact your team administrator for the EC2 SSH key"
+        log_error "Example: export EC2_KEY=\"\$HOME/.ssh/telos-ec2-key\""
         exit 1
     fi
 
@@ -108,15 +98,17 @@ check_prerequisites() {
         exit 1
     fi
 
+    # Check that we're on macOS
+    if [[ "$OSTYPE" != "darwin"* ]]; then
+        log_warn "This script is designed for macOS. You're running on $OSTYPE"
+    fi
+
     log_info "All prerequisites met!"
 }
 
-# Build Windows locally
-build_windows() {
-    log_info "Building Windows Electron app..."
-
-    # Ensure NSIS is in PATH
-    export PATH="/c/Program Files (x86)/NSIS:$PATH"
+# Build macOS locally
+build_macos() {
+    log_info "Building macOS Electron app..."
 
     # Install dependencies if needed
     if [ ! -d "node_modules" ]; then
@@ -128,20 +120,18 @@ build_windows() {
     log_info "Building zkbob-client-js..."
     yarn workspace zkbob-client-js build
 
-    # Build React app
-    log_info "Building React app..."
-    cd apps/zktelos-wallet
+    # Build Rust library (libzkbob-rs-node)
+    log_info "Building libzkbob-rs-node (Rust library)..."
+    yarn workspace libzkbob-rs-node build
+
+    # Build Electron for macOS
+    log_info "Building macOS Electron installers (this may take several minutes)..."
     export NODE_OPTIONS=--max-old-space-size=8192
-    npx react-app-rewired build
+    export CI=false
+    yarn electron:build:mac
 
-    # Build Electron
-    log_info "Building Windows Electron installers (this may take several minutes)..."
-    npx electron-builder --win
-
-    cd ../..
-
-    log_info "Windows build complete!"
-    log_info "Artifacts: apps/zktelos-wallet/dist/*.exe"
+    log_info "macOS build complete!"
+    log_info "Artifacts: apps/zktelos-wallet/dist/*.dmg"
 }
 
 # Build Linux on EC2
@@ -166,7 +156,12 @@ build_linux_ec2() {
         # Build zkbob-client-js
         yarn workspace zkbob-client-js build
 
+        # Build Rust library (libzkbob-rs-node)
+        yarn workspace libzkbob-rs-node build
+
         # Build Electron for Linux
+        export NODE_OPTIONS=--max-old-space-size=8192
+        export CI=false
         yarn electron:build:linux
 
         echo "Linux build complete!"
@@ -186,7 +181,7 @@ ENDSSH
 create_release() {
     log_info "Creating GitHub draft release..."
 
-    # Switch to team account if needed (set GH_USER environment variable to override)
+    # Switch to team account if needed
     if [ -n "$GH_USER" ]; then
         gh auth switch --user "$GH_USER" 2>/dev/null || true
     fi
@@ -194,21 +189,21 @@ create_release() {
     # Create release
     RELEASE_NOTES="## zkTelos Wallet ${VERSION}
 
-Built locally due to GitHub Actions billing limits.
+Built with native Rust support for macOS and Linux.
 
 ### Downloads
 
-**Windows:**
-- \`zkTelos Wallet-${VERSION}-win.exe\` - NSIS installer for all architectures
-- \`zkTelos Wallet-${VERSION}-win-x64.exe\` - Portable executable for x64
-- \`zkTelos Wallet-${VERSION}-win-arm64.exe\` - Portable executable for ARM64
+**macOS:**
+- \`zkTelos Wallet-${VERSION}.dmg\` - Universal installer (Intel + Apple Silicon)
+- \`zkTelos Wallet-${VERSION}-arm64.dmg\` - Apple Silicon (M1/M2/M3) optimized
+- \`zkTelos Wallet-${VERSION}-x64.dmg\` - Intel Mac
 
 **Linux:**
 - \`zkTelos Wallet-${VERSION}.AppImage\` - Portable application (no installation required)
 - \`zktelos-wallet_${VERSION}_amd64.deb\` - Debian/Ubuntu package
 
 ### Build Details
-- Built with Rust addon support
+- Built with Rust library support
 - Node.js $(node --version)
 - Electron 27.0.0
 - Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
@@ -216,12 +211,12 @@ Built locally due to GitHub Actions billing limits.
 🦀 Built with Rust | ⚡ Powered by Electron"
 
     RELEASE_URL=$(gh release create "$VERSION" \
-        apps/zktelos-wallet/dist/*.exe \
+        apps/zktelos-wallet/dist/*.dmg \
         dist-linux/*.AppImage \
         dist-linux/*.deb \
         --draft \
         --repo "$REPO" \
-        --title "$VERSION - Manual Build" \
+        --title "$VERSION - macOS + Linux Build" \
         --notes "$RELEASE_NOTES")
 
     log_info "Draft release created: $RELEASE_URL"
@@ -234,16 +229,16 @@ Built locally due to GitHub Actions billing limits.
 
 # Main execution
 main() {
-    log_info "=== zkTelos Wallet Manual Build & Release ==="
+    log_info "=== zkTelos Wallet Manual Build & Release (macOS + Linux) ==="
     log_info "Version: $VERSION"
     log_info ""
 
     check_prerequisites
 
-    # Build Windows
+    # Build macOS
     log_info ""
-    log_info "Step 1/3: Building Windows artifacts..."
-    build_windows
+    log_info "Step 1/3: Building macOS artifacts..."
+    build_macos
 
     # Build Linux
     log_info ""
@@ -257,6 +252,8 @@ main() {
 
     log_info ""
     log_info "${GREEN}✓ Build and release complete!${NC}"
+    log_info ""
+    log_info "${YELLOW}Note: Windows builds must be done separately on a Windows machine${NC}"
 }
 
 # Run main function
