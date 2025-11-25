@@ -45,6 +45,33 @@ const createSteps = (t) => [
     ]
   },
   {
+    id: 'home-overview',
+    title: t('onboardingTutorial.steps.homeOverview.title'),
+    text: `<div class="home-overview-content">
+      <p>${t('onboardingTutorial.steps.homeOverview.content.paragraph1')}</p>
+      <p>${t('onboardingTutorial.steps.homeOverview.content.paragraph2')}</p>
+    </div>`,
+    attachTo: {
+      element: '[data-tour="home-overview"]',
+      on: 'top'
+    },
+    buttons: [
+      {
+        text: t('onboardingTutorial.buttons.back'),
+        classes: 'shepherd-button-secondary',
+        action() {
+          return this.back();
+        }
+      },
+      {
+        text: t('onboardingTutorial.buttons.next'),
+        action() {
+          return this.next();
+        }
+      }
+    ]
+  },
+  {
     id: 'supported-tokens',
     title: t('onboardingTutorial.steps.supportedTokens.title'),
     text: `<div class="supported-tokens-content">
@@ -99,14 +126,15 @@ const createSteps = (t) => [
     ]
   },
   {
-    id: 'transfer',
-    title: t('onboardingTutorial.steps.transfer.title'),
-    text: `<div class="transfer-content">
-    <p>${t('onboardingTutorial.steps.transfer.content.paragraph1')}</p>
-    <p>${t('onboardingTutorial.steps.transfer.content.paragraph2')}</p>
+    id: 'withdraw',
+    title: t('onboardingTutorial.steps.withdraw.title'),
+    text: `<div class="withdraw-content">
+    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph1')}</p>
+    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph2')}</p>
+    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph3')}</p>
     </div>`,
     attachTo: {
-      element: '[data-tour="transfer-tab"]',
+      element: '[data-tour="withdraw-tab"]',
       on: 'bottom'
     },
     buttons: [
@@ -126,15 +154,14 @@ const createSteps = (t) => [
     ]
   },
   {
-    id: 'withdraw',
-    title: t('onboardingTutorial.steps.withdraw.title'),
-    text: `<div class="withdraw-content">
-    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph1')}</p>
-    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph2')}</p>
-    <p>${t('onboardingTutorial.steps.withdraw.content.paragraph3')}</p>
+    id: 'transfer',
+    title: t('onboardingTutorial.steps.transfer.title'),
+    text: `<div class="transfer-content">
+    <p>${t('onboardingTutorial.steps.transfer.content.paragraph1')}</p>
+    <p>${t('onboardingTutorial.steps.transfer.content.paragraph2')}</p>
     </div>`,
     attachTo: {
-      element: '[data-tour="withdraw-tab"]',
+      element: '[data-tour="transfer-tab"]',
       on: 'bottom'
     },
     buttons: [
@@ -189,7 +216,7 @@ export const OnboardingTutorialProvider = ({ children }) => {
   const shepherdTourInstance = useMemo(() => new Shepherd.Tour(tourOptions), []);
 
   const handleTourEnd = useCallback(() => {
-    history.push('/deposit');
+    history.push('/home');
   }, [history]);
 
   useEffect(() => {

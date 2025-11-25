@@ -462,6 +462,13 @@
           "paragraph3": "此地址允许您私密地发送和接收代币。"
         }
       },
+      "homeOverview": {
+        "title": "您的主页仪表板",
+        "content": {
+          "paragraph1": "连接后，您可以在一个地方查看您的私人账户、公共账户和最近的活动。",
+          "paragraph2": "从这里，您可以轻松地存入、提取、转账或在不同类型之间转换代币。"
+        }
+      },
       "supportedTokens": {
         "title": "选择支持的网络和代币",
         "content": {
