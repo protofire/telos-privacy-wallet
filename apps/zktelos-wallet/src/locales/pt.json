@@ -462,6 +462,13 @@
           "paragraph3": "Este endereço permite que você envie e receba tokens de forma privada."
         }
       },
+      "homeOverview": {
+        "title": "Seu Painel Inicial",
+        "content": {
+          "paragraph1": "Uma vez conectado, você pode ver sua conta privada, conta pública e atividade recente tudo em um só lugar.",
+          "paragraph2": "Daqui, você pode facilmente depositar, sacar, transferir ou converter tokens entre diferentes tipos."
+        }
+      },
       "supportedTokens": {
         "title": "Escolha redes e tokens suportados",
         "content": {

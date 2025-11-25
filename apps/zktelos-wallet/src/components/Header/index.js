@@ -165,7 +165,7 @@ export default ({ empty }) => {
         <LogoSection>
           <Logo />
         </LogoSection>
-        <AccountSection>
+        <AccountSection data-tour="create-zkaccount">
           {!isMobile && networkDropdown}
           {/* <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}

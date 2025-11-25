@@ -464,6 +464,13 @@
           "paragraph3": "This address lets you send and receive tokens privately."
         }
       },
+      "homeOverview": {
+        "title": "Your Home Dashboard",
+        "content": {
+          "paragraph1": "Once connected, you can see your private account, public account, and recent activity all in one place.",
+          "paragraph2": "From here, you can easily deposit, withdraw, transfer, or convert tokens between different types."
+        }
+      },
       "supportedTokens": {
         "title": "Choose supported networks and tokens",
         "content": {
