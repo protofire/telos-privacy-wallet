@@ -1,10 +1,10 @@
-import { Privkey } from 'hdwallet-babyjub';
-import { numberToHex, padLeft } from 'web3-utils';
+import {Privkey} from 'hdwallet-babyjub';
+import {numberToHex, padLeft} from 'web3-utils';
 
-import { NetworkType } from './network-type';
-import { InternalError } from './errors';
+import {NetworkType} from './network-type';
+import {InternalError} from './errors';
 
-import { TreeNode } from 'libzkbob-rs-wasm-web';
+import {TreeNode} from 'libzkbob-rs-wasm-web';
 
 const util = require('ethereumjs-util');
 
@@ -122,7 +122,7 @@ export function isEqualBuffers(buf1: Uint8Array, buf2: Uint8Array): boolean {
   }
 
   for (let i = 0; i < buf1.length; i++) {
-    if(buf1[i] != buf2[i]) {
+    if (buf1[i] != buf2[i]) {
       return false;
     }
   }
@@ -273,9 +273,9 @@ export function hexToNode(data: string): TreeNode | null {
   const value = reader.readBigInt(32);
 
   if (height != null && index != null && value != null) {
-    return { height, index, value: value.toString()};
+    return {height, index, value: value.toString()};
   }
-  
+
   return null;
 }
 
@@ -301,15 +301,27 @@ export function rangesIntersectionLength(r1from: number, r1to: number, r2from: n
 
 export function assertNotNull<T>(val: T): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
-      throw new InternalError('Unexpected null');
+    throw new InternalError('Unexpected null');
   }
 }
 
 export function removeDuplicates<T>(array: T[]): T[] {
   return array.reduce((acc: T[], cur: T) => {
-      if (!acc.includes(cur)) {
-          acc.push(cur);
-      }
-      return acc;
+    if (!acc.includes(cur)) {
+      acc.push(cur);
+    }
+    return acc;
   }, [])
+}
+
+export function isDesktop() {
+  if (typeof process === 'object' && process.versions && process.versions.electron) {
+    return true;
+  }
+
+  if (navigator.userAgent.toLowerCase().indexOf('electron') > -1) {
+    return true;
+  }
+
+  return false;
 }

@@ -1,11 +1,11 @@
-import { Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx } from "libzkbob-rs-wasm-web";
-import { Chains, Pools, Parameters, ClientConfig, AccountConfig, accountId, ProverMode, DepositType, ZkAddressPrefix } from "./config";
-import { truncateHexPrefix, toTwosComplementHex, bigintToArrayLe } from "./utils";
-import { SyncStat, ZkBobState, ZERO_OPTIMISTIC_STATE } from "./state";
-import { DirectDeposit, RegularTxType, TxCalldataVersion, txTypeToString } from "./tx";
-import { CONSTANTS } from "./constants";
-import { HistoryRecord, HistoryRecordState, HistoryTransactionType, ComplianceHistoryRecord } from "./history";
-import { EphemeralAddress } from "./ephemeral";
+import {Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx} from "libzkbob-rs-wasm-web";
+import {Chains, Pools, Parameters, ClientConfig, AccountConfig, accountId, ProverMode, DepositType, ZkAddressPrefix} from "./config";
+import {truncateHexPrefix, toTwosComplementHex, bigintToArrayLe, isDesktop} from "./utils";
+import {SyncStat, ZkBobState, ZERO_OPTIMISTIC_STATE} from "./state";
+import {DirectDeposit, RegularTxType, TxCalldataVersion, txTypeToString} from "./tx";
+import {CONSTANTS} from "./constants";
+import {HistoryRecord, HistoryRecordState, HistoryTransactionType, ComplianceHistoryRecord} from "./history";
+import {EphemeralAddress} from "./ephemeral";
 import {
   InternalError,
   PoolJobError,
@@ -23,20 +23,21 @@ import {
   TxSwapTooHighError,
   ZkAddressParseError,
 } from "./errors";
-import { JobInfo, SequencerJob } from "./services/relayer";
-import { GiftCardProperties, SequencerFee, TreeState, TxFee, ZkBobProvider, isProxyFee } from "./client-provider";
-import { DepositData, SignatureRequest } from "./signers/abstract-signer";
-import { DepositSignerFactory } from "./signers/signer-factory";
-import { PERMIT2_CONTRACT } from "./signers/permit2-signer";
-import { DirectDepositProcessor, DirectDepositType } from "./dd";
-import { ForcedExitProcessor, ForcedExitState, CommittedForcedExit, FinalizedForcedExit } from "./emergency";
+import {JobInfo, SequencerJob} from "./services/relayer";
+import {GiftCardProperties, SequencerFee, TreeState, TxFee, ZkBobProvider, isProxyFee} from "./client-provider";
+import {DepositData, SignatureRequest} from "./signers/abstract-signer";
+import {DepositSignerFactory} from "./signers/signer-factory";
+import {PERMIT2_CONTRACT} from "./signers/permit2-signer";
+import {DirectDepositProcessor, DirectDepositType} from "./dd";
+import {ForcedExitProcessor, ForcedExitState, CommittedForcedExit, FinalizedForcedExit} from "./emergency";
 
-import { wrap } from "comlink";
-import { PreparedTransaction } from "./networks";
-import { Privkey } from "hdwallet-babyjub";
-import { IDBPDatabase, openDB } from "idb";
-import { NAKED_ADDR_REGEX } from "./address-prefixes";
-import { DB_PREFIX } from "./constants";
+import {wrap} from "comlink";
+import {PreparedTransaction} from "./networks";
+import {Privkey} from "hdwallet-babyjub";
+import {IDBPDatabase, openDB} from "idb";
+import {NAKED_ADDR_REGEX} from "./address-prefixes";
+import {DB_PREFIX} from "./constants";
+import {proveTxNativeHardware} from "./worker";
 
 const OUTPLUSONE = CONSTANTS.OUT + 1; // number of leaves (account + notes) in a transaction
 const PARTIAL_TREE_USAGE_THRESHOLD = 500; // minimum tx count in Merkle tree to partial tree update using
@@ -114,14 +115,14 @@ enum ShieldedAddressFormat {
 
 export class ZkBobClient extends ZkBobProvider {
   // States for the current account in the different pools
-  private zpStates: { [poolAlias: string]: ZkBobState } = {};
+  private zpStates: {[poolAlias: string]: ZkBobState} = {};
   // Holds gift cards temporary states (id - gift card unique ID based on sk and pool)
-  private auxZpStates: { [id: string]: ZkBobState } = {};
+  private auxZpStates: {[id: string]: ZkBobState} = {};
   // Direct deposit processors are used to create DD and fetch DD pending txs
-  private ddProcessors: { [poolAlias: string]: DirectDepositProcessor } = {};
+  private ddProcessors: {[poolAlias: string]: DirectDepositProcessor} = {};
   // Forced exit processors are used to withdraw funds emergency from the pool
   // and deactivate the account
-  private feProcessors: { [poolAlias: string]: ForcedExitProcessor } = {};
+  private feProcessors: {[poolAlias: string]: ForcedExitProcessor} = {};
   // The single worker for the all pools
   private worker: any;
   // Performance estimation (msec per tx)
@@ -206,7 +207,7 @@ export class ZkBobClient extends ZkBobProvider {
     }
 
     let worker: any;
-    worker = wrap(new Worker(new URL("./worker.js", import.meta.url), { type: "module" }));
+    worker = wrap(new Worker(new URL("./worker.js", import.meta.url), {type: "module"}));
     await worker.initWasm(allParamsSet, config.forcedMultithreading);
 
     return worker;
@@ -412,12 +413,12 @@ export class ZkBobClient extends ZkBobProvider {
           case HistoryTransactionType.Deposit:
           case HistoryTransactionType.TransferIn: {
             // we don't spend fee from the shielded balance in case of deposit or input transfer
-            pendingDelta = oneRecord.actions.map(({ amount }) => amount).reduce((acc, cur) => acc + cur, pendingDelta);
+            pendingDelta = oneRecord.actions.map(({amount}) => amount).reduce((acc, cur) => acc + cur, pendingDelta);
             break;
           }
           case HistoryTransactionType.Withdrawal:
           case HistoryTransactionType.TransferOut: {
-            pendingDelta = oneRecord.actions.map(({ amount }) => amount).reduce((acc, cur) => acc - cur, pendingDelta);
+            pendingDelta = oneRecord.actions.map(({amount}) => amount).reduce((acc, cur) => acc - cur, pendingDelta);
             pendingDelta -= oneRecord.fee;
             break;
           }
@@ -678,10 +679,10 @@ export class ZkBobClient extends ZkBobProvider {
   }
 
   // Waiting while sequencer process the jobs set
-  public async waitJobsTxHashes(jobs: SequencerJob[]): Promise<{ job: SequencerJob; txHash: string }[]> {
+  public async waitJobsTxHashes(jobs: SequencerJob[]): Promise<{job: SequencerJob; txHash: string}[]> {
     const promises = jobs.map(async (job) => {
       const txHash = await this.waitJobTxHash(job);
-      return { job, txHash };
+      return {job, txHash};
     });
 
     return Promise.all(promises);
@@ -968,7 +969,7 @@ export class ZkBobClient extends ZkBobProvider {
       throw new TxInsufficientFundsError(txAmount, balance);
     }
 
-    const tx = { txType, memo: txData.memo, proof: txProof, depositSignature: signature };
+    const tx = {txType, memo: txData.memo, proof: txProof, depositSignature: signature};
     this.assertCalldataLength(tx, estimatedFee.calldataTotalLength);
     const job = await sequencer.sendTransactions([tx]);
     this.startJobMonitoring(job);
@@ -1133,7 +1134,7 @@ export class ZkBobClient extends ZkBobProvider {
 
       const onePart = txParts[index];
       const outputs = onePart.outNotes.map((aNote) => {
-        return { to: aNote.destination, amount: `${aNote.amountGwei}` };
+        return {to: aNote.destination, amount: `${aNote.amountGwei}`};
       });
       const oneTx: ITransferData = {
         outputs,
@@ -1152,7 +1153,7 @@ export class ZkBobClient extends ZkBobProvider {
       const proofTime = (Date.now() - startProofDate) / 1000;
       console.log(`Proof calculation took ${proofTime.toFixed(1)} sec`);
 
-      const transaction = { memo: oneTxData.memo, proof: txProof, txType: RegularTxType.Transfer };
+      const transaction = {memo: oneTxData.memo, proof: txProof, txType: RegularTxType.Transfer};
       this.assertCalldataLength(transaction, onePart.calldataLength);
 
       const aJob = await sequencer.sendTransactions([transaction]);
@@ -1162,7 +1163,7 @@ export class ZkBobClient extends ZkBobProvider {
       // Temporary save transaction parts in the history module (to prevent history delays)
       const ts = Math.floor(Date.now() / 1000);
       const transfers = outputs.map((out) => {
-        return { to: out.to, amount: BigInt(out.amount) };
+        return {to: out.to, amount: BigInt(out.amount)};
       });
       if (transfers.length == 0) {
         const record = await HistoryRecord.aggregateNotes(onePart.fee.total, ts, "0", true, BigInt(oneTxData.public.out_commit));
@@ -1230,7 +1231,7 @@ export class ZkBobClient extends ZkBobProvider {
     }
 
     const usedFee = sequencerFee ?? (await this.getSequencerFee());
-    const txParts = await this.getTransactionParts(RegularTxType.Withdraw, [{ amountGwei, destination: address }], usedFee, swapAmount);
+    const txParts = await this.getTransactionParts(RegularTxType.Withdraw, [{amountGwei, destination: address}], usedFee, swapAmount);
 
     if (txParts.length == 0) {
       const available = await this.calcMaxAvailableTransfer(RegularTxType.Withdraw, usedFee, swapAmount, false);
@@ -1287,7 +1288,7 @@ export class ZkBobClient extends ZkBobProvider {
       const proofTime = (Date.now() - startProofDate) / 1000;
       console.log(`Proof calculation took ${proofTime.toFixed(1)} sec`);
 
-      const transaction = { memo: oneTxData.memo, proof: txProof, txType };
+      const transaction = {memo: oneTxData.memo, proof: txProof, txType};
       this.assertCalldataLength(transaction, onePart.calldataLength);
 
       const aJob = await sequencer.sendTransactions([transaction]);
@@ -1366,7 +1367,7 @@ export class ZkBobClient extends ZkBobProvider {
     const dstAddr = await this.generateAddress(); // getting address from the current account
     const actualFee = giftCardBalance - redeemAmount; // fee can be greater than needed to make redemption amount equals to nominal
     const oneTx: ITransferData = {
-      outputs: [{ to: dstAddr, amount: `${redeemAmount}` }],
+      outputs: [{to: dstAddr, amount: `${redeemAmount}`}],
       proxy: this.network().addressToBytes(minFee.proxyAddress),
       prover: this.network().addressToBytes(minFee.proverAddress),
       proxy_fee: minFee.proxyPart.toString(),
@@ -1381,7 +1382,7 @@ export class ZkBobClient extends ZkBobProvider {
     const proofTime = (Date.now() - startProofDate) / 1000;
     console.log(`Proof calculation took ${proofTime.toFixed(1)} sec`);
 
-    const transaction = { memo: txData.memo, proof: txProof, txType: RegularTxType.Transfer };
+    const transaction = {memo: txData.memo, proof: txProof, txType: RegularTxType.Transfer};
     this.assertCalldataLength(transaction, this.network().estimateCalldataLength(this.calldataVersion(), RegularTxType.Transfer, 1, 0));
 
     const sequencer = this.sequencer();
@@ -1391,7 +1392,7 @@ export class ZkBobClient extends ZkBobProvider {
     // Temporary save transaction in the history module for the current account
     const ts = Math.floor(Date.now() / 1000);
     const rec = await HistoryRecord.transferIn(
-      [{ to: dstAddr, amount: redeemAmount }],
+      [{to: dstAddr, amount: redeemAmount}],
       0n,
       ts,
       "0",
@@ -1475,7 +1476,7 @@ export class ZkBobClient extends ZkBobProvider {
     if (txType === RegularTxType.Transfer || txType === RegularTxType.Withdraw) {
       // we set allowPartial flag here to get parts anywhere
       const requests: TransferRequest[] = transfersGwei.map((gwei) => {
-        return { amountGwei: gwei, destination: "0" };
+        return {amountGwei: gwei, destination: "0"};
       }); // destination address is ignored for estimation purposes
       const parts = await this.getTransactionParts(txType, requests, sequencerFee, withdrawSwap, updateState, true);
       const totalBalance = await this.getTotalBalance(false);
@@ -1596,7 +1597,7 @@ export class ZkBobClient extends ZkBobProvider {
     for (let i = 0; i < transfers.length; i += CONSTANTS.OUT) {
       const requests = transfers.slice(i, i + CONSTANTS.OUT);
       const totalAmount = requests.reduce((acc, cur) => acc + cur.amountGwei, BigInt(0));
-      aggregatedTransfers.push({ totalAmount, requests });
+      aggregatedTransfers.push({totalAmount, requests});
     }
 
     let accountBalance: bigint = await state.accountBalance();
@@ -1727,7 +1728,7 @@ export class ZkBobClient extends ZkBobProvider {
         if (!txValid) {
           throw new TxProofError();
         }
-        return { inputs, proof };
+        return {inputs, proof};
       } catch (e) {
         if (proverMode == ProverMode.Delegated) {
           console.error(`Failed to prove tx using delegated prover: ${e}`);
@@ -1738,8 +1739,9 @@ export class ZkBobClient extends ZkBobProvider {
       }
     }
 
-    const txProof = await this.worker.proveTx(this.snarkParamsAlias(), pub, sec);
+    const txProof = isDesktop() ? await proveTxNativeHardware(pub, sec) : await this.worker.proveTx(this.snarkParamsAlias(), pub, sec);
     const txValid = await this.worker.verifyTxProof(this.snarkParamsAlias(), txProof.inputs, txProof.proof);
+
     if (!txValid) {
       throw new TxProofError();
     }
@@ -1759,11 +1761,11 @@ export class ZkBobClient extends ZkBobProvider {
       const index = await state.getNextIndex();
       const root = await state.getRoot();
 
-      return { root, index };
+      return {root, index};
     } else {
       const root = await state.getRootAt(index);
 
-      return { root, index };
+      return {root, index};
     }
   }
 
@@ -1988,8 +1990,8 @@ export class ZkBobClient extends ZkBobProvider {
       const avgSavingTime =
         statsWithRelevantSavingTime.length > 0
           ? statsWithRelevantSavingTime
-              .map((aStat) => aStat.writeStateTime / (aStat.txCount - aStat.cdnTxCnt))
-              .reduce((acc, cur) => acc + cur) / statsWithRelevantSavingTime.length
+            .map((aStat) => aStat.writeStateTime / (aStat.txCount - aStat.cdnTxCnt))
+            .reduce((acc, cur) => acc + cur) / statsWithRelevantSavingTime.length
           : undefined;
 
       // save transaction decrypt time for the current pool
@@ -2013,7 +2015,7 @@ export class ZkBobClient extends ZkBobProvider {
   // synthetic benchmark, result in microseconds per tx
   private async estimateSyncSpeed(samplesNum: number = 1000): Promise<number> {
     const sk = bigintToArrayLe(Privkey("test test test test test test test test test test test tell", "m/0'/0'"));
-    const samples = Array.from({ length: samplesNum }, (_value, index) => index * (CONSTANTS.OUT + 1));
+    const samples = Array.from({length: samplesNum}, (_value, index) => index * (CONSTANTS.OUT + 1));
     const txs: IndexedTx[] = samples.map((index) => {
       return {
         index,

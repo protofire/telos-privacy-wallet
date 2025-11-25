@@ -2,11 +2,17 @@
 
 # dependencies
 node_modules
+
 apps/zktelos-wallet/node_modules
 apps/zktelos-wallet/build
 apps/zktelos-wallet/dist
+
 packages/zkbob-client-js/node_modules
 packages/zkbob-client-js/lib
+
+packages/libzkbob-rs-node/node_modules
+packages/libzkbob-rs-node/target
+
 /.pnp
 .pnp.js
 
@@ -15,6 +21,7 @@ packages/zkbob-client-js/lib
 
 # production
 /build
+
 .vscode
 # misc
 .DS_Store

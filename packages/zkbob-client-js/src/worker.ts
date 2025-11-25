@@ -1,17 +1,18 @@
-import { expose } from 'comlink';
-import { IDepositData, IDepositPermittableData, ITransferData, IWithdrawData,
-          ParseTxsResult, ParseTxsColdStorageResult, StateUpdate,
-          IndexedTx, TreeNode, SnarkProof, IAddressComponents,
-          TxMemoChunk, TxInput, Account, Note,
-        } from 'libzkbob-rs-wasm-web';
-import { threads } from 'wasm-feature-detect';
-import { SnarkParams } from './params';
-import { Parameters } from './config';
-import { InternalError } from './errors';
+import {expose} from 'comlink';
+import {
+  IDepositData, IDepositPermittableData, ITransferData, IWithdrawData,
+  ParseTxsResult, ParseTxsColdStorageResult, StateUpdate,
+  IndexedTx, TreeNode, SnarkProof, IAddressComponents,
+  TxMemoChunk, TxInput, Account, Note,
+} from 'libzkbob-rs-wasm-web';
+import {threads} from 'wasm-feature-detect';
+import {SnarkParams} from './params';
+import {Parameters} from './config';
+import {InternalError} from './errors';
 
-let txParams: { [name: string]: SnarkParams } = {};
+let txParams: {[name: string]: SnarkParams} = {};
 let txParser: any;
-let zpAccounts: { [accountId: string]: any } = {};
+let zpAccounts: {[accountId: string]: any} = {};
 
 let wasm: any;
 
@@ -21,12 +22,12 @@ const obj = {
     forcedMultithreading: boolean | undefined = undefined,
   ) {
     console.info('Initializing web worker...');
-    
+
     // Safari doesn't support spawning Workers from inside other Workers yet.
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const isMtSupported = await threads() && !isSafari;
     const isMt = forcedMultithreading ?? isMtSupported;  // forced MT param has a higher priority than supported one
-    
+
     if (isMt) {
       console.log('Using multi-threaded version');
       wasm = await import('libzkbob-rs-wasm-web-mt');
@@ -54,15 +55,6 @@ const obj = {
     console.info('Web worker init complete.');
   },
 
-  async loadTxParams(paramsName: string, expectedHash?: string) {
-    const params = txParams[paramsName];
-    if (params === undefined) {
-      throw new InternalError(`Cannot find snark parameters set \'${paramsName}\'`);
-    }
-
-    params.getParams(wasm, expectedHash);
-  },
-
   async proveTx(paramsName: string, pub, sec) {
     const params = txParams[paramsName];
     if (params === undefined) {
@@ -72,6 +64,24 @@ const obj = {
     console.debug('Web worker: proveTx');
     let snarkParams = await params.getParams(wasm);
     return wasm.Proof.tx(snarkParams, pub, sec);
+  },
+
+  async loadTxParams(paramsName: string, expectedHash?: string) {
+    const params = txParams[paramsName];
+    if (params === undefined) {
+      throw new InternalError(`Cannot find snark parameters set \'${paramsName}\'`);
+    }
+
+    params.getParams(wasm, expectedHash);
+  },
+
+  async getProofParams(paramsName: string) {
+    const params = txParams[paramsName];
+    if (params === undefined) {
+      throw new InternalError(`Cannot find snark parameters set \'${paramsName}\'`);
+    }
+
+    return await params.getParams(wasm);
   },
 
   async verifyTxProof(paramsName: string, inputs: string[], proof: SnarkProof): Promise<boolean> {
@@ -264,5 +274,22 @@ const obj = {
   }
 
 };
+
+export const initParamsRafael = async (
+  params: Parameters,
+) => {
+  for (const [name, par] of Object.entries(params)) {
+    const snarkParams = new SnarkParams(par);
+    // VK is always needed to transact, so initiate its loading right now
+    snarkParams.getVk().catch((err) => {
+      console.warn(`Unable to fetch tx verification key (don't worry, it will refetched when needed): ${err.message}`);
+    });
+    txParams[name] = snarkParams;
+  }
+}
+
+export const proveTxNativeHardware = async (pub: any, sec: any) => {
+  return await (window as any).nativeProver.nativeProveTx([pub, sec])
+}
 
 expose(obj);

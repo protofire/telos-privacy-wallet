@@ -1,7 +1,10 @@
-const { app, BrowserWindow, session, shell, protocol, net, nativeImage } = require('electron');
-const { join } = require('path');
+const {app, BrowserWindow, session, shell, protocol, net, nativeImage, ipcMain} = require('electron');
+const {join} = require('path');
+const fs = require('fs')
+const zp = require('libzkbob-rs-node');
 
 let mainWindow;
+let proofParamsBuffer = null;
 
 // Configure logging based on platform and environment
 if (process.platform === 'win32' && app.isPackaged) {
@@ -44,19 +47,19 @@ const EMBED_TYPES = new Set([
 function installSecurityHooks() {
   // Set origin header for WalletConnect compatibility
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    const { url, requestHeaders } = details;
+    const {url, requestHeaders} = details;
 
     // Override origin for WalletConnect relay connections
     if (url.includes('relay.walletconnect.com') || url.includes('walletconnect')) {
       requestHeaders['Origin'] = 'https://privacy.telos.protofire.io';
     }
 
-    callback({ requestHeaders });
+    callback({requestHeaders});
   });
 
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    const { url, responseHeaders, resourceType } = details;
-    let headers = { ...responseHeaders };
+    const {url, responseHeaders, resourceType} = details;
+    let headers = {...responseHeaders};
 
     const isWS =
       resourceType === 'webSocket' ||
@@ -65,7 +68,7 @@ function installSecurityHooks() {
       url.startsWith('wss:');
 
     if (!isAppAsset(url) || isWS || !EMBED_TYPES.has(resourceType)) {
-      callback({ responseHeaders: headers });
+      callback({responseHeaders: headers});
       return;
     }
 
@@ -75,17 +78,17 @@ function installSecurityHooks() {
     headers['Cross-Origin-Opener-Policy'] = ['same-origin'];
     headers['Cross-Origin-Embedder-Policy'] = ['credentialless'];
 
-    callback({ responseHeaders: headers });
+    callback({responseHeaders: headers});
   });
 
   session.defaultSession.webRequest.onCompleted((d) => {
     if (d.resourceType === 'webSocket' && d.url.startsWith('wss://relay.walletconnect.com')) {
-      console.log('[WS completed]', { statusCode: d.statusCode, url: d.url });
+      console.log('[WS completed]', {statusCode: d.statusCode, url: d.url});
     }
   });
   session.defaultSession.webRequest.onErrorOccurred((d) => {
     if (d.resourceType === 'webSocket' && d.url.startsWith('wss://relay.walletconnect.com')) {
-      console.log('[WS errorOccurred]', { error: d.error, url: d.url });
+      console.log('[WS errorOccurred]', {error: d.error, url: d.url});
     }
   });
 }
@@ -129,6 +132,7 @@ function createWindow() {
       webSecurity: true,
       sandbox: false,
       experimentalFeatures: true,
+      preload: join(__dirname, 'preload.js'),
     },
   });
 
@@ -147,16 +151,33 @@ function createWindow() {
 
   mainWindow.on('closed', () => (mainWindow = null));
 
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  mainWindow.webContents.setWindowOpenHandler(({url}) => {
     shell.openExternal(url);
-    return { action: 'deny' };
+    return {action: 'deny'};
   });
+}
+
+function loadProofParameters() {
+  try {
+    const binPath = join(__dirname, 'assets', 'transfer_params.bin');
+    console.log(`[Startup] Loading ZK proof parameters from: ${binPath}`);
+
+    const bin = fs.readFileSync(binPath);
+
+    proofParamsBuffer = zp.readParamsFromBinary(bin, false);
+
+    console.log('[Startup] ZK proof parameters successfully pre-loaded.');
+  } catch (error) {
+    console.error('[Startup Error] Failed to load ZK proof parameters:', error);
+  }
 }
 
 app.whenReady().then(async () => {
   await registerAppProtocolHandler();
   installSecurityHooks();
+  setupRustIpcHandler();
   createWindow();
+  loadProofParameters()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -178,3 +199,24 @@ app.on('certificate-error', (event, _webContents, _url, _error, _certificate, ca
   event.preventDefault();
   callback(true);
 });
+
+function setupRustIpcHandler() {
+  // Channel name for the request
+  const channel = 'prove-tx';
+
+  // Handle synchronous request from the Renderer
+  ipcMain.handle(channel, async (_, inputData) => {
+    try {
+      console.log(`[IPC Main] Received request on ${channel} with data:`, inputData);
+
+      const params = proofParamsBuffer
+      const result = await zp.proveTxAsync(params, inputData[0], inputData[1])
+
+      return result
+    } catch (error) {
+      console.error(`[IPC Main] Error running Rust task:`, error);
+      // Return an error object
+      return {success: false, error: error.message};
+    }
+  });
+}

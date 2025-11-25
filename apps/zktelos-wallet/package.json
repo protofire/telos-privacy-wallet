@@ -10,6 +10,7 @@
     "build": "NODE_OPTIONS=--max-old-space-size=8192 react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
+    "electron:dev": "electron .",
     "electron:build:prod": "yarn build && electron-builder",
     "electron:build:mac": "yarn electron:build:prod --mac",
     "electron:build:win": "yarn electron:build:prod --win",
@@ -66,7 +67,8 @@
     "wagmi": "^0.12.1",
     "web-vitals": "^1.0.1",
     "webpack": "^5.70.0",
-    "zkbob-client-js": "*"
+    "zkbob-client-js": "*",
+    "libzkbob-rs-node": "*"
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.20.0",
@@ -90,12 +92,13 @@
       "electron/assets/**",
       "build/assets/**",
       "**/*.wasm",
-      "**/*.bin"
+      "**/*.bin",
+      "**/*.node"
     ],
     "files": [
       "build/**/*",
       "electron/**/*",
-      "node_modules/*"
+      "node_modules/libzkbob-rs-node/**/*"
     ],
     "asar": true,
     "npmRebuild": false,
