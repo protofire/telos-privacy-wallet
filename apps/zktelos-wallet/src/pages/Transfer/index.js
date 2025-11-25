@@ -46,9 +46,19 @@ export default () => {
 
   return isPending ? <PendingAction /> : (
     <ContentContainer>
-      <Card note={t('transfer.note')}>
+      <Card style={{ width: '550px' }}>
         <TitleRow>
-          <Title>{t('transfer.title')}</Title>
+          <Title>
+            {t('transfer.title')}
+            <SelectorInline>
+              <PoolSelector
+                options={poolOptions}
+                selectedAlias={currentPool.alias}
+                onSelect={handlePoolSelect}
+              />
+            </SelectorInline>
+            {t('transfer.suffix')}
+          </Title>
           <Row>
             <Text>{t('multitransfer.title')}</Text>
             <Switch
@@ -75,15 +85,8 @@ export default () => {
               </Tooltip>
             </CsvButtonContainer>
           </Row>
-          <PoolSelectWrapper>
-            <PoolSelectorLabel>{t('transfer.betweenLabel')}</PoolSelectorLabel>
-            <PoolSelector
-              options={poolOptions}
-              selectedAlias={currentPool.alias}
-              onSelect={handlePoolSelect}
-            />
-          </PoolSelectWrapper>
         </TitleRow>
+        <Note>{t('transfer.note')}</Note>
         {isMulti ? <MultiTransfer ref={multitransferRef} /> : (
           <SingleTransfer
             poolOptions={poolOptions}
@@ -109,15 +112,23 @@ const Row = styled.div`
 `;
 
 const TitleRow = styled(Row)`
-  padding: 0 10px;
   flex-wrap: wrap;
+  margin-bottom: 12px;
 `;
 
 const Title = styled.span`
   color: ${props => props.theme.card.title.color};
-  font-size: 16px;
+  font-size: 20px;
   font-weight: ${props => props.theme.text.weight.normal};
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const SelectorInline = styled.span`
+  display: inline-flex;
+  align-items: center;
 `;
 
 const Text = styled(Title)`
@@ -125,6 +136,12 @@ const Text = styled(Title)`
   font-size: 14px;
   font-weight: ${props => props.theme.text.weight.normal};
   margin-right: 6px;
+`;
+
+const Note = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.card.note.color};
+  margin: 0 4px 16px;
 `;
 
 const InfoIcon = styled(InfoIconDefault)`
@@ -152,16 +169,6 @@ const CsvButtonContainer = styled(Row)`
   `}
 `;
 
-const PoolSelectWrapper = styled.div`
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  @media (min-width: 600px) {
-    margin-top: 0;
-  }
-`;
-
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -174,10 +181,4 @@ const ContentContainer = styled.div`
   @media only screen and (max-width: 560px) {
     margin: 30px 0;
   }
-`;
-
-const PoolSelectorLabel = styled.span`
-  font-size: 14px;
-  color: ${props => props.theme.card.title.color};
-  margin-right: 6px;
 `;

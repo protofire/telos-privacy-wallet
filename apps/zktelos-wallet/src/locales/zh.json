@@ -79,7 +79,7 @@
     "getToken": "获取{{symbol}}"
   },
   "home": {
-    "title": "首页",
+    "title": "总览",
     "titleOffline": "创建您的私密账户",
     "portfolio": "我的投资组合",
     "latestTransactions": "最新交易",
@@ -92,13 +92,14 @@
     "value": "价值"
   },
   "deposit": {
-    "title": "存入",
-    "intoLabel": "至",
+    "title": "转为",
+    "suffix": "私密",
     "note": "{{symbol}}将会被存入您的zk账户。成功收款后，您可以进行{{symbol}}的隐私转账。",
     "ddNote": "存入{{symbol}}最多需要10分钟。"
   },
   "transfer": {
-    "title": "转账",
+    "title": "在",
+    "suffix": "之间转账",
     "betweenLabel": "在",
     "note": "转账将会以隐私的方式完成。发送人，收款人，及转账金额将不会被公开。",
     "addressInputPlaceholder": "请输入zkTelos收款人地址",
@@ -119,7 +120,8 @@
     "hasBeenTransferredTo": "已发送至{{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
-    "title": "提现",
+    "title": "转为",
+    "suffix": "公开",
     "fromLabel": "从",
     "note": "{{symbol}}将会从zkTelos中取出并存入到您提供的钱包地址",
     "addressInputPlaceholder": "输入收款人的{{network}}地址",

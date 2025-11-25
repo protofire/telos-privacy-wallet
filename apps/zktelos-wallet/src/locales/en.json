@@ -79,7 +79,7 @@
     "getToken": "Get {{symbol}}"
   },
   "home": {
-    "title": "Home",
+    "title": "Overview",
     "titleOffline": "Create your Private Account",
     "portfolio": "My portfolio",
     "latestTransactions": "Recent activity",
@@ -94,13 +94,15 @@
     "value": "Value"
   },
   "deposit": {
-    "title": "Deposit",
-    "intoLabel": "Into",
+    "title": "Make",
+    "suffix": "private",
     "note": "{{symbol}} will be deposited to your zkAccount. Once received, you can transfer {{symbol}} privately.",
     "ddNote": "{{symbol}} depositing can take up to 10 minutes."
   },
   "transfer": {
-    "title": "Transfer",
+    "title": "Transfer between",
+    "menuTitle": "Send privately",
+    "suffix": "",
     "betweenLabel": "Between",
     "note": "The transfer will be performed privately. Sender, recipient and amount are never disclosed.",
     "addressInputPlaceholder": "Enter address of zkTelos receiver",
@@ -121,7 +123,8 @@
     "hasBeenTransferredTo": "has been transferred to {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
-    "title": "Withdraw",
+    "title": "Make",
+    "suffix": "public",
     "fromLabel": "From",
     "note": "{{symbol}} will be withdrawn from zkTelos and deposited into the provided wallet address.",
     "addressInputPlaceholder": "Enter {{network}} address of receiver",

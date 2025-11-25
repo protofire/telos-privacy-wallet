@@ -119,15 +119,17 @@ export default () => {
     <ContentContainer>
       <Card>
         <TitleRow>
-          <Title>{t('withdraw.title')}</Title>
-          <PoolSelectorRow>
-            <PoolSelectorLabel>{t('withdraw.fromLabel')}</PoolSelectorLabel>
-            <PoolSelector
-              options={poolOptions}
-              selectedAlias={currentPool.alias}
-              onSelect={handlePoolSelect}
-            />
-          </PoolSelectorRow>
+          <Title>
+            {t('withdraw.title')}
+            <SelectorInline>
+              <PoolSelector
+                options={poolOptions}
+                selectedAlias={currentPool.alias}
+                onSelect={handlePoolSelect}
+              />
+            </SelectorInline>
+            {t('withdraw.suffix')}
+          </Title>
         </TitleRow>
         <Note>{t('withdraw.note', { symbol: currentPool.tokenSymbol })}</Note>
         <TransferInput
@@ -227,7 +229,7 @@ const Text = styled.span`
   display: flex;
   align-items: center;
   gap: 4px;
-  color: ${props => props.theme.text.color.primary};
+  color: ${props => props.theme.card.note.color};
   text-align: center;
   & > b, & > strong {
     font-weight: 600;
@@ -252,36 +254,29 @@ const ContentContainer = styled.div`
   }
 `;
 
-const Row = styled.div`
+const TitleRow = styled.div`
   display: flex;
-  align-items: center;
-`;
-
-const TitleRow = styled(Row)`
-  justify-content: space-between;
-  padding: 0 4px 10px;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
+  padding: 0 4px 10px;
 `;
 
 const Title = styled.span`
-  font-size: 16px;
+  font-size: 20px;
   color: ${props => props.theme.card.title.color};
   font-weight: ${props => props.theme.text.weight.normal};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const SelectorInline = styled.span`
+  display: inline-flex;
+  align-items: center;
 `;
 
 const Note = styled.p`
   font-size: 14px;
   color: ${props => props.theme.card.note.color};
   margin: 0 4px 16px;
-`;
-
-const PoolSelectorRow = styled(Row)`
-  gap: 8px;
-`;
-
-const PoolSelectorLabel = styled.span`
-  font-size: 14px;
-  color: ${props => props.theme.card.title.color};
-  font-weight: ${props => props.theme.text.weight.normal};
 `;
