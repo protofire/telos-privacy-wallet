@@ -10,8 +10,8 @@ apps/zktelos-wallet/dist
 packages/zkbob-client-js/node_modules
 packages/zkbob-client-js/lib
 
-packages/my-rust-addon/node_modules
-packages/my-rust-addon/target
+packages/libzkbob-rs-node/node_modules
+packages/libzkbob-rs-node/target
 
 /.pnp
 .pnp.js
