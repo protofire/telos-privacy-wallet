@@ -1,0 +1,20 @@
+sources:
+  - name: zkbob-usdc-polygon
+    handler:
+      graphql:
+        endpoint: '{context.subgraphEndpoint:https://api.thegraph.com/subgraphs/name/zkbob/zkbob-usdc-polygon}'
+
+additionalTypeDefs: |
+  extend type DirectDeposit {
+    subgraphEndpoint: String!
+  }
+
+additionalResolvers:
+  - ./subgraph/resolvers
+
+documents:
+  - ./subgraph/tx-query.graphql
+  - ./subgraph/dd-query.graphql
+
+codegen:
+  contextType: 'MeshContext & { subgraphEndpoint: string }'

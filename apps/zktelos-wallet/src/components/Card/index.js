@@ -1,0 +1,59 @@
+import React from 'react';
+import styled from 'styled-components';
+
+export default ({ title, icon, note, children, style, titleStyle }) => (
+  <Card style={style}>
+    {(title || icon) && (
+      <Header>
+        {icon && <Icon src={icon} />}
+        {title && <Title style={titleStyle}>{title}</Title>}
+      </Header>
+    )}
+    {children}
+    {note && <Note>{note}</Note>}
+  </Card>
+);
+
+const Card = styled.div`
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  padding: 16px;
+  width: 480px;
+  max-width: 100%;
+  box-sizing: border-box;
+  & > * {
+    margin-bottom: 6px;
+  }
+  & > :last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+
+const Icon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+`;
+
+const Title = styled.span`
+  color: ${props => props.theme.card.title.color};
+  font-weight: ${props => props.theme.text.weight.bold};
+`;
+
+const Note = styled.span`
+  font-size: 14px;
+  line-height: 22px;
+  color: ${props => props.theme.card.note.color};
+  font-weight: ${props => props.theme.text.weight.normal};
+  align-self: center;
+  text-align: center;
+  padding: 0 10px;
+`;
