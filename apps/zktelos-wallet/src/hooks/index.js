@@ -10,6 +10,7 @@ import useApproval from './useApproval';
 import useHistoricalTokenSymbol from './useHistoricalTokenSymbol';
 import useTokenPrices from './useTokenPrices';
 import useAutoReset from './useAutoReset';
+import useWrapToken from './useWrapToken';
 
 export {
   useDateFromNow,
@@ -24,4 +25,5 @@ export {
   useHistoricalTokenSymbol,
   useTokenPrices as useTokenMapPrices,
   useAutoReset,
+  useWrapToken,
 };

@@ -3,67 +3,16 @@ name: Build Electron with Rust Addon
 on:
   push:
     branches:
-      - poc/native-electron
-  pull_request:
-    branches:
-      - poc/native-electron
+      - main
   workflow_dispatch:
 
 env:
   NODE_VERSION: "20.x"
 
 jobs:
-  # Commented out macOS build - already tested and working
-  # build-macos:
-  #   name: Build macOS (ARM64 & x64)
-  #   runs-on: macos-latest
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
-  #         cache: "yarn"
-  #
-  #     - name: Install Rust
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         profile: minimal
-  #         override: true
-  #
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
-  #
-  #     - name: Build zkbob-client-js
-  #       run: yarn workspace zkbob-client-js build
-  #
-  #     - name: Build Rust addon
-  #       run: |
-  #         cd packages/my-rust-addon
-  #         yarn build
-  #
-  #     - name: Build Electron app
-  #       env:
-  #         CI: false
-  #         NODE_OPTIONS: --max-old-space-size=8192
-  #       run: yarn electron:build:mac
-  #
-  #     - name: Upload macOS artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: macos-installers
-  #         path: |
-  #           apps/zktelos-wallet/dist/*.dmg
-  #           apps/zktelos-wallet/dist/*.zip
-  #         retention-days: 30
-
-  build-windows:
-    name: Build Windows (x64)
-    runs-on: windows-latest
+  build-macos:
+    name: Build macOS (ARM64 & x64)
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
@@ -81,7 +30,6 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-          target: x86_64-pc-windows-msvc
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -98,7 +46,63 @@ jobs:
         env:
           CI: false
           NODE_OPTIONS: --max-old-space-size=8192
-        run: yarn electron:build:win
+        run: yarn electron:build:mac
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installers
+          path: |
+            apps/zktelos-wallet/dist/*.dmg
+            apps/zktelos-wallet/dist/*.zip
+          retention-days: 30
+
+  build-windows:
+    name: Build Windows (x64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: x86_64-pc-windows-msvc
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build zkbob-client-js
+        run: npm run build --workspace=zkbob-client-js
+
+      - name: Build Rust addon
+        run: npm run build --workspace=my-rust-addon
+
+      - name: Create .env file
+        shell: pwsh
+        run: |
+          @"
+          REACT_APP_CONFIG=dev
+          REACT_APP_BUILD_TARGET=electron
+          REACT_APP_WALLETCONNECT_PROJECT_ID=${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}
+          REACT_APP_LOCK_TIMEOUT=100000
+          "@ | Out-File -FilePath apps/zktelos-wallet/.env -Encoding utf8
+
+      - name: Build Electron app
+        env:
+          CI: false
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run electron:build:win
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -162,7 +166,7 @@ jobs:
 
   create-release-draft:
     name: Create Release Draft
-    needs: [build-windows, build-linux]
+    needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
@@ -181,12 +185,17 @@ jobs:
         with:
           draft: true
           files: |
+            artifacts/macos-installers/*
             artifacts/windows-installer/*
             artifacts/linux-installers/*
           body: |
             ## zkTelos Wallet Release
 
             ### Downloads
+
+            **macOS:**
+            - `.dmg` - Instalador estándar (recomendado)
+            - `.zip` - Versión portátil
 
             **Windows:**
             - `.exe` - Instalador NSIS para Windows x64

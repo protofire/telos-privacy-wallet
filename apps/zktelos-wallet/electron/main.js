@@ -6,7 +6,14 @@ const zp = require('libzkbob-rs-node');
 let mainWindow;
 let proofParamsBuffer = null;
 
-app.commandLine.appendSwitch('enable-logging');
+// Configure logging based on platform and environment
+if (process.platform === 'win32' && app.isPackaged) {
+  // Disable console logging in packaged Windows app to prevent console windows
+  app.commandLine.appendSwitch('disable-logging');
+} else {
+  // Enable logging for development and other platforms
+  app.commandLine.appendSwitch('enable-logging');
+}
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -129,11 +136,12 @@ function createWindow() {
     },
   });
 
-  mainWindow.webContents.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ' +
-    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-    'Chrome/140.0.0.0 Safari/537.36'
-  );
+  // Set platform-specific user agent
+  const userAgent = process.platform === 'win32'
+    ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+    : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
+
+  mainWindow.webContents.setUserAgent(userAgent);
 
   mainWindow.loadURL(app.isPackaged ? 'app://local/index.html' : 'http://localhost:3000');
 

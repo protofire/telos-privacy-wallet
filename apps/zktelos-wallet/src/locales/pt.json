@@ -23,7 +23,7 @@
     "recipient": "Destinatário",
     "link": "Link",
     "payment": "Pagamento",
-    "totalAssetBalance": "Soma dos ativos mantidos em sua carteira pública e zkAccount, mostrados em USD.",
+    "totalAssetBalance": "Soma dos ativos mantidos nas suas contas pública e privada, mostrada em USD.",
     "shieldedAddress": "Endereço protegido: ",
     "shieldedBalance": "Saldo protegido: ",
     "generatingAddress": "Gerando endereço...",
@@ -59,6 +59,8 @@
     "max": "Máximo",
     "changeWallet": "Mudar carteira",
     "disconnect": "Desconectar",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "Mostrar frase secreta",
     "setPassword": "Definir senha",
     "disablePassword": "Desativar senha",
@@ -119,7 +121,8 @@
     "note": "{{symbol}} será retirado do zkTelos e depositado no endereço da carteira fornecido.",
     "addressInputPlaceholder": "Inserir endereço {{network}} do destinatário",
     "convertion": "Converter parte de {{from}} para {{to}} na retirada",
-    "convertionDetails": "Você receberá <strong>{{amount1}} {{symbol1}}</strong> e <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": "Você receberá <strong>{{amount1}} {{symbol1}}</strong> e <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "Adicionar carteira atual: {{address}} como destinatário"
   },
   "limits": {
     "deposit": {
@@ -215,6 +218,15 @@
   "swapModal": {
     "title": "A troca está em andamento",
     "description": "Você pode fechar esta janela e voltar mais tarde para ver os resultados. Deseja fechar a janela?"
+  },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "Quantidade",
+    "available": "Disponível: {{amount}} {{symbol}}",
+    "invalidAmount": "Insira um valor válido",
+    "exceedsBalance": "O valor excede o saldo disponível",
+    "processing": "Processando..."
   },
   "accountSetupModal": {
     "access": {

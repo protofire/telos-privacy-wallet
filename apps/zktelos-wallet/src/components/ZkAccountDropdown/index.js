@@ -8,7 +8,7 @@ import Tooltip from 'components/Tooltip';
 import OptionButton from 'components/OptionButton';
 import Button from 'components/Button';
 import PrivateAddress from 'components/AdressWithCopy';
-import QRCodeReader from 'components/QRCodeReader';
+// import QRCodeReader from 'components/QRCodeReader';
 import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as BackIconDefault } from 'assets/back.svg';
@@ -48,17 +48,17 @@ const Content = ({
     setShowQRCode(false);
   }, []);
 
-  const initGiftCard = useCallback(async result => {
-    try {
-      const paramsString = result.split('?')[1];
-      const queryParams = new URLSearchParams(paramsString);
-      const code = queryParams.get('gift-code');
-      await initializeGiftCard(code);
-      close();
-    } catch (error) {
-      console.log(error);
-    }
-  }, [initializeGiftCard, close]);
+  // const initGiftCard = useCallback(async result => {
+  //   try {
+  //     const paramsString = result.split('?')[1];
+  //     const queryParams = new URLSearchParams(paramsString);
+  //     const code = queryParams.get('gift-code');
+  //     await initializeGiftCard(code);
+  //     close();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }, [initializeGiftCard, close]);
 
   const handleOptionClick = useCallback(actions => {
     close();

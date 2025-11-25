@@ -23,8 +23,9 @@ import ConvertOptions from 'components/ConvertOptions';
 
 import { useFee, useParsedAmount, useLatestAction, useMaxTransferable } from 'hooks';
 
-import { formatNumber, minBigNumber } from 'utils';
+import { formatNumber, minBigNumber, shortAddress } from 'utils';
 
+import { ReactComponent as ArrowRightCornerIcon } from 'assets/arrow-right-corner.svg';
 import { NETWORKS } from 'constants';
 import { useMaxAmountExceeded, useConvertion } from './hooks';
 
@@ -35,7 +36,7 @@ export default () => {
     isPending, isDemo, limits, isLoadingLimits, minTxAmount,
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
-  const { isAddress } = useContext(WalletContext);
+  const { isAddress, address, connector } = useContext(WalletContext);
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const [receiver, setReceiver] = useState('');
@@ -47,12 +48,13 @@ export default () => {
   const maxAmountExceeded = useMaxAmountExceeded(amount, maxWithdrawable, limits.dailyWithdrawalLimit?.available);
   const convertionDetails = useConvertion(currentPool);
 
+
   const onWihdrawal = useCallback(() => {
     setIsConfirmModalOpen(false);
     setDisplayAmount('');
     setReceiver('');
-    const _amountToConvert = currentPool.isNative ? amount : amountToConvert;
-    withdraw(receiver, amount, _amountToConvert, relayerFee);
+    const requestedSwapAmount = currentPool.isNative ? ethers.constants.Zero : amountToConvert;
+    withdraw(receiver, amount, requestedSwapAmount, relayerFee);
   }, [receiver, amount, amountToConvert, withdraw, relayerFee, currentPool]);
 
   const setMax = useCallback(async () => {
@@ -126,6 +128,12 @@ export default () => {
             currentPool={currentPool}
           />
         )}
+        {connector && (
+          <Text onClick={() => setReceiver(address)} style={{ cursor: 'pointer' }}>
+            {t('withdraw.addCurrentWallet', { address: shortAddress(address, 12) })}
+            <ArrowRightCornerIcon width={16} height={16} />
+          </Text>
+        )}
         <MultilineInput
           placeholder={t('withdraw.addressInputPlaceholder', { network: NETWORKS[currentPool.chainId].name })}
           secondary
@@ -188,10 +196,17 @@ export default () => {
 const Text = styled.span`
   font-size: 14px;
   line-height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: ${props => props.theme.text.color.primary};
   text-align: center;
   & > b, & > strong {
     font-weight: 600;
+  }
+
+  &:hover {
+    color: ${props => props.theme.color.purple};
   }
 `;
 

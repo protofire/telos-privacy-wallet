@@ -8,7 +8,7 @@ import LatestTransactions from 'components/LatestTransactions';
 import PublicAccount from 'components/PublicAccount';
 import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
-import Button from 'components/Button';
+import CreatePrivateAccountButton from 'components/CreatePrivateAccount';
 import Skeleton from 'components/Skeleton';
 
 import { PoolContext, ZkAccountContext, WalletContext, ModalContext } from 'contexts';
@@ -44,9 +44,9 @@ export default () => {
           <Card title={t('home.titleOffline')}>
             <EmptyPortfolioContainer>
               <EmptyPortfolioText>{t('home.description')}</EmptyPortfolioText>
-              <ConnectWalletButton onClick={openCreateAccountModal} data-ga-id="connect-wallet-home">
+              <CreatePrivateAccountButton onClick={openCreateAccountModal}>
                 {t('common.createPrivateAccount')}
-              </ConnectWalletButton>
+              </CreatePrivateAccountButton>
             </EmptyPortfolioContainer>
           </Card>
         </CardsContainer>
@@ -161,21 +161,3 @@ const ContentContainer = styled.div`
   gap: 16px;
 `;
 
-const ConnectWalletButton = styled(Button)`
-  background: ${props => props.theme.color.telosGradientSoft};
-  color: rgb(149 126 223 / 90%);
-  border: 1px solid rgb(149 126 223 / 40%);
-  padding: 16px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: ${props => props.theme.color.telosGradient};
-    color: ${props => props.theme.color.white};
-    transition: all 0.3s ease;
-    transform: scale(1.05);
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  }
-`;

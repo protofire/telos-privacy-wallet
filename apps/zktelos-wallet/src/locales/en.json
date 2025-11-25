@@ -23,7 +23,7 @@
     "recipient": "Recipient",
     "link": "Link",
     "payment": "Payment",
-    "totalAssetBalance": "Sum of assets held in your public wallet and zkAccount, shown in USD.",
+    "totalAssetBalance": "Sum of assets held in your public and private accounts, shown in USD.",
     "shieldedAddress": "Shielded address: ",
     "shieldedBalance": "Shielded balance: ",
     "generatingAddress": "Generating address...",
@@ -59,6 +59,8 @@
     "max": "Max",
     "changeWallet": "Change wallet",
     "disconnect": "Disconnect",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "Show secret phrase",
     "setPassword": "Set password",
     "disablePassword": "Disable password",
@@ -121,7 +123,8 @@
     "note": "{{symbol}} will be withdrawn from zkTelos and deposited into the provided wallet address.",
     "addressInputPlaceholder": "Enter {{network}} address of receiver",
     "convertion": "Convert some {{from}} to {{to}} on withdrawal",
-    "convertionDetails": "You will get <strong>{{amount1}} {{symbol1}}</strong> and <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": "You will get <strong>{{amount1}} {{symbol1}}</strong> and <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "Add current wallet: {{address}} as receiver"
   },
   "limits": {
     "deposit": {
@@ -217,6 +220,15 @@
   "swapModal": {
     "title": "The swap is in progress",
     "description": "You can close this window and return later to view the results. Do you want to close the window?"
+  },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "Amount",
+    "available": "Available: {{amount}} {{symbol}}",
+    "invalidAmount": "Enter a valid amount",
+    "exceedsBalance": "Amount exceeds available balance",
+    "processing": "Processing..."
   },
   "accountSetupModal": {
     "access": {

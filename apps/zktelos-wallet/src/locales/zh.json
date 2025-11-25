@@ -23,7 +23,7 @@
     "recipient": "收款人",
     "link": "链接",
     "payment": "支付",
-    "totalAssetBalance": "您公共钱包和zk账户中资产的总价值，以USD显示。",
+    "totalAssetBalance": "您公共账户和私密账户中持有的资产总和，以USD显示。",
     "shieldedAddress": "隐私地址: ",
     "shieldedBalance": "隐私余额: ",
     "generatingAddress": "生成隐私地址...",
@@ -59,6 +59,8 @@
     "max": "最大",
     "changeWallet": "切换钱包",
     "disconnect": "中断连接",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "显示助记词",
     "setPassword": "设置密码",
     "disablePassword": "停用密码",
@@ -119,7 +121,8 @@
     "note": "{{symbol}}将会从zkTelos中取出并存入到您提供的钱包地址",
     "addressInputPlaceholder": "输入收款人的{{network}}地址",
     "convertion": "提款时将一部分 {{from}} 转化为 {{to}}",
-    "convertionDetails": " 您将收到 <strong>{{amount1}} {{symbol1}}</strong> 和 <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": " 您将收到 <strong>{{amount1}} {{symbol1}}</strong> 和 <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "将当前钱包 {{address}} 设为收款地址"
   },
   "limits": {
     "deposit": {
@@ -215,6 +218,15 @@
   "swapModal": {
     "title": "兑换进行中",
     "description": "您可以关闭此窗口并稍后返回页面以查看结果。是否关闭窗口？"
+  },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "金额",
+    "available": "可用：{{amount}} {{symbol}}",
+    "invalidAmount": "请输入有效金额",
+    "exceedsBalance": "金额超出可用余额",
+    "processing": "正在处理..."
   },
   "accountSetupModal": {
     "access": {

@@ -20,7 +20,12 @@ const useEvmWallet = pool => {
   const { signMessageAsync } = useSignMessage();
   const { connectAsync, connectors } = useConnect();
   const { disconnectAsync } = useDisconnect();
-  const { refetch } = useBalance({ address, chainId: pool.chainId });
+  const { refetch } = useBalance({
+    address,
+    chainId: pool.chainId,
+    enabled: Boolean(address),
+    watch: Boolean(address),
+  });
   const { data: signer } = useSigner({ chainId: pool.chainId });
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork({

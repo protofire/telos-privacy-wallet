@@ -23,7 +23,7 @@
     "recipient": "Получатель",
     "link": "Ссылка",
     "payment": "Платеж",
-    "totalAssetBalance": "Сумма активов, хранящихся в вашем публичном кошельке и zkAccount, показана в USD.",
+    "totalAssetBalance": "Сумма активов, хранящихся на ваших публичном и приватном аккаунтах, показана в USD.",
     "shieldedAddress": "Защищенный адрес: ",
     "shieldedBalance": "Защищенный баланс: ",
     "generatingAddress": "Генерация адреса...",
@@ -59,6 +59,8 @@
     "max": "Макс",
     "changeWallet": "Переключить кошелек",
     "disconnect": "Отключиться",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap",
     "showSecretPhrase": "Показать секретную фразу",
     "setPassword": "Установить пароль",
     "disablePassword": "Отключить пароль",
@@ -119,7 +121,8 @@
     "note": "{{symbol}} будет выведен из zkTelos и зачислен на указанный адрес кошелька.",
     "addressInputPlaceholder": "Введите {{network}} адрес получателя",
     "convertion": "Конвертировать часть {{from}} в {{to}} при выводе",
-    "convertionDetails": "Вы получите <strong>{{amount1}} {{symbol1}}</strong> и <strong>~ {{amount2}} {{symbol2}}</strong>"
+    "convertionDetails": "Вы получите <strong>{{amount1}} {{symbol1}}</strong> и <strong>~ {{amount2}} {{symbol2}}</strong>",
+    "addCurrentWallet": "Добавить текущий кошелек {{address}} как получателя"
   },
   "limits": {
     "deposit": {
@@ -216,6 +219,15 @@
   "swapModal": {
     "title": "Обмен в процессе",
     "description": "Вы можете закрыть это окно и вернуться позже, чтобы посмотреть результаты. Вы хотите закрыть окно?"
+  },
+  "wrapModal": {
+    "wrapTitle": "Wrap {{symbol}}",
+    "unwrapTitle": "Unwrap {{symbol}}",
+    "amountLabel": "Сумма",
+    "available": "Доступно: {{amount}} {{symbol}}",
+    "invalidAmount": "Введите корректную сумму",
+    "exceedsBalance": "Сумма превышает доступный баланс",
+    "processing": "Обработка..."
   },
   "accountSetupModal": {
     "access": {

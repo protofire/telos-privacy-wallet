@@ -89,6 +89,14 @@ export const ModalContextProvider = ({ children }) => {
   const openPaymentConfirmationModal = () => setIsPaymentConfirmationModalOpen(true);
   const closePaymentConfirmationModal = () => setIsPaymentConfirmationModalOpen(false);
 
+  const [isWrapModalOpen, setIsWrapModalOpen] = useState(false);
+  const [wrapModalMode, setWrapModalMode] = useState('wrap');
+  const openWrapModal = mode => {
+    setWrapModalMode(mode || 'wrap');
+    setIsWrapModalOpen(true);
+  };
+  const closeWrapModal = () => setIsWrapModalOpen(false);
+
   const closeAllModals = () => {
     closeWalletModal();
     // closeAccountSetUpModal();
@@ -106,6 +114,7 @@ export const ModalContextProvider = ({ children }) => {
     closeTokenSelector();
     closePaymentLinkModal();
     closePaymentConfirmationModal();
+    closeWrapModal();
   };
 
   return (
@@ -133,6 +142,7 @@ export const ModalContextProvider = ({ children }) => {
         isTokenListModalOpen, openTokenListModal, closeTokenListModal,
         isPaymentLinkModalOpen, openPaymentLinkModal, closePaymentLinkModal,
         isPaymentConfirmationModalOpen, openPaymentConfirmationModal, closePaymentConfirmationModal,
+        isWrapModalOpen, openWrapModal, closeWrapModal, wrapModalMode,
         closeAllModals,
       }}
     >

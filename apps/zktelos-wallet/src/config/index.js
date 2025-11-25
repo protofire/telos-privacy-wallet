@@ -37,9 +37,9 @@ const config = {
     }
   },
   dev: {
-    defaultPool: 'tlos_testnet',
+    defaultPool: 'tlos_testnet_native',
     pools: {
-      'tlos_testnet': {
+      'tlos_testnet_pusd': {
         chainId: 41,
         poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
         tokenAddress: '0x28d1BCc58E6Cd0270F45b63e4FFd13b3fF5E98af',

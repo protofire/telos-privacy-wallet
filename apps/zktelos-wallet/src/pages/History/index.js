@@ -54,6 +54,7 @@ export default () => {
           item.from,
           item.txHash,
           actions[item.type].name,
+          // eslint-disable-next-line eqeqeq
           item.state == 2 ? "finalized" : "pending",
           item.failureReason,
           item.timestamp

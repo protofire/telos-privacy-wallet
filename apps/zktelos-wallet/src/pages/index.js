@@ -16,6 +16,7 @@ import ConfirmLogoutModal from 'containers/ConfirmLogoutModal';
 import SeedPhraseModal from 'containers/SeedPhraseModal';
 import IncreasedLimitsModal from 'containers/IncreasedLimitsModal';
 import RedeemGiftCardModal from 'containers/RedeemGiftCardModal';
+import WrapModal from 'containers/WrapModal';
 
 import Header from 'components/Header';
 import ChangePasswordModal from 'components/ChangePasswordModal';
@@ -131,6 +132,7 @@ const MainApp = () => {
       <IncreasedLimitsModal />
       <DisablePasswordModal />
       <PaymentLinkModal />
+      <WrapModal />
     </>
   );
 }
