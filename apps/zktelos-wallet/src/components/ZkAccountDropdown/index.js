@@ -4,32 +4,25 @@ import QRCode from 'react-qr-code';
 import { useTranslation, Trans } from 'react-i18next';
 
 import Dropdown from 'components/Dropdown';
-import Tooltip from 'components/Tooltip';
 import OptionButton from 'components/OptionButton';
 import Button from 'components/Button';
 import PrivateAddress from 'components/AdressWithCopy';
 // import QRCodeReader from 'components/QRCodeReader';
-import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
-import { formatNumber } from 'utils';
-
-import { TOKENS_ICONS } from 'constants';
-
-import { ZkAccountContext, ModalContext, PoolContext, BalanceVisibilityContext, WalletContext } from 'contexts';
+import { ZkAccountContext, ModalContext, WalletContext } from 'contexts';
 
 const Content = ({
-  balance, generateAddress, getSeed, setPassword,
+  generateAddress, getSeed, setPassword,
   removePassword, logout, close, showSeedPhrase,
-  isLoadingState, initializeGiftCard, currentPool,
+  isLoadingState, initializeGiftCard,
   generatePaymentLink,
 }) => {
   const { t } = useTranslation();
   const [privateAddress, setPrivateAddress] = useState(null);
   const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const { isVisible } = useContext(BalanceVisibilityContext);
   const { disconnect } = useContext(WalletContext);
 
   const { hasPassword } = getSeed();
@@ -114,28 +107,7 @@ const Content = ({
 
   return (
     <Container>
-      <RowSpaceBetween>
-        <SmallText>{t('common.zkAccount')}</SmallText>
-        <Row>
-          <TokenIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
-          {isVisible ? (
-            <Tooltip
-              content={formatNumber(balance, currentPool.tokenDecimals, 18)}
-              placement="bottom"
-              trigger={['hover']}
-            >
-              <Balance>
-                <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
-              </Balance>
-            </Tooltip>
-          ) : (
-            <Balance>
-              <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
-            </Balance>
-          )}
-          <Balance style={{ marginLeft: 5 }}>{currentPool.tokenSymbol}</Balance>
-        </Row>
-      </RowSpaceBetween>
+      <Title style={{ marginBottom: 20 }}>{t('common.zkAccount')}</Title>
       <Button
         style={{ marginBottom: 10 }}
         onClick={generateQRCode}
@@ -180,7 +152,7 @@ const Content = ({
 
 export default ({ children }) => {
   const {
-    balance: poolBalance, generateAddress, isDemo,
+    generateAddress, isDemo,
     isLoadingState, initializeGiftCard, getSeed,
   } = useContext(ZkAccountContext);
   const {
@@ -188,7 +160,6 @@ export default ({ children }) => {
     openConfirmLogoutModal, openDisablePasswordModal, openPaymentLinkModal,
     isZkAccountDropdownOpen, openZkAccountDropdown, closeZkAccountDropdown,
   } = useContext(ModalContext);
-  const { currentPool } = useContext(PoolContext);
 
   return (
     <Dropdown
@@ -198,7 +169,6 @@ export default ({ children }) => {
       close={closeZkAccountDropdown}
       content={() => (
         <Content
-          balance={poolBalance}
           generateAddress={generateAddress}
           switchAccount={openAccountSetUpModal}
           setPassword={openChangePasswordModal}
@@ -209,7 +179,6 @@ export default ({ children }) => {
           isLoadingState={isLoadingState}
           initializeGiftCard={initializeGiftCard}
           getSeed={getSeed}
-          currentPool={currentPool}
           close={closeZkAccountDropdown}
           generatePaymentLink={openPaymentLinkModal}
         />
@@ -226,32 +195,6 @@ const Container = styled.div`
   & > :last-child {
     margin-bottom: 0;
   }
-`;
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const SmallText = styled.span`
-  font-size: 14px;
-  color: ${({ theme }) => theme.text.color.secondary};
-`;
-
-const Balance = styled.span`
-  font-size: 16px;
-  color: ${({ theme }) => theme.text.color.primary};
-`;
-
-const RowSpaceBetween = styled(Row)`
-  justify-content: space-between;
-  margin-bottom: 20px;
-`;
-
-const TokenIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
 `;
 
 const Description = styled.span`

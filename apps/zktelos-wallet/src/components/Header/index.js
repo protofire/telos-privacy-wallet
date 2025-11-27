@@ -129,18 +129,7 @@ export default ({ empty }) => {
         <Row>
           <ZkAvatar seed={zkAccount} size={16} />
           <Address><ZkName seed={zkAccount} /></Address>
-          {isLoadingState ? (
-            <BalanceSkeleton isMobile={isMobile} />
-          ) : (
-            <>
-              <Balance>
-                <BalanceDisplay
-                  value={`${formatBalance(poolBalance, currentPool.tokenDecimals, isMobile)} ${currentPool.tokenSymbol}`}
-                />
-              </Balance>
-              <DropdownIcon />
-            </>
-          )}
+          <DropdownIcon />
         </Row>
       </AccountDropdownButton>
     </ZkAccountDropdown>
