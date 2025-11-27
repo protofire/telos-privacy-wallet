@@ -11,6 +11,7 @@ import { ZkAccountContext, PoolContext, BalanceVisibilityContext } from 'context
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
 import { formatNumber } from 'utils';
+import config from 'config';
 
 import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import AddressWithCopy from 'components/AdressWithCopy';
@@ -20,8 +21,9 @@ import Tooltip from 'components/Tooltip';
 import Dropdown from 'components/Dropdown';
 import OptionButtonDefault from 'components/OptionButton';
 
-const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoading }) => {
+const PrivatePortfolioRow = ({ poolAlias, asset, icon, balance, price, tokenDecimals, isLoading }) => {
   const { isVisible } = useContext(BalanceVisibilityContext);
+  const { setCurrentPool } = useContext(PoolContext);
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
@@ -47,13 +49,15 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
 
   const handleWithdraw = useCallback(() => {
     setIsActionDropdownOpen(false);
+    setCurrentPool(poolAlias);
     history.push('/withdraw' + location.search);
-  }, [history, location]);
+  }, [history, location, setCurrentPool, poolAlias]);
 
   const handleTransfer = useCallback(() => {
     setIsActionDropdownOpen(false);
+    setCurrentPool(poolAlias);
     history.push('/transfer' + location.search);
-  }, [history, location]);
+  }, [history, location, setCurrentPool, poolAlias]);
 
   if (!balance || balance.isZero()) {
     return null;
@@ -121,27 +125,74 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
 
 export default () => {
   const { t } = useTranslation();
-  const { currentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
 
   const {
     zkAccount,
-    balance: poolBalance,
+    balances,
+    zkClients,
     isLoadingState: isLoadingBalance,
-    generateAddress,
   } = useContext(ZkAccountContext);
-  const [shieldedAddress, setShieldedAddress] = useState('');
+  const [shieldedAddresses, setShieldedAddresses] = useState({});
 
   const isLoading = isLoadingBalance || isLoadingPrices;
-  const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
-  // For private account, we currently only show the pool token
-  const tokenSymbol = currentPool?.tokenSymbol;
 
-  const generateAndStoreAddress = useCallback(async () => {
-    const address = await generateAddress();
-    setShieldedAddress(address);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generateAddress, currentPool]);
+  // Generate token rows for all pools (only base tokens, no wrapped)
+  const poolTokenRows = useMemo(() => {
+    if (!balances) return [];
+
+    const rows = Object.keys(config.pools).map(poolAlias => {
+      const pool = config.pools[poolAlias];
+      const balance = balances[poolAlias] || ethers.constants.Zero;
+      const tokenPrice = priceMap?.get(pool.tokenSymbol) || null;
+      // For private account, show base token (PUSD, TLOS) not wrapped (WTLOS)
+      const tokenSymbol = pool.tokenSymbol;
+
+      return {
+        poolAlias,
+        asset: tokenSymbol,
+        icon: TOKENS_ICONS[tokenSymbol],
+        balance,
+        price: tokenPrice,
+        tokenDecimals: pool.tokenDecimals || 18,
+      };
+    });
+
+    return rows;
+  }, [balances, priceMap]);
+
+  // Check if there's any balance to show the table
+  const hasAnyBalance = useMemo(() => {
+    const hasBalance = poolTokenRows.some(row => row.balance && row.balance.gt(0));
+    return hasBalance;
+  }, [poolTokenRows]);
+
+  // Generate addresses for all pools
+  const generateAndStoreAddresses = useCallback(async () => {
+    if (!zkAccount || !zkClients) return;
+
+    const poolAliases = Object.keys(config.pools);
+    const addressPromises = poolAliases.map(async (poolAlias) => {
+      const client = zkClients[poolAlias];
+      if (!client) return { poolAlias, address: null };
+
+      try {
+        const address = await client.generateAddress();
+        return { poolAlias, address };
+      } catch (error) {
+        console.error(`Error generating address for pool ${poolAlias}:`, error);
+        return { poolAlias, address: null };
+      }
+    });
+
+    const results = await Promise.all(addressPromises);
+    const addressesMap = {};
+    results.forEach(({ poolAlias, address }) => {
+      if (address) addressesMap[poolAlias] = address;
+    });
+
+    setShieldedAddresses(addressesMap);
+  }, [zkAccount, zkClients]);
 
   const getRefreshIcon = () => {
     if (isLoadingBalance) {
@@ -152,8 +203,8 @@ export default () => {
 
   useEffect(() => {
     if (!zkAccount) return;
-    generateAndStoreAddress();
-  }, [zkAccount, generateAndStoreAddress]);
+    generateAndStoreAddresses();
+  }, [zkAccount, generateAndStoreAddresses]);
 
   if (!zkAccount) return null;
 
@@ -167,27 +218,40 @@ export default () => {
               <ZkName seed={zkAccount} />
             </AccountName>
           </HeaderTitle>
-          {shieldedAddress ? (
-            <AddressWithCopy
-              prefixIcon={getRefreshIcon()}
-              onPrefixClick={generateAndStoreAddress}
-              $noBorder
-              $fontSize="14px"
-              $height="auto"
-              $borderRadius="0"
-              $maxWidth="250px"
-              $padding="0"
-              $background="transparent"
-            >
-              {shieldedAddress}
-            </AddressWithCopy>
-          ) : (
-            <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
-          )}
+          <AddressesContainer>
+            {Object.keys(config.pools).map(poolAlias => {
+              const pool = config.pools[poolAlias];
+              const address = shieldedAddresses[poolAlias];
+              const tokenSymbol = pool.tokenSymbol;
+
+              return (
+                <AddressRow key={poolAlias}>
+                  <TokenLabel>{tokenSymbol}:</TokenLabel>
+                  {address ? (
+                    <AddressWithCopy
+                      prefixIcon={getRefreshIcon()}
+                      onPrefixClick={generateAndStoreAddresses}
+                      $noBorder
+                      $fontSize="13px"
+                      $height="auto"
+                      $borderRadius="0"
+                      $maxWidth="210px"
+                      $padding="0"
+                      $background="transparent"
+                    >
+                      {address}
+                    </AddressWithCopy>
+                  ) : (
+                    <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
+                  )}
+                </AddressRow>
+              );
+            })}
+          </AddressesContainer>
         </HeaderContent>
       </HeaderContainer>
 
-      {poolBalance && poolBalance.gt(0) && (
+      {hasAnyBalance && (
         <Table>
           <colgroup>
             <Col style={{ width: '25%' }} />
@@ -206,14 +270,19 @@ export default () => {
             </HeaderRow>
           </thead>
           <tbody>
-            <PrivatePortfolioRow
-              asset={tokenSymbol}
-              icon={TOKENS_ICONS[tokenSymbol]}
-              balance={poolBalance}
-              price={poolTokenPrice}
-              tokenDecimals={currentPool?.tokenDecimals || 18}
-              isLoading={isLoading}
-            />
+            {/* All Pool Tokens (PUSD, TLOS) - no wrapped tokens */}
+            {poolTokenRows.map(tokenData => (
+              <PrivatePortfolioRow
+                key={tokenData.poolAlias}
+                poolAlias={tokenData.poolAlias}
+                asset={tokenData.asset}
+                icon={tokenData.icon}
+                balance={tokenData.balance}
+                price={tokenData.price}
+                tokenDecimals={tokenData.tokenDecimals}
+                isLoading={isLoading}
+              />
+            ))}
           </tbody>
         </Table>
       )}
@@ -259,8 +328,29 @@ const AccountName = styled.span`
   color: ${props => props.theme.text.color.primary};
 `;
 
+const AddressesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const AddressRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+const TokenLabel = styled.span`
+  font-size: 13px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.secondary};
+  text-transform: uppercase;
+  min-width: 50px;
+`;
+
 const ShieldedAddress = styled.span`
-  font-size: 14px;
+  font-size: 13px;
   color: ${props => props.theme.color.black};
   line-height: 16px;
 `;

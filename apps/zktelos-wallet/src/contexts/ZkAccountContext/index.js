@@ -659,6 +659,25 @@ export const ZkAccountContextProvider = ({ children }) => {
     updatePoolData();
   }, [updatePoolData, currentPool]);
 
+  // Load data for all pools when zkAccount is set (after login)
+  useEffect(() => {
+    if (!zkAccount) return;
+
+    const poolAliases = Object.keys(config.pools);
+
+    // Update all pools in parallel (balance, history, limits, pending deposits, minTxAmount)
+    Promise.all(poolAliases.map(poolAlias =>
+      Promise.all([
+        updatePoolData(poolAlias),
+        loadMinTxAmount(poolAlias)
+      ])
+    ))
+      .catch(error => {
+        console.error('[ZkAccountContext] Error loading pools data:', error);
+      });
+  }, [zkAccount]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Note: updatePoolData and loadMinTxAmount are intentionally omitted to only trigger on login/logout
+
   useEffect(() => {
     loadMinTxAmount();
   }, [loadMinTxAmount, currentPool]);
@@ -726,8 +745,8 @@ export const ZkAccountContextProvider = ({ children }) => {
   return (
     <ZkAccountContext.Provider
       value={{
-        zkAccount, balance, saveZkAccountMnemonic, deposit, isPoolSwitching, getSeed,
-        withdraw, transfer, generateAddress, history, unlockAccount, transferMulti,
+        zkAccount, balance, balances, zkClients, saveZkAccountMnemonic, deposit, isPoolSwitching, getSeed,
+        withdraw, transfer, generateAddress, history, histories, unlockAccount, transferMulti,
         isLoadingZkAccount, isLoadingState, isLoadingHistory, isPending, pendingActions,
         removeZkAccountMnemonic, updatePoolData, minTxAmount, loadingPercentage,
         estimateFee, isLoadingLimits, limits, calcMaxTransferable,

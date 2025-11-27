@@ -41,7 +41,7 @@ export default () => {
     const headers = ['amount', 'from', 'to', 'toYourself', 'commitment', 'extraInfo', 'failed', 'fee', 'from', 'txHash', 'type', 'state', 'failureReason', 'timestamp'];
     let csvContent = items.map(item => {
       let result = item.actions.map(action => {
-        console.log("action", action);
+
         return [
           getSign(item) + action.amount.toString(),
           action.from,
