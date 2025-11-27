@@ -1,6 +1,6 @@
 import React, { useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
+// import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
 
 import ButtonDefault from 'components/Button';
@@ -9,8 +9,8 @@ import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
 import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
-import Skeleton from 'components/Skeleton';
-import BalanceDisplay from 'components/BalanceDisplay';
+// import Skeleton from 'components/Skeleton';
+// import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as StyledEyeIcon } from 'assets/eye.svg';
 import { ReactComponent as StyledEyeClosedIcon } from 'assets/eye-off.svg';
@@ -22,7 +22,7 @@ import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
 
-import { formatNumber } from 'utils';
+// import { formatNumber } from 'utils';
 import { NETWORKS } from 'constants';
 import { useWindowDimensions } from 'hooks';
 
@@ -32,26 +32,26 @@ import {
   WalletContext,
 } from 'contexts';
 
-const { parseUnits } = ethers.utils;
+// const { parseUnits } = ethers.utils;
 
-const formatBalance = (balance, tokenDecimals, isMobile) => {
-  const decimals = (isMobile && balance.gte(parseUnits('1000', tokenDecimals))) ? 0 : null;
-  return formatNumber(balance, tokenDecimals, decimals);
-};
+// const formatBalance = (balance, tokenDecimals, isMobile) => {
+//   const decimals = (isMobile && balance.gte(parseUnits('1000', tokenDecimals))) ? 0 : null;
+//   return formatNumber(balance, tokenDecimals, decimals);
+// };
 
-const BalanceSkeleton = isMobile => (
-  <Skeleton
-    width={isMobile ? 60 : 80}
-    style={{ marginLeft: isMobile ? 5 : 0 }}
-  />
-);
+// const BalanceSkeleton = isMobile => (
+//   <Skeleton
+//     width={isMobile ? 60 : 80}
+//     style={{ marginLeft: isMobile ? 5 : 0 }}
+//   />
+// );
 
 export default ({ empty }) => {
   const { t } = useTranslation();
   const { address: account } = useContext(WalletContext);
   const { updateBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const {
-    zkAccount, isLoadingZkAccount, balance: poolBalance,
+    zkAccount, isLoadingZkAccount,
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
   const { openAccessAccountModal } = useContext(ModalContext);
@@ -321,16 +321,16 @@ const Address = styled.span`
   }
 `;
 
-const Balance = styled.span`
-  font-weight: ${props => props.theme.text.weight.extraBold};
-  @media only screen and (max-width: 1100px) {
-    margin-left: 8px;
-  }
-  @media only screen and (max-width: 800px) {
-    font-weight: ${props => props.theme.text.weight.bold};
-    font-size: 14px;
-  }
-`;
+// const Balance = styled.span`
+//   font-weight: ${props => props.theme.text.weight.extraBold};
+//   @media only screen and (max-width: 1100px) {
+//     margin-left: 8px;
+//   }
+//   @media only screen and (max-width: 800px) {
+//     font-weight: ${props => props.theme.text.weight.bold};
+//     font-size: 14px;
+//   }
+// `;
 
 const Spinner = styled(SpinnerDefault)`
   path {
