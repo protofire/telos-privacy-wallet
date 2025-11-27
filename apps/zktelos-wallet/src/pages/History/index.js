@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -10,16 +10,16 @@ import { actions, getSign } from 'components/HistoryItem';
 import Button from 'components/Button';
 import AccountSetUpButton from 'containers/AccountSetUpButton';
 
-import { PoolContext, ZkAccountContext } from 'contexts';
+import { ZkAccountContext } from 'contexts';
 import { useWindowDimensions } from 'hooks';
+import config from 'config';
 
 export default () => {
   const { t } = useTranslation();
   const {
-    history, zkAccount, pendingDirectDeposits,
+    histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
   const { width } = useWindowDimensions();
   const isMobile = width <= 500;
 
@@ -29,12 +29,36 @@ export default () => {
   const isLoading = isLoadingZkAccount || isLoadingHistory;
   const title = t('history.title');
 
-  const items = pendingDirectDeposits.concat(history);
+  // Combine histories from all pools
+  const items = useMemo(() => {
+    if (!histories) return [];
+
+    const poolAliases = Object.keys(config.pools);
+    const combined = [];
+
+    poolAliases.forEach(poolAlias => {
+      const poolHistory = histories[poolAlias] || [];
+      const pendingDeposits = (pendingDirectDepositsByPool && pendingDirectDepositsByPool[poolAlias]) || [];
+
+      // Add poolAlias metadata to each transaction
+      const poolTransactions = pendingDeposits.concat(poolHistory).map(tx => ({
+        ...tx,
+        poolAlias,
+        pool: config.pools[poolAlias],
+      }));
+
+      combined.push(...poolTransactions);
+    });
+
+    // Sort by timestamp (most recent first)
+    return combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }, [histories, pendingDirectDepositsByPool]);
+
   const isHistoryEmpty = items.length === 0;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [zkAccount, currentPool]);
+  }, [zkAccount]);
 
 
   const exportData = () => {
@@ -91,7 +115,7 @@ export default () => {
         {!isHistoryEmpty && (
           <>
             {items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item, index) =>
-              <HistoryItem key={index} item={item} zkAccount={zkAccount} currentPool={currentPool} isMobile={isMobile} />
+              <HistoryItem key={index} item={item} zkAccount={zkAccount} isMobile={isMobile} />
             )}
             {items.length > pageSize && (
               <Pagination

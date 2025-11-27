@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -11,7 +11,8 @@ import Link from 'components/Link';
 import CreatePrivateAccountButton from 'components/CreatePrivateAccount';
 import Skeleton from 'components/Skeleton';
 
-import { PoolContext, ZkAccountContext, WalletContext, ModalContext } from 'contexts';
+import { ZkAccountContext, WalletContext, ModalContext } from 'contexts';
+import config from 'config';
 
 import shieldIcon from 'assets/shield.svg';
 import globeIcon from 'assets/globe.svg';
@@ -23,14 +24,38 @@ export default () => {
   const { address: account } = useContext(WalletContext);
   const { openCreateAccountModal } = useContext(ModalContext);
   const {
-    history: fullHistory, zkAccount, pendingDirectDeposits,
+    histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
 
   const isLoading = isLoadingZkAccount || isLoadingHistory;
 
-  const last3Actions = pendingDirectDeposits.concat(fullHistory).slice(0, 3);
+  // Combine histories from all pools
+  const allTransactions = useMemo(() => {
+    if (!histories) return [];
+
+    const poolAliases = Object.keys(config.pools);
+    const combined = [];
+
+    poolAliases.forEach(poolAlias => {
+      const poolHistory = histories[poolAlias] || [];
+      const pendingDeposits = (pendingDirectDepositsByPool && pendingDirectDepositsByPool[poolAlias]) || [];
+
+      // Add poolAlias metadata to each transaction
+      const poolTransactions = pendingDeposits.concat(poolHistory).map(tx => ({
+        ...tx,
+        poolAlias,
+        pool: config.pools[poolAlias],
+      }));
+
+      combined.push(...poolTransactions);
+    });
+
+    // Sort by timestamp (most recent first)
+    return combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }, [histories, pendingDirectDepositsByPool]);
+
+  const last3Actions = allTransactions.slice(0, 3);
   const isLatest5HistoryEmpty = last3Actions.length === 0;
 
   const handleViewAll = () => {
@@ -96,7 +121,6 @@ export default () => {
                 <LatestTransactions
                   transactions={last3Actions}
                   zkAccount={zkAccount}
-                  currentPool={currentPool}
                 />
               )}
             </Card>

@@ -23,12 +23,14 @@ const {
   DirectDeposit,
 } = HistoryTransactionType;
 
-const TransactionItem = ({ transaction, zkAccount, currentPool }) => {
+const TransactionItem = ({ transaction, zkAccount }) => {
   const { t } = useTranslation();
   const [isCopied, setIsCopied] = useState(false);
-  const tokenSymbol = useHistoricalTokenSymbol(currentPool, transaction);
+  // Use pool from transaction metadata (added in Home/History pages)
+  const txPool = transaction.pool;
+  const tokenSymbol = useHistoricalTokenSymbol(txPool, transaction);
   const date = useDateFromNow(transaction.timestamp);
-  const currentChainId = currentPool.chainId;
+  const currentChainId = txPool.chainId;
 
   const onCopy = useCallback((text, result) => {
     if (result) {
@@ -70,16 +72,16 @@ const TransactionItem = ({ transaction, zkAccount, currentPool }) => {
             <Amount $error={transaction.failed}>
               {sign}{' '}
               <Tooltip
-                content={formatNumber(total, currentPool.tokenDecimals, 18)}
+                content={formatNumber(total, txPool.tokenDecimals, 18)}
                 placement="top"
               >
-                <span>{formatNumber(total, currentPool.tokenDecimals, 2)}</span>
+                <span>{formatNumber(total, txPool.tokenDecimals, 2)}</span>
               </Tooltip>
               {' '}{tokenSymbol}
               {transaction.fee && !transaction.fee.isZero() && (
                 <FeeText>
                   {' '}{t('history.fee', {
-                    amount: formatNumber(transaction.fee, currentPool.tokenDecimals),
+                    amount: formatNumber(transaction.fee, txPool.tokenDecimals),
                     symbol: tokenSymbol,
                   })}
                 </FeeText>
@@ -142,7 +144,7 @@ const TransactionItem = ({ transaction, zkAccount, currentPool }) => {
   );
 };
 
-export default ({ transactions, zkAccount, currentPool }) => {
+export default ({ transactions, zkAccount }) => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
@@ -154,7 +156,6 @@ export default ({ transactions, zkAccount, currentPool }) => {
           key={index}
           transaction={transaction}
           zkAccount={zkAccount}
-          currentPool={currentPool}
         />
       ))}
     </Container>
