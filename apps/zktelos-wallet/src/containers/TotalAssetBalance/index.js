@@ -3,39 +3,67 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-
-import { TokenBalanceContext, ZkAccountContext, PoolContext, WalletContext } from 'contexts';
+import { TokenBalanceContext, ZkAccountContext, WalletContext } from 'contexts';
 
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
 import Tooltip from 'components/Tooltip';
 
 import { useTokenMapPrices } from 'hooks';
+import config from 'config';
 
 export default () => {
   const { address: account } = useContext(WalletContext)
-  const { balance } = useContext(TokenBalanceContext);
-  const { balance: zkAccountBalance, isLoadingState, zkAccount } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
+  const { balances, nativeBalance } = useContext(TokenBalanceContext);
+  const { balances: zkAccountBalances, isLoadingState, zkAccount } = useContext(ZkAccountContext);
   const { priceMap } = useTokenMapPrices();
   const { t } = useTranslation();
 
   const totalUsdValue = useMemo(() => {
-    if (!balance || !zkAccountBalance || !priceMap || !currentPool) return null;
+    // Early return if priceMap is not ready
+    if (!priceMap || priceMap.size === 0) return null;
 
-    const tokenPrice = priceMap.get(currentPool.tokenSymbol) || 0;
-    const balanceInToken = parseFloat(ethers.utils.formatUnits(balance, currentPool.tokenDecimals));
-    const zkBalanceInToken = parseFloat(ethers.utils.formatUnits(zkAccountBalance, currentPool.tokenDecimals));
-    const totalInToken = balanceInToken + zkBalanceInToken;
-    const usdValue = totalInToken * tokenPrice;
+    // Check if we have any balance data
+    const hasBalanceData = balances && Object.keys(balances).length > 0;
+    const hasZkBalanceData = zkAccountBalances && Object.keys(zkAccountBalances).length > 0;
 
-    return usdValue.toLocaleString('en-US', {
+    // If no data at all, return null (will show loading skeleton)
+    if (!hasBalanceData && !hasZkBalanceData) return null;
+
+    let totalUsd = 0;
+
+    // Iterate over all pools and sum their USD values
+    Object.keys(config.pools).forEach(poolAlias => {
+      const pool = config.pools[poolAlias];
+      const publicBalance = (balances && balances[poolAlias]) || ethers.constants.Zero;
+      const privateBalance = (zkAccountBalances && zkAccountBalances[poolAlias]) || ethers.constants.Zero;
+
+      const tokenPrice = priceMap.get(pool.tokenSymbol) || 0;
+
+      const publicInToken = parseFloat(ethers.utils.formatUnits(publicBalance, pool.tokenDecimals));
+      const privateInToken = parseFloat(ethers.utils.formatUnits(privateBalance, pool.tokenDecimals));
+      const totalInToken = publicInToken + privateInToken;
+      const usdValue = totalInToken * tokenPrice;
+
+      totalUsd += usdValue;
+    });
+
+    // Add native TLOS balance (only once, not per pool)
+    if (nativeBalance && !nativeBalance.isZero()) {
+      const tlosPrice = priceMap.get('TLOS') || 0;
+      const nativeInToken = parseFloat(ethers.utils.formatUnits(nativeBalance, 18));
+      const nativeUsdValue = nativeInToken * tlosPrice;
+
+      totalUsd += nativeUsdValue;
+    }
+
+    return totalUsd.toLocaleString('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-  }, [balance, zkAccountBalance, priceMap, currentPool]);
+  }, [balances, zkAccountBalances, nativeBalance, priceMap]);
 
   if (!account && !zkAccount) return null;
 

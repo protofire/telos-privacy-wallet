@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import { ethers } from 'ethers';
 import * as Sentry from '@sentry/react';
 
@@ -6,6 +6,7 @@ import { PoolContext, WalletContext } from 'contexts';
 
 import { showLoadingError } from 'utils';
 import tokenAbi from 'abis/token.json';
+import config from 'config';
 
 const TokenBalanceContext = createContext({ balance: null });
 
@@ -14,41 +15,75 @@ export default TokenBalanceContext;
 export const TokenBalanceContextProvider = ({ children }) => {
   const { address: account, getBalance, callContract } = useContext(WalletContext);
   const { currentPool } = useContext(PoolContext);
-  const [balance, setBalance] = useState(ethers.constants.Zero);
-  const [nativeBalance, setNativeBalance] = useState(ethers.constants.Zero);
+  const [balances, setBalances] = useState({});
+  const [nativeBalances, setNativeBalances] = useState({});
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
-  const updateBalance = useCallback(async () => {
+  // Computed values pointing to current pool
+  const balance = useMemo(() => balances[currentPool.alias] || ethers.constants.Zero, [balances, currentPool.alias]);
+  const nativeBalance = useMemo(() => nativeBalances[currentPool.alias] || ethers.constants.Zero, [nativeBalances, currentPool.alias]);
+
+  const updateBalance = useCallback(async (poolAlias) => {
+    if (!poolAlias) {
+      console.error('updateBalance called without poolAlias');
+      return;
+    }
+
     setIsLoadingBalance(true);
     let balance = ethers.constants.Zero;
     let nativeBalance = ethers.constants.Zero;
+
+    const pool = config.pools[poolAlias];
+    if (!pool) {
+      console.error(`Pool not found: ${poolAlias}`);
+      setIsLoadingBalance(false);
+      return;
+    }
+
     if (account) {
       try {
         [balance, nativeBalance] = await Promise.all([
-          callContract(currentPool.tokenAddress, tokenAbi, 'balanceOf', [account]),
+          callContract(pool.tokenAddress, tokenAbi, 'balanceOf', [account]),
           getBalance(),
         ]);
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateBalance' } });
+        Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateBalance', pool: poolAlias } });
         showLoadingError('walletBalance');
       }
     }
-    setBalance(balance);
-    setNativeBalance(nativeBalance);
+    setBalances(prev => ({ ...prev, [poolAlias]: balance }));
+    setNativeBalances(prev => ({ ...prev, [poolAlias]: nativeBalance }));
     setIsLoadingBalance(false);
-  }, [account, getBalance, callContract, currentPool.tokenAddress]);
+  }, [account, getBalance, callContract]);
 
+  // Update all pools balances when account changes
   useEffect(() => {
-    updateBalance();
-  }, [updateBalance]);
+    if (!account) return;
+
+    const poolAliases = Object.keys(config.pools);
+
+    // Update all pools in parallel
+    Promise.all(poolAliases.map(poolAlias => updateBalance(poolAlias)))
+      .catch(error => {
+        console.error('Error updating all pool balances:', error);
+      });
+  }, [account, updateBalance]);
+
+  // Wrapper for backward compatibility: if no poolAlias provided, update current pool
+  const updateBalanceWrapper = useCallback(async (poolAlias) => {
+    const targetPool = poolAlias || currentPool.alias;
+    return updateBalance(targetPool);
+  }, [updateBalance, currentPool.alias]);
 
   return (
     <TokenBalanceContext.Provider
       value={{
-        balance,
-        nativeBalance,
-        updateBalance,
+        balance, // Current pool balance (computed)
+        nativeBalance, // Current pool native balance (computed)
+        balances, // All pools balances (object keyed by poolAlias)
+        nativeBalances, // All pools native balances (object keyed by poolAlias)
+        updateBalance: updateBalanceWrapper,
         isLoadingBalance: isLoadingBalance,
       }}>
       {children}
