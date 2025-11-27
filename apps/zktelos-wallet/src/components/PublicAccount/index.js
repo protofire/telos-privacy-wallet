@@ -19,6 +19,7 @@ import { TOKENS_ICONS } from 'constants';
 import { TokenBalanceContext, PoolContext, WalletContext, ModalContext, BalanceVisibilityContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { formatNumber, shortAddress } from 'utils';
+import config from 'config';
 
 const PortfolioRow = ({
   asset,
@@ -128,22 +129,16 @@ const PortfolioRow = ({
 export default () => {
   const { t } = useTranslation();
   const { address: account, connector, disconnect } = useContext(WalletContext);
-  const { nativeBalance, balance: poolTokenBalance, isLoadingBalance } = useContext(TokenBalanceContext);
-  const { currentPool } = useContext(PoolContext);
+  const { nativeBalance, balances, isLoadingBalance } = useContext(TokenBalanceContext);
+  const { setCurrentPool } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
   const { openWalletModal, openWrapModal } = useContext(ModalContext);
   const history = useHistory();
   const location = useLocation();
 
   const tlosPrice = priceMap?.get('TLOS') || null;
-  const poolTokenPrice = priceMap?.get(currentPool?.tokenSymbol) || null;
-
   const isLoading = isLoadingBalance || isLoadingPrices;
-  const isNative = currentPool.isNative;
-  const tokenSymbol = `${isNative ? 'W' : ''}${currentPool?.tokenSymbol}`;
-  const supportsWrapping = isNative;
   const wrapDisabled = !nativeBalance || nativeBalance.isZero();
-  const unwrapDisabled = !poolTokenBalance || poolTokenBalance.isZero();
 
   const getRefreshIcon = () => {
     return <RenewIcon width={18} height={18} />;
@@ -160,6 +155,48 @@ export default () => {
   const goToDeposit = useCallback(() => {
     history.push('/deposit' + location.search);
   }, [history, location]);
+
+  // Generate token rows for all pools
+  const poolTokenRows = useMemo(() => {
+    if (!balances) return [];
+
+    return Object.keys(config.pools).map(poolAlias => {
+      const pool = config.pools[poolAlias];
+      const balance = balances[poolAlias] || ethers.constants.Zero;
+      const tokenPrice = priceMap?.get(pool.tokenSymbol) || null;
+      const isNative = pool.isNative;
+      const tokenSymbol = `${isNative ? 'W' : ''}${pool.tokenSymbol}`;
+      const unwrapDisabled = !balance || balance.isZero();
+
+      return {
+        poolAlias,
+        asset: tokenSymbol,
+        icon: TOKENS_ICONS[tokenSymbol],
+        balance,
+        price: tokenPrice,
+        tokenDecimals: pool.tokenDecimals || 18,
+        actions: [
+          {
+            id: 'deposit',
+            label: t('deposit.title') + ' ' + t('deposit.suffix'),
+            onClick: () => {
+              setCurrentPool(poolAlias);
+              goToDeposit();
+            },
+          },
+          isNative ? {
+            id: 'unwrap',
+            label: t('buttonText.unwrap'),
+            onClick: () => {
+              setCurrentPool(poolAlias);
+              openWrapModal('unwrap');
+            },
+            disabled: unwrapDisabled,
+          } : { id: 'unwrap-disabled', hidden: true },
+        ],
+      };
+    });
+  }, [balances, priceMap, t, setCurrentPool, goToDeposit, openWrapModal]);
 
   if (!account) {
     return <ConnectWalletWrapper>
@@ -210,6 +247,7 @@ export default () => {
           </HeaderRow>
         </thead>
         <tbody>
+          {/* TLOS Native Balance */}
           <PortfolioRow
             asset="TLOS"
             icon={TOKENS_ICONS['TLOS']}
@@ -223,35 +261,28 @@ export default () => {
                 label: t('deposit.title') + ' ' + t('deposit.suffix'),
                 onClick: goToDeposit,
               },
-              supportsWrapping ? {
+              {
                 id: 'wrap',
                 label: t('buttonText.wrap'),
                 onClick: () => openWrapModal('wrap'),
                 disabled: wrapDisabled,
-              } : { id: 'wrap-disabled', hidden: true },
-            ]}
-          />
-          <PortfolioRow
-            asset={tokenSymbol}
-            icon={TOKENS_ICONS[tokenSymbol]}
-            balance={poolTokenBalance}
-            price={poolTokenPrice}
-            tokenDecimals={currentPool?.tokenDecimals || 18}
-            isLoading={isLoading}
-            actions={[
-              {
-                id: 'deposit',
-                label: t('deposit.title') + ' ' + t('deposit.suffix'),
-                onClick: goToDeposit,
               },
-              supportsWrapping ? {
-                id: 'unwrap',
-                label: t('buttonText.unwrap'),
-                onClick: () => openWrapModal('unwrap'),
-                disabled: unwrapDisabled,
-              } : { id: 'unwrap-disabled', hidden: true },
             ]}
           />
+
+          {/* All Pool Tokens (WTLOS, PUSD, etc.) */}
+          {poolTokenRows.map(tokenData => (
+            <PortfolioRow
+              key={tokenData.poolAlias}
+              asset={tokenData.asset}
+              icon={tokenData.icon}
+              balance={tokenData.balance}
+              price={tokenData.price}
+              tokenDecimals={tokenData.tokenDecimals}
+              isLoading={isLoading}
+              actions={tokenData.actions}
+            />
+          ))}
         </tbody>
       </Table>
     </Container>
