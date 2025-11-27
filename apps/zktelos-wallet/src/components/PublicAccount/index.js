@@ -220,7 +220,7 @@ export default () => {
             actions={[
               {
                 id: 'deposit',
-                label: t('buttonText.deposit'),
+                label: t('deposit.title') + ' ' + t('deposit.suffix'),
                 onClick: goToDeposit,
               },
               supportsWrapping ? {
@@ -241,7 +241,7 @@ export default () => {
             actions={[
               {
                 id: 'deposit',
-                label: t('buttonText.deposit'),
+                label: t('deposit.title') + ' ' + t('deposit.suffix'),
                 onClick: goToDeposit,
               },
               supportsWrapping ? {

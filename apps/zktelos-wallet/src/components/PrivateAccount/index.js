@@ -102,10 +102,10 @@ const PrivatePortfolioRow = ({ asset, icon, balance, price, tokenDecimals, isLoa
           content={() => (
             <ActionDropdownContainer>
               <OptionButton onClick={handleWithdraw}>
-                {t('withdraw.title')}
+                {t('withdraw.title')} {t('withdraw.suffix')}
               </OptionButton>
               <OptionButton onClick={handleTransfer}>
-                {t('transfer.title')}
+                {t('transfer.menuTitle')}
               </OptionButton>
             </ActionDropdownContainer>
           )}
