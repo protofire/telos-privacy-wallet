@@ -98,7 +98,7 @@
     "ddNote": "存入{{symbol}}最多需要10分钟。"
   },
   "transfer": {
-    "title": "在",
+    "title": "私密发送",
     "suffix": "之间转账",
     "betweenLabel": "在",
     "note": "转账将会以隐私的方式完成。发送人，收款人，及转账金额将不会被公开。",

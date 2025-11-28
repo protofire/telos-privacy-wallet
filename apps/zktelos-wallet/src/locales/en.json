@@ -100,7 +100,7 @@
     "ddNote": "{{symbol}} depositing can take up to 10 minutes."
   },
   "transfer": {
-    "title": "Transfer between",
+    "title": "Privately send",
     "menuTitle": "Send privately",
     "suffix": "",
     "betweenLabel": "Between",

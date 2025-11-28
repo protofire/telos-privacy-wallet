@@ -98,7 +98,7 @@
     "ddNote": "O depósito de {{symbol}} pode levar até 10 minutos."
   },
   "transfer": {
-    "title": "Transferir entre",
+    "title": "Enviar privadamente",
     "suffix": "",
     "menuTitle": "Transferir de forma privada",
     "betweenLabel": "Entre",
