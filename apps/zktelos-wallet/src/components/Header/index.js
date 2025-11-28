@@ -316,9 +316,6 @@ const AccountDropdownButton = styled(NetworkDropdownButton)`
 const Address = styled.span`
   margin-left: 8px;
   margin-right: 8px;
-  @media only screen and (max-width: 1100px) {
-    display: none;
-  }
 `;
 
 // const Balance = styled.span`
