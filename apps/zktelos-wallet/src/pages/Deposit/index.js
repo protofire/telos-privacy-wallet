@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react';
 import { HistoryTransactionType } from 'zkbob-client-js';
 import styled from 'styled-components';
 import { useTranslation, Trans } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 import AccountSetUpButton from 'containers/AccountSetUpButton';
 import PendingAction from 'containers/PendingAction';
@@ -42,6 +43,7 @@ const useHardcodedFee = amount => useMemo(
 
 export default () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const { address: account } = useContext(WalletContext);
   const {
     zkAccount, isLoadingZkAccount, deposit,
@@ -72,6 +74,22 @@ export default () => {
   }, [currentPool.alias, switchToPool]);
 
   const [isNativeSelected, setIsNativeSelected] = useState(true);
+
+  useEffect(() => {
+    if (!currentPool.isNative) return;
+
+    const queryParams = new URLSearchParams(location.search);
+    const toParam = queryParams.get('to');
+
+    if (toParam) {
+      const upperToParam = toParam.toUpperCase();
+      if (upperToParam === 'TLOS') {
+        setIsNativeSelected(true);
+      } else if (upperToParam === 'WTELOS' || upperToParam === 'WTLOS') {
+        setIsNativeSelected(false);
+      }
+    }
+  }, [location.search, currentPool.isNative]);
   const isNativeTokenUsed = useMemo(
     () => isNativeSelected && currentPool.isNative,
     [isNativeSelected, currentPool],
@@ -86,7 +104,11 @@ export default () => {
   );
   const hardcodedNativeFee = useHardcodedFee(amount);
   const shouldUseHardcodedFee = useMemo(
-    () => isNativeTokenUsed && directDepositFee.isZero(),
+    () => {
+      if (!isNativeTokenUsed) return false;
+      if (!directDepositFee || typeof directDepositFee.isZero !== 'function') return false;
+      return directDepositFee.isZero();
+    },
     [isNativeTokenUsed, directDepositFee],
   );
   const displayedFeeValue = useMemo(

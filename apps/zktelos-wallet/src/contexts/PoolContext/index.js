@@ -27,12 +27,28 @@ export const PoolContextProvider = ({ children }) => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
+    const toParam = queryParams.get('to');
+    
+    if (toParam) {
+      const alias = Object.keys(config.pools).find(alias => {
+        const pool = config.pools[alias];
+        return pool.tokenSymbol?.toLowerCase() === toParam.toLowerCase();
+      });
+      if (alias) {
+        setCurrentPool(alias);
+        return;
+      }
+    }
+    
     const poolInParams = queryParams.get('pool');
-    const alias = Object.keys(config.pools).find(alias =>
-      alias.toLowerCase() === poolInParams?.toLowerCase()
-    );
-    if (!alias) return;
-    setCurrentPool(alias);
+    if (poolInParams) {
+      const alias = Object.keys(config.pools).find(alias =>
+        alias.toLowerCase() === poolInParams?.toLowerCase()
+      );
+      if (alias) {
+        setCurrentPool(alias);
+      }
+    }
   }, [location.search]);
 
   return (

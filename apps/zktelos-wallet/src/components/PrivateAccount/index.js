@@ -34,13 +34,27 @@ export default () => {
   const isLoading = isLoadingBalance || isLoadingPrices;
 
   const handleWithdraw = useCallback((poolAlias) => {
+    const pool = config.pools[poolAlias];
+    const tokenSymbol = pool?.tokenSymbol;
+    const queryParams = new URLSearchParams(location.search);
+    if (tokenSymbol) {
+      queryParams.set('to', tokenSymbol);
+    }
     setCurrentPool(poolAlias);
-    history.push('/withdraw' + location.search);
+    const queryString = queryParams.toString();
+    history.push(`/withdraw${queryString ? `?${queryString}` : ''}`);
   }, [history, location, setCurrentPool]);
 
   const handleTransfer = useCallback((poolAlias) => {
+    const pool = config.pools[poolAlias];
+    const tokenSymbol = pool?.tokenSymbol;
+    const queryParams = new URLSearchParams(location.search);
+    if (tokenSymbol) {
+      queryParams.set('to', tokenSymbol);
+    }
     setCurrentPool(poolAlias);
-    history.push('/transfer' + location.search);
+    const queryString = queryParams.toString();
+    history.push(`/transfer${queryString ? `?${queryString}` : ''}`);
   }, [history, location, setCurrentPool]);
 
   const tableRows = useMemo(() => {

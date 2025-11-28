@@ -44,8 +44,13 @@ export default () => {
     disconnect();
   }
 
-  const goToDeposit = useCallback(() => {
-    history.push('/deposit' + location.search);
+  const goToDeposit = useCallback((tokenSymbol) => {
+    const queryParams = new URLSearchParams(location.search);
+    if (tokenSymbol) {
+      queryParams.set('to', tokenSymbol);
+    }
+    const queryString = queryParams.toString();
+    history.push(`/deposit${queryString ? `?${queryString}` : ''}`);
   }, [history, location]);
 
   const tableRows = useMemo(() => {
@@ -63,7 +68,7 @@ export default () => {
           {
             id: 'deposit',
             label: t('deposit.title') + ' ' + t('deposit.suffix'),
-            onClick: goToDeposit,
+            onClick: () => goToDeposit('TLOS'),
           },
           {
             id: 'wrap',
@@ -97,7 +102,7 @@ export default () => {
               label: t('deposit.title') + ' ' + t('deposit.suffix'),
               onClick: () => {
                 setCurrentPool(poolAlias);
-                goToDeposit();
+                goToDeposit(tokenSymbol);
               },
             },
             isNative ? {
