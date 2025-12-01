@@ -20,8 +20,8 @@ export const TokenBalanceContextProvider = ({ children }) => {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
   // Computed values pointing to current pool
-  const balance = useMemo(() => balances[currentPool.alias] || ethers.constants.Zero, [balances, currentPool.alias]);
-  const nativeBalance = useMemo(() => nativeBalances[currentPool.alias] || ethers.constants.Zero, [nativeBalances, currentPool.alias]);
+  const balance = useMemo(() => account ? balances[currentPool.alias] : ethers.constants.Zero, [balances, currentPool.alias, account]);
+  const nativeBalance = useMemo(() => account ? nativeBalances[currentPool.alias] : ethers.constants.Zero, [nativeBalances, currentPool.alias, account]);
 
   const updateBalance = useCallback(async (poolAlias) => {
     if (!poolAlias) {
