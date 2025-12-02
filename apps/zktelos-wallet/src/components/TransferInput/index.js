@@ -199,6 +199,7 @@ const TokenContainer = styled.div`
   margin-left: 15px;
 `;
 
+
 const InfoIcon = styled(InfoIconDefault)`
   margin-left: 2px;
   margin-right: -2px;

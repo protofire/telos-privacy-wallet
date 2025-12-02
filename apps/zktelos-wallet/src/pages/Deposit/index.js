@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react';
 import { HistoryTransactionType } from 'zkbob-client-js';
 import styled from 'styled-components';
 import { useTranslation, Trans } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 import AccountSetUpButton from 'containers/AccountSetUpButton';
 import PendingAction from 'containers/PendingAction';
@@ -23,6 +24,7 @@ import Limits from 'components/Limits';
 import DemoCard from 'components/DemoCard';
 import IncreasedLimitsBanner from 'components/IncreasedLimitsBanner';
 import DefaultLink from 'components/Link';
+import PoolSelector from 'components/PoolSelector';
 
 import { ReactComponent as WargingIcon } from 'assets/warning.svg';
 
@@ -40,13 +42,15 @@ const useHardcodedFee = amount => useMemo(
 
 export default () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const { address: account } = useContext(WalletContext);
   const {
     zkAccount, isLoadingZkAccount, deposit,
     isLoadingState, isPending, isDemo,
     isLoadingLimits, limits, minTxAmount,
+    switchToPool,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, availablePools } = useContext(PoolContext);
   const { balance, nativeBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { openWalletModal, openIncreasedLimitsModal } = useContext(ModalContext);
   const { status: increasedLimitsStatus } = useContext(IncreasedLimitsContext);
@@ -54,7 +58,38 @@ export default () => {
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const latestAction = useLatestAction(HistoryTransactionType.Deposit);
   const { fee, relayerFee, isLoadingFee, directDepositFee } = useFee(amount, TxType.BridgeDeposit);
+  // Deposit is on-chain, so only show pools in active chain
+  const poolOptions = useMemo(
+    () => availablePools.map(pool => ({
+      alias: pool.alias,
+      tokenSymbol: pool.tokenSymbol,
+      label: pool.tokenSymbol,
+    })),
+    [availablePools],
+  );
+
+  const handlePoolSelect = useCallback(alias => {
+    if (alias === currentPool.alias) return;
+    switchToPool(alias);
+  }, [currentPool.alias, switchToPool]);
+
   const [isNativeSelected, setIsNativeSelected] = useState(true);
+
+  useEffect(() => {
+    if (!currentPool.isNative) return;
+
+    const queryParams = new URLSearchParams(location.search);
+    const toParam = queryParams.get('to');
+
+    if (toParam) {
+      const upperToParam = toParam.toUpperCase();
+      if (upperToParam === 'TLOS') {
+        setIsNativeSelected(true);
+      } else if (upperToParam === 'WTELOS' || upperToParam === 'WTLOS') {
+        setIsNativeSelected(false);
+      }
+    }
+  }, [location.search, currentPool.isNative]);
   const isNativeTokenUsed = useMemo(
     () => isNativeSelected && currentPool.isNative,
     [isNativeSelected, currentPool],
@@ -69,7 +104,11 @@ export default () => {
   );
   const hardcodedNativeFee = useHardcodedFee(amount);
   const shouldUseHardcodedFee = useMemo(
-    () => isNativeTokenUsed && directDepositFee.isZero(),
+    () => {
+      if (!isNativeTokenUsed) return false;
+      if (!directDepositFee || typeof directDepositFee.isZero !== 'function') return false;
+      return directDepositFee.isZero();
+    },
     [isNativeTokenUsed, directDepositFee],
   );
   const displayedFeeValue = useMemo(
@@ -106,10 +145,21 @@ export default () => {
 
   return isPending ? <PendingAction /> : (
     <ContentContainer>
-      <Card
-        title={t('deposit.title')}
-        note={t('deposit.note', { symbol: currentPool.tokenSymbol })}
-      >
+      <Card>
+        <TitleRow>
+          <Title>
+            {t('deposit.title')}
+            <SelectorInline>
+              <PoolSelector
+                options={poolOptions}
+                selectedAlias={currentPool.alias}
+                onSelect={handlePoolSelect}
+              />
+            </SelectorInline>
+            {t('deposit.suffix')}
+          </Title>
+        </TitleRow>
+        <Note>{t('deposit.note', { symbol: currentPool.tokenSymbol })}</Note>
         <TransferInput
           balance={account ? balance : null}
           nativeBalance={account ? nativeBalance : null}
@@ -126,6 +176,9 @@ export default () => {
           setIsNativeSelected={setIsNativeSelected}
           isNativeTokenUsed={isNativeTokenUsed}
           gaIdPostfix="deposit"
+          poolOptions={poolOptions}
+          selectedPoolAlias={currentPool.alias}
+          onPoolSelect={handlePoolSelect}
         />
         {(() => {
           if (!zkAccount && !isLoadingZkAccount) {
@@ -213,6 +266,34 @@ const Row = styled.div`
   display: flex;
   align-items: center;
 `;
+
+const TitleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 4px 10px;
+`;
+
+const Title = styled.span`
+  font-size: 20px;
+  color: ${props => props.theme.card.title.color};
+  font-weight: ${props => props.theme.text.weight.normal};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const SelectorInline = styled.span`
+  display: inline-flex;
+  align-items: center;
+`;
+
+const Note = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.card.note.color};
+  margin: 0 4px 16px;
+`;
+
 
 const MessageContainer = styled(Row)`
   justify-content: center;

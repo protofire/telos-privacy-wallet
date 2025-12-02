@@ -1,121 +1,80 @@
-import React, { useCallback, useState, useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useSwitchNetwork } from 'wagmi';
 
 import Dropdown from 'components/Dropdown';
 import OptionButtonDefault from 'components/OptionButton';
 
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
-import { ReactComponent as CheckIcon } from 'assets/check-stroke.svg';
 
-import { NETWORKS, TOKENS_ICONS } from 'constants';
+import { NETWORKS } from 'constants';
 
 import config from 'config';
 
-import { ZkAccountContext, ModalContext, PoolContext } from 'contexts';
+import { ModalContext, PoolContext } from 'contexts';
 
 const chainIds = Object.keys(config.chains).map(chainId => Number(chainId));
-const poolsWithAliases = Object.values(config.pools).map((pool, index) => ({
-  ...pool,
-  alias: Object.keys(config.pools)[index],
-}));
-const poolsByChainId = chainIds.map(chainId => {
-  return {
-    chainId,
-    pools: Object.values(poolsWithAliases).filter(pool => pool.chainId === chainId),
-    external: Object.entries(config.chains).find(([k,_]) => Number(k) === chainId)[1]["external"]
-  };
-});
 
-const Content = ({ switchToPool, currentPool, close }) => {
+const Content = ({ closeDropdown }) => {
   const { t } = useTranslation();
-  const [openedChainId, setOpenedChainId] = useState(currentPool.chainId);
+  const { activeChainId } = useContext(PoolContext);
+  const { switchNetworkAsync } = useSwitchNetwork();
 
-  const showPools = useCallback((chainId,external) => {
-    if(external) {
+  const handleClick = useCallback(async (chainId) => {
+    const external = config.chains[chainId]?.external;
+    if (external) {
       window.open(external);
       return;
     }
-    if (openedChainId === chainId) {
-      setOpenedChainId(null);
-    } else {
-      setOpenedChainId(chainId);
-    }
-  }, [openedChainId]);
 
-  const onSwitchPool = useCallback(poolId => {
-    close();
-    switchToPool(poolId);
-  }, [switchToPool, close]);
+    if (chainId === activeChainId) return;
+
+    try {
+      await switchNetworkAsync?.(chainId);
+      closeDropdown();
+    } catch (error) {
+      console.error('Failed to switch network:', error);
+    }
+  }, [activeChainId, switchNetworkAsync, closeDropdown]);
 
   return (
     <Container>
       <Title>{t('networks.title')}</Title>
-      {poolsByChainId.map(({ chainId, pools,external }, index) =>
-        <React.Fragment key={index}>
-          <OptionButton
-            onClick={() => showPools(chainId,external)}
-            className={openedChainId === chainId ? 'active' : ''}
-          >
-            <RowSpaceBetween>
+      {chainIds.map(chainId => (
+        <OptionButton
+          key={chainId}
+          onClick={() => handleClick(chainId)}
+          className={chainId === activeChainId ? 'active' : ''}
+        >
+          <RowSpaceBetween>
+            <Row>
+              <NetworkIcon src={NETWORKS[chainId].icon} />
+              {NETWORKS[chainId].name}
+            </Row>
+            {config.chains[chainId]?.external && (
               <Row>
-                <NetworkIcon src={NETWORKS[chainId].icon} />
-                {NETWORKS[chainId].name}
+                <DropdownIcon style={{ transform: 'rotate(270deg)' }} />
               </Row>
-              <Row>
-                {pools.length}
-                {openedChainId === chainId ? (
-                  <DropdownIcon />
-                ) : (
-                  <DropdownIcon style={{ transform: 'rotate(270deg)' }} />
-                )}
-              </Row>
-            </RowSpaceBetween>
-          </OptionButton>
-          {openedChainId === chainId && (
-            <TokensContainer>
-              {pools.map((pool, index) =>
-                <OptionButtonSmall
-                  key={index}
-                  onClick={() => onSwitchPool(pool.alias)}
-                  className={currentPool.alias === pool.alias ? 'active' : ''}
-                  data-ga-id={`pool-${pool.alias.toLowerCase()}`}
-                >
-                  <RowSpaceBetween>
-                    <Row>
-                      <TokenIcon src={TOKENS_ICONS[pool.tokenSymbol]} />
-                      {pool.tokenSymbol}
-                    </Row>
-                    {currentPool.alias === pool.alias && <CheckIcon />}
-                  </RowSpaceBetween>
-                </OptionButtonSmall>
-              )}
-            </TokensContainer>
-          )}
-        </React.Fragment>
-      )}
+            )}
+          </RowSpaceBetween>
+        </OptionButton>
+      ))}
     </Container>
   );
 };
 
 export default ({ children }) => {
-  const { isPoolSwitching, isLoadingState, switchToPool } = useContext(ZkAccountContext);
   const { isNetworkDropdownOpen, openNetworkDropdown, closeNetworkDropdown } = useContext(ModalContext);
-  const { currentPool } = useContext(PoolContext);
   return (
     <Dropdown
       width={310}
       placement="bottomLeft"
-      disabled={isPoolSwitching || isLoadingState}
       isOpen={isNetworkDropdownOpen}
       open={openNetworkDropdown}
       close={closeNetworkDropdown}
       content={() => (
-        <Content
-          switchToPool={switchToPool}
-          currentPool={currentPool}
-          close={closeNetworkDropdown}
-        />
+        <Content closeDropdown={closeNetworkDropdown} />
       )}
     >
       {children}
@@ -151,20 +110,6 @@ const NetworkIcon = styled.img`
   width: 24px;
   height: 24px;
   margin-right: 10px;
-`;
-
-const TokenIcon = styled(NetworkIcon)`
-  margin-right: 4px;
-`;
-
-const TokensContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-top: -10px;
-  &:last-child > :last-child {
-    margin-bottom: 0;
-  }
 `;
 
 const OptionButton = styled(OptionButtonDefault)`

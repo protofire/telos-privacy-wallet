@@ -1,52 +1,67 @@
 import { useState, useCallback, useContext } from 'react';
 import styled from 'styled-components';
-import QRCode from 'react-qr-code';
-import { useTranslation, Trans } from 'react-i18next';
+// import QRCode from 'react-qr-code';
+import { useTranslation } from 'react-i18next';
 
 import Dropdown from 'components/Dropdown';
-import Tooltip from 'components/Tooltip';
 import OptionButton from 'components/OptionButton';
 import Button from 'components/Button';
 import PrivateAddress from 'components/AdressWithCopy';
 // import QRCodeReader from 'components/QRCodeReader';
-import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
-import { formatNumber } from 'utils';
-
-import { TOKENS_ICONS } from 'constants';
-
-import { ZkAccountContext, ModalContext, PoolContext, BalanceVisibilityContext, WalletContext } from 'contexts';
+import { ZkAccountContext, ModalContext, WalletContext, PoolContext } from 'contexts';
 
 const Content = ({
-  balance, generateAddress, getSeed, setPassword,
+  zkClients, getSeed, setPassword,
   removePassword, logout, close, showSeedPhrase,
-  isLoadingState, initializeGiftCard, currentPool,
-  generatePaymentLink,
+  isLoadingState, zkAccount,
 }) => {
   const { t } = useTranslation();
-  const [privateAddress, setPrivateAddress] = useState(null);
-  const [showQRCode, setShowQRCode] = useState(false);
+  const [shieldedAddresses, setShieldedAddresses] = useState({});
+  // const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const { isVisible } = useContext(BalanceVisibilityContext);
   const { disconnect } = useContext(WalletContext);
+  const { allPools } = useContext(PoolContext);
 
-  const { hasPassword } = getSeed();
+  // const { hasPassword } = getSeed();
 
   const generatePrivateAddress = useCallback(async () => {
-    setPrivateAddress(await generateAddress());
-  }, [generateAddress]);
+    if (!zkAccount || !zkClients) return;
 
-  const generateQRCode = useCallback(async () => {
-    await generatePrivateAddress();
-    setShowQRCode(true);
-  }, [generatePrivateAddress]);
+    const addressPromises = allPools.map(async (pool) => {
+      const poolAlias = pool.alias;
+      const client = zkClients[poolAlias];
+      if (!client) return { poolAlias, address: null };
 
-  const closeQRCode = useCallback(() => {
-    setPrivateAddress(null);
-    setShowQRCode(false);
-  }, []);
+      try {
+        const address = await client.generateAddress();
+        return { poolAlias, address };
+      } catch (error) {
+        console.error(`Error generating address for pool ${poolAlias}:`, error);
+        return { poolAlias, address: null };
+      }
+    });
+
+    const results = await Promise.all(addressPromises);
+    const addressesMap = {};
+    results.forEach(({ poolAlias, address }) => {
+      if (address) addressesMap[poolAlias] = address;
+    });
+
+    setShieldedAddresses(addressesMap);
+  }, [zkAccount, zkClients, allPools]);
+
+  // const generateQRCode = useCallback(async () => {
+  //   await generatePrivateAddress();
+  //   setShowQRCode(true);
+  // }, [generatePrivateAddress]);
+
+  // const closeQRCode = useCallback(() => {
+  //   setPrivateAddress(null);
+  //   setShowQRCode(false);
+  // }, []);
 
   // const initGiftCard = useCallback(async result => {
   //   try {
@@ -71,28 +86,28 @@ const Content = ({
       action: showSeedPhrase,
       gaIdPostfix: 'secret-phrase',
     },
-    {
-      text: hasPassword ? t('buttonText.disablePassword') : t('buttonText.setPassword'),
-      action: hasPassword ? removePassword : setPassword,
-      gaIdPostfix: `${hasPassword ? 'disable' : 'enable'}-password`,
-    },
+    // {
+    //   text: hasPassword ? t('buttonText.disablePassword') : t('buttonText.setPassword'),
+    //   action: hasPassword ? removePassword : setPassword,
+    //   gaIdPostfix: `${hasPassword ? 'disable' : 'enable'}-password`,
+    // },
   ];
 
-  if (showQRCode) {
-    return (
-      <Container>
-        <BackIcon onClick={closeQRCode} />
-        <Title>{t('qrCode.title')}</Title>
-        <Description>
-          <Trans i18nKey="qrCode.description" />
-        </Description>
-        <QRCode
-          value={privateAddress}
-          style={{ alignSelf: 'center' }}
-        />
-      </Container>
-    );
-  }
+  // if (showQRCode) {
+  //   return (
+  //     <Container>
+  //       <BackIcon onClick={closeQRCode} />
+  //       <Title>{t('qrCode.title')}</Title>
+  //       <Description>
+  //         <Trans i18nKey="qrCode.description" />
+  //       </Description>
+  //       <QRCode
+  //         value={privateAddress}
+  //         style={{ alignSelf: 'center' }}
+  //       />
+  //     </Container>
+  //   );
+  // }
 
   if (showSettings) {
     return (
@@ -112,40 +127,48 @@ const Content = ({
     )
   }
 
+  const hasAddresses = Object.keys(shieldedAddresses).length > 0;
+
   return (
     <Container>
-      <RowSpaceBetween>
-        <SmallText>{t('common.zkAccount')}</SmallText>
-        <Row>
-          <TokenIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
-          {isVisible ? (
-            <Tooltip
-              content={formatNumber(balance, currentPool.tokenDecimals, 18)}
-              placement="bottom"
-              trigger={['hover']}
-            >
-              <Balance>
-                <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
-              </Balance>
-            </Tooltip>
-          ) : (
-            <Balance>
-              <BalanceDisplay value={formatNumber(balance, currentPool.tokenDecimals, 6)} />
-            </Balance>
-          )}
-          <Balance style={{ marginLeft: 5 }}>{currentPool.tokenSymbol}</Balance>
-        </Row>
-      </RowSpaceBetween>
-      <Button
+      <Title style={{ marginBottom: 20 }}>{t('common.zkAccount')}</Title>
+      {/* <Button
         style={{ marginBottom: 10 }}
         onClick={generateQRCode}
         disabled={isLoadingState}
         data-ga-id="zkaccount-generate-qr-code"
       >
         {t('buttonText.generateQRCode')}
-      </Button>
-      {privateAddress ? (
-        <PrivateAddress>{privateAddress}</PrivateAddress>
+      </Button> */}
+      {hasAddresses ? (
+        <AddressesContainer>
+          {allPools.map(pool => {
+            const poolAlias = pool.alias;
+            const address = shieldedAddresses[poolAlias];
+            const tokenSymbol = pool.tokenSymbol;
+
+            return (
+              <AddressRow key={poolAlias}>
+                <TokenLabel>{tokenSymbol}:</TokenLabel>
+                {address ? (
+                  <PrivateAddress
+                    $noBorder
+                    $fontSize="13px"
+                    $height="auto"
+                    $borderRadius="0"
+                    $maxWidth="210px"
+                    $padding="0"
+                    $background="transparent"
+                  >
+                    {address}
+                  </PrivateAddress>
+                ) : (
+                  <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
+                )}
+              </AddressRow>
+            );
+          })}
+        </AddressesContainer>
       ) : (
         <Button
           onClick={generatePrivateAddress}
@@ -180,15 +203,14 @@ const Content = ({
 
 export default ({ children }) => {
   const {
-    balance: poolBalance, generateAddress, isDemo,
-    isLoadingState, initializeGiftCard, getSeed,
+    zkAccount, zkClients,
+    isLoadingState, getSeed,
   } = useContext(ZkAccountContext);
   const {
     openSeedPhraseModal, openAccountSetUpModal, openChangePasswordModal,
-    openConfirmLogoutModal, openDisablePasswordModal, openPaymentLinkModal,
+    openConfirmLogoutModal, openDisablePasswordModal,
     isZkAccountDropdownOpen, openZkAccountDropdown, closeZkAccountDropdown,
   } = useContext(ModalContext);
-  const { currentPool } = useContext(PoolContext);
 
   return (
     <Dropdown
@@ -198,20 +220,16 @@ export default ({ children }) => {
       close={closeZkAccountDropdown}
       content={() => (
         <Content
-          balance={poolBalance}
-          generateAddress={generateAddress}
+          zkAccount={zkAccount}
+          zkClients={zkClients}
           switchAccount={openAccountSetUpModal}
           setPassword={openChangePasswordModal}
           removePassword={openDisablePasswordModal}
           logout={openConfirmLogoutModal}
           showSeedPhrase={openSeedPhraseModal}
-          isDemo={isDemo}
           isLoadingState={isLoadingState}
-          initializeGiftCard={initializeGiftCard}
           getSeed={getSeed}
-          currentPool={currentPool}
           close={closeZkAccountDropdown}
-          generatePaymentLink={openPaymentLinkModal}
         />
       )}
     >
@@ -226,32 +244,6 @@ const Container = styled.div`
   & > :last-child {
     margin-bottom: 0;
   }
-`;
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const SmallText = styled.span`
-  font-size: 14px;
-  color: ${({ theme }) => theme.text.color.secondary};
-`;
-
-const Balance = styled.span`
-  font-size: 16px;
-  color: ${({ theme }) => theme.text.color.primary};
-`;
-
-const RowSpaceBetween = styled(Row)`
-  justify-content: space-between;
-  margin-bottom: 20px;
-`;
-
-const TokenIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
 `;
 
 const Description = styled.span`
@@ -278,4 +270,32 @@ const Title = styled.span`
   font-size: 20px;
   color: ${({ theme }) => theme.text.color.primary};
   font-weight: ${({ theme }) => theme.text.weight.bold};
+`;
+
+const AddressesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+`;
+
+const AddressRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+const TokenLabel = styled.span`
+  font-size: 13px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.secondary};
+  text-transform: uppercase;
+  min-width: 50px;
+`;
+
+const ShieldedAddress = styled.span`
+  font-size: 13px;
+  color: ${props => props.theme.color.black};
+  line-height: 16px;
 `;
