@@ -14,7 +14,6 @@ import {
   ZkAccountContext, TokenBalanceContext, ModalContext,
   IncreasedLimitsContext, PoolContext, WalletContext,
 } from 'contexts';
-import config from 'config';
 
 import TransferInput from 'components/TransferInput';
 import Card from 'components/Card';
@@ -51,7 +50,7 @@ export default () => {
     isLoadingLimits, limits, minTxAmount,
     switchToPool,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, availablePools } = useContext(PoolContext);
   const { balance, nativeBalance, isLoadingBalance } = useContext(TokenBalanceContext);
   const { openWalletModal, openIncreasedLimitsModal } = useContext(ModalContext);
   const { status: increasedLimitsStatus } = useContext(IncreasedLimitsContext);
@@ -59,13 +58,14 @@ export default () => {
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const latestAction = useLatestAction(HistoryTransactionType.Deposit);
   const { fee, relayerFee, isLoadingFee, directDepositFee } = useFee(amount, TxType.BridgeDeposit);
+  // Deposit is on-chain, so only show pools in active chain
   const poolOptions = useMemo(
-    () => Object.entries(config.pools).map(([alias, pool]) => ({
-      alias,
+    () => availablePools.map(pool => ({
+      alias: pool.alias,
       tokenSymbol: pool.tokenSymbol,
       label: pool.tokenSymbol,
     })),
-    [],
+    [availablePools],
   );
 
   const handlePoolSelect = useCallback(alias => {

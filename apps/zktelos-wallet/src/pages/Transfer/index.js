@@ -17,7 +17,6 @@ import MultiTransfer from './MultiTransfer';
 import PoolSelector from 'components/PoolSelector';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
-import config from 'config';
 
 import { useLatestAction } from 'hooks';
 
@@ -29,14 +28,15 @@ export default () => {
   const [isMulti, setIsMulti] = useState(false);
   const multitransferRef = useRef(null);
   const fileInputRef = useRef(null);
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, availablePools } = useContext(PoolContext);
+  // Filter to active chain pools for consistency with the rest of the UI
   const poolOptions = useMemo(
-    () => Object.entries(config.pools).map(([alias, pool]) => ({
-      alias,
+    () => availablePools.map(pool => ({
+      alias: pool.alias,
       tokenSymbol: pool.tokenSymbol,
       label: pool.tokenSymbol,
     })),
-    [],
+    [availablePools],
   );
 
   const handlePoolSelect = useCallback(alias => {

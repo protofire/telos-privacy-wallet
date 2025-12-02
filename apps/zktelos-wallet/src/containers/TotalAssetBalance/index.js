@@ -3,19 +3,20 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { TokenBalanceContext, ZkAccountContext, WalletContext } from 'contexts';
+import { TokenBalanceContext, ZkAccountContext, WalletContext, PoolContext } from 'contexts';
 
 import Skeleton from 'components/Skeleton';
 import BalanceDisplay from 'components/BalanceDisplay';
 import Tooltip from 'components/Tooltip';
 
 import { useTokenMapPrices } from 'hooks';
-import config from 'config';
+import { NETWORKS } from 'constants';
 
 export default () => {
   const { address: account } = useContext(WalletContext)
   const { balances, nativeBalance } = useContext(TokenBalanceContext);
   const { balances: zkAccountBalances, isLoadingState, zkAccount } = useContext(ZkAccountContext);
+  const { availablePools } = useContext(PoolContext);
   const { priceMap } = useTokenMapPrices();
   const { t } = useTranslation();
 
@@ -32,29 +33,33 @@ export default () => {
 
     let totalUsd = 0;
 
-    // Iterate over all pools and sum their USD values
-    Object.keys(config.pools).forEach(poolAlias => {
-      const pool = config.pools[poolAlias];
-      const publicBalance = (balances && balances[poolAlias]) || ethers.constants.Zero;
-      const privateBalance = (zkAccountBalances && zkAccountBalances[poolAlias]) || ethers.constants.Zero;
-
+    // Both public and shielded balances: only pools in active chain
+    // This keeps the total consistent with what's shown in Public/Private Account tables
+    availablePools.forEach(pool => {
+      const poolAlias = pool.alias;
       const tokenPrice = priceMap.get(pool.tokenSymbol) || 0;
 
+      // Public balance
+      const publicBalance = (balances && balances[poolAlias]) || ethers.constants.Zero;
       const publicInToken = parseFloat(ethers.utils.formatUnits(publicBalance, pool.tokenDecimals));
-      const privateInToken = parseFloat(ethers.utils.formatUnits(privateBalance, pool.tokenDecimals));
-      const totalInToken = publicInToken + privateInToken;
-      const usdValue = totalInToken * tokenPrice;
+      totalUsd += publicInToken * tokenPrice;
 
-      totalUsd += usdValue;
+      // Shielded balance
+      const privateBalance = (zkAccountBalances && zkAccountBalances[poolAlias]) || ethers.constants.Zero;
+      const privateInToken = parseFloat(ethers.utils.formatUnits(privateBalance, pool.tokenDecimals));
+      totalUsd += privateInToken * tokenPrice;
     });
 
-    // Add native TLOS balance (only once, not per pool)
+    // Add native balance only if there are native pools in active chain
     if (nativeBalance && !nativeBalance.isZero()) {
-      const tlosPrice = priceMap.get('TLOS') || 0;
-      const nativeInToken = parseFloat(ethers.utils.formatUnits(nativeBalance, 18));
-      const nativeUsdValue = nativeInToken * tlosPrice;
-
-      totalUsd += nativeUsdValue;
+      const hasNativePool = availablePools.some(p => p.isNative);
+      if (hasNativePool) {
+        const nativeSymbol = NETWORKS[availablePools[0]?.chainId]?.nativeSymbol || 'ETH';
+        const nativePrice = priceMap.get(nativeSymbol) || 0;
+        const nativeInToken = parseFloat(ethers.utils.formatUnits(nativeBalance, 18));
+        const nativeUsdValue = nativeInToken * nativePrice;
+        totalUsd += nativeUsdValue;
+      }
     }
 
     return totalUsd.toLocaleString('en-US', {
@@ -63,7 +68,7 @@ export default () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-  }, [balances, zkAccountBalances, nativeBalance, priceMap]);
+  }, [balances, zkAccountBalances, nativeBalance, priceMap, availablePools]);
 
   if (!account && !zkAccount) return null;
 

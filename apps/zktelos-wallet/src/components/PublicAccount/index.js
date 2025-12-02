@@ -11,24 +11,23 @@ import OptionButtonDefault from 'components/OptionButton';
 import PortfolioTable from 'components/PortfolioTable';
 import { sortRowsByAsset } from 'components/PortfolioTable/formatters';
 
-import { CONNECTORS_ICONS } from 'constants';
-import { TOKENS_ICONS } from 'constants';
+import { CONNECTORS_ICONS, TOKENS_ICONS, NETWORKS } from 'constants';
 import { TokenBalanceContext, PoolContext, WalletContext, ModalContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { shortAddress } from 'utils';
-import config from 'config';
 
 export default () => {
   const { t } = useTranslation();
   const { address: account, connector, disconnect } = useContext(WalletContext);
   const { nativeBalance, balances, isLoadingBalance } = useContext(TokenBalanceContext);
-  const { setCurrentPool } = useContext(PoolContext);
+  const { setCurrentPool, availablePools, activeChainId } = useContext(PoolContext);
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
   const { openWalletModal, openWrapModal } = useContext(ModalContext);
   const history = useHistory();
   const location = useLocation();
 
-  const tlosPrice = priceMap?.get('TLOS') || null;
+  const nativeSymbol = NETWORKS[activeChainId]?.nativeSymbol || 'ETH';
+  const nativePrice = priceMap?.get(nativeSymbol) || null;
   const isLoading = isLoadingBalance || isLoadingPrices;
   const wrapDisabled = !nativeBalance || nativeBalance.isZero();
 
@@ -56,19 +55,21 @@ export default () => {
   const tableRows = useMemo(() => {
     const rows = [];
 
-    if (nativeBalance && !nativeBalance.isZero()) {
+    // Show native balance only if there's a native pool in the active chain
+    const hasNativePool = availablePools.some(p => p.isNative);
+    if (hasNativePool && nativeBalance && !nativeBalance.isZero()) {
       rows.push({
-        key: 'TLOS-native',
-        asset: 'TLOS',
-        icon: TOKENS_ICONS['TLOS'],
+        key: `${nativeSymbol}-native`,
+        asset: nativeSymbol,
+        icon: TOKENS_ICONS[nativeSymbol],
         balance: nativeBalance,
-        price: tlosPrice,
+        price: nativePrice,
         tokenDecimals: 18,
         actions: [
           {
             id: 'deposit',
             label: t('deposit.title') + ' ' + t('deposit.suffix'),
-            onClick: () => goToDeposit('TLOS'),
+            onClick: () => goToDeposit(nativeSymbol),
           },
           {
             id: 'wrap',
@@ -81,8 +82,8 @@ export default () => {
     }
 
     if (balances) {
-      const poolRows = Object.keys(config.pools).map(poolAlias => {
-        const pool = config.pools[poolAlias];
+      const poolRows = availablePools.map(pool => {
+        const poolAlias = pool.alias;
         const balance = balances[poolAlias] || ethers.constants.Zero;
         const tokenPrice = priceMap?.get(pool.tokenSymbol) || null;
         const isNative = pool.isNative;
@@ -122,7 +123,7 @@ export default () => {
     }
 
     return sortRowsByAsset(rows);
-  }, [balances, priceMap, nativeBalance, tlosPrice, t, setCurrentPool, goToDeposit, openWrapModal, wrapDisabled]);
+  }, [balances, priceMap, nativeBalance, nativePrice, nativeSymbol, t, setCurrentPool, goToDeposit, openWrapModal, wrapDisabled, availablePools]);
 
   if (!account) {
     return <ConnectWalletWrapper>

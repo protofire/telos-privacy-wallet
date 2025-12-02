@@ -9,7 +9,6 @@ import AccountSetUpButton from 'containers/AccountSetUpButton';
 import PendingAction from 'containers/PendingAction';
 
 import { ZkAccountContext, PoolContext, WalletContext } from 'contexts';
-import config from 'config';
 
 import TransferInput from 'components/TransferInput';
 import Card from 'components/Card';
@@ -38,7 +37,7 @@ export default () => {
     isPending, isDemo, limits, isLoadingLimits, minTxAmount,
     switchToPool,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, availablePools } = useContext(PoolContext);
   const { isAddress, address, connector } = useContext(WalletContext);
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
@@ -50,13 +49,14 @@ export default () => {
   const maxWithdrawable = useMaxTransferable(TxType.Withdraw, relayerFee, amountToConvert);
   const maxAmountExceeded = useMaxAmountExceeded(amount, maxWithdrawable, limits.dailyWithdrawalLimit?.available);
   const convertionDetails = useConvertion(currentPool);
+  // Filter to active chain pools for consistency with the rest of the UI
   const poolOptions = useMemo(
-    () => Object.entries(config.pools).map(([alias, pool]) => ({
-      alias,
+    () => availablePools.map(pool => ({
+      alias: pool.alias,
       tokenSymbol: pool.tokenSymbol,
       label: pool.tokenSymbol,
     })),
-    [],
+    [availablePools],
   );
 
   const handlePoolSelect = useCallback(alias => {

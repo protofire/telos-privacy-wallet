@@ -14,7 +14,7 @@ export default TokenBalanceContext;
 
 export const TokenBalanceContextProvider = ({ children }) => {
   const { address: account, getBalance, callContract } = useContext(WalletContext);
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, availablePools } = useContext(PoolContext);
   const [balances, setBalances] = useState({});
   const [nativeBalances, setNativeBalances] = useState({});
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
@@ -24,6 +24,7 @@ export const TokenBalanceContextProvider = ({ children }) => {
   const nativeBalance = useMemo(() => account ? nativeBalances[currentPool.alias] : ethers.constants.Zero, [nativeBalances, currentPool.alias, account]);
 
   const updateBalance = useCallback(async (poolAlias) => {
+    if (!account) return;
     if (!poolAlias) {
       console.error('updateBalance called without poolAlias');
       return;
@@ -40,35 +41,34 @@ export const TokenBalanceContextProvider = ({ children }) => {
       return;
     }
 
-    if (account) {
-      try {
-        [balance, nativeBalance] = await Promise.all([
-          callContract(pool.tokenAddress, tokenAbi, 'balanceOf', [account]),
-          getBalance(),
-        ]);
-      } catch (error) {
-        console.error(error);
-        Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateBalance', pool: poolAlias } });
-        showLoadingError('walletBalance');
-      }
+
+    try {
+      [balance, nativeBalance] = await Promise.all([
+        callContract(pool.tokenAddress, tokenAbi, 'balanceOf', [account]),
+        getBalance(),
+      ]);
+    } catch (error) {
+      console.error(error);
+      Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateBalance', pool: poolAlias } });
+      showLoadingError('walletBalance');
     }
+
     setBalances(prev => ({ ...prev, [poolAlias]: balance }));
     setNativeBalances(prev => ({ ...prev, [poolAlias]: nativeBalance }));
     setIsLoadingBalance(false);
   }, [account, getBalance, callContract]);
 
-  // Update all pools balances when account changes
+  // Update balances only for pools in active chain
   useEffect(() => {
     if (!account) return;
 
-    const poolAliases = Object.keys(config.pools);
+    const poolAliases = availablePools.map(p => p.alias);
 
-    // Update all pools in parallel
     Promise.all(poolAliases.map(poolAlias => updateBalance(poolAlias)))
       .catch(error => {
-        console.error('Error updating all pool balances:', error);
+        console.error('Error updating pool balances:', error);
       });
-  }, [account, updateBalance]);
+  }, [account, updateBalance, availablePools]);
 
   // Wrapper for backward compatibility: if no poolAlias provided, update current pool
   const updateBalanceWrapper = useCallback(async (poolAlias) => {

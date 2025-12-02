@@ -23,6 +23,7 @@ export const NETWORKS = {
   40: {
     name: 'Telos',
     icon: require('assets/telos.svg').default,
+    nativeSymbol: 'TLOS',
     blockExplorerUrls: {
       address: 'https://teloscan.io/address/%s',
       tx: 'https://teloscan.io/tx/%s',
@@ -31,6 +32,7 @@ export const NETWORKS = {
   41: {
     name: 'Telos Testnet',
     icon: require('assets/telos.svg').default,
+    nativeSymbol: 'TLOS',
     blockExplorerUrls: {
       address: 'https://testnet.teloscan.io/address/%s',
       tx: 'https://testnet.teloscan.io/tx/%s',

@@ -8,7 +8,15 @@ export const calculateValue = (balance, price, tokenDecimals) => {
 };
 
 export const formatBalance = (balance, tokenDecimals) => {
-  return balance ? formatNumber(balance, tokenDecimals, 2) : '0';
+  if (!balance) return '0';
+  const formatted = formatNumber(balance, tokenDecimals, 2);
+  const numericValue = parseFloat(formatted);
+  if (numericValue > 0 && numericValue < 0.01) return '< 0.01';
+  return formatted;
+};
+
+export const formatFullBalance = (balance, tokenDecimals) => {
+  return balance ? formatNumber(balance, tokenDecimals, 6) : '0';
 };
 
 export const formatPrice = (price) => {

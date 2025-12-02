@@ -10,9 +10,8 @@ import { actions, getSign } from 'components/HistoryItem';
 import Button from 'components/Button';
 import AccountSetUpButton from 'containers/AccountSetUpButton';
 
-import { ZkAccountContext } from 'contexts';
+import { ZkAccountContext, PoolContext } from 'contexts';
 import { useWindowDimensions } from 'hooks';
-import config from 'config';
 
 export default () => {
   const { t } = useTranslation();
@@ -20,6 +19,7 @@ export default () => {
     histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
   } = useContext(ZkAccountContext);
+  const { availablePools } = useContext(PoolContext);
   const { width } = useWindowDimensions();
   const isMobile = width <= 500;
 
@@ -29,14 +29,13 @@ export default () => {
   const isLoading = isLoadingZkAccount || isLoadingHistory;
   const title = t('history.title');
 
-  // Combine histories from all pools
   const items = useMemo(() => {
     if (!histories) return [];
 
-    const poolAliases = Object.keys(config.pools);
     const combined = [];
 
-    poolAliases.forEach(poolAlias => {
+    availablePools.forEach(pool => {
+      const poolAlias = pool.alias;
       const poolHistory = histories[poolAlias] || [];
       const pendingDeposits = (pendingDirectDepositsByPool && pendingDirectDepositsByPool[poolAlias]) || [];
 
@@ -44,7 +43,7 @@ export default () => {
       const poolTransactions = pendingDeposits.concat(poolHistory).map(tx => ({
         ...tx,
         poolAlias,
-        pool: config.pools[poolAlias],
+        pool,
       }));
 
       combined.push(...poolTransactions);
@@ -52,7 +51,7 @@ export default () => {
 
     // Sort by timestamp (most recent first)
     return combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-  }, [histories, pendingDirectDepositsByPool]);
+  }, [histories, pendingDirectDepositsByPool, availablePools]);
 
   const isHistoryEmpty = items.length === 0;
 

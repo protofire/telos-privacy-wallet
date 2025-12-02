@@ -9,7 +9,6 @@ import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
 import { ZkAccountContext, PoolContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
-import config from 'config';
 
 import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import AddressWithCopy from 'components/AdressWithCopy';
@@ -21,7 +20,7 @@ export default () => {
   const { priceMap, isLoading: isLoadingPrices } = useTokenMapPrices();
   const history = useHistory();
   const location = useLocation();
-  const { setCurrentPool } = useContext(PoolContext);
+  const { setCurrentPool, availablePools } = useContext(PoolContext);
 
   const {
     zkAccount,
@@ -34,7 +33,7 @@ export default () => {
   const isLoading = isLoadingBalance || isLoadingPrices;
 
   const handleWithdraw = useCallback((poolAlias) => {
-    const pool = config.pools[poolAlias];
+    const pool = availablePools.find(p => p.alias === poolAlias);
     const tokenSymbol = pool?.tokenSymbol;
     const queryParams = new URLSearchParams(location.search);
     if (tokenSymbol) {
@@ -43,10 +42,10 @@ export default () => {
     setCurrentPool(poolAlias);
     const queryString = queryParams.toString();
     history.push(`/withdraw${queryString ? `?${queryString}` : ''}`);
-  }, [history, location, setCurrentPool]);
+  }, [history, location, setCurrentPool, availablePools]);
 
   const handleTransfer = useCallback((poolAlias) => {
-    const pool = config.pools[poolAlias];
+    const pool = availablePools.find(p => p.alias === poolAlias);
     const tokenSymbol = pool?.tokenSymbol;
     const queryParams = new URLSearchParams(location.search);
     if (tokenSymbol) {
@@ -55,13 +54,13 @@ export default () => {
     setCurrentPool(poolAlias);
     const queryString = queryParams.toString();
     history.push(`/transfer${queryString ? `?${queryString}` : ''}`);
-  }, [history, location, setCurrentPool]);
+  }, [history, location, setCurrentPool, availablePools]);
 
   const tableRows = useMemo(() => {
     if (!balances) return [];
 
-    const rows = Object.keys(config.pools).map(poolAlias => {
-      const pool = config.pools[poolAlias];
+    const rows = availablePools.map(pool => {
+      const poolAlias = pool.alias;
       const balance = balances[poolAlias] || ethers.constants.Zero;
       const tokenPrice = priceMap?.get(pool.tokenSymbol) || null;
       const tokenSymbol = pool.tokenSymbol;
@@ -89,18 +88,18 @@ export default () => {
     });
 
     return sortRowsByAsset(rows);
-  }, [balances, priceMap, t, handleWithdraw, handleTransfer]);
+  }, [balances, priceMap, t, handleWithdraw, handleTransfer, availablePools]);
 
   const hasAnyBalance = useMemo(() => {
     return tableRows.some(row => row.balance && row.balance.gt(0));
   }, [tableRows]);
 
-  // Generate addresses for all pools
+  // Generate addresses for pools in active chain
   const generateAndStoreAddresses = useCallback(async () => {
     if (!zkAccount || !zkClients) return;
 
-    const poolAliases = Object.keys(config.pools);
-    const addressPromises = poolAliases.map(async (poolAlias) => {
+    const addressPromises = availablePools.map(async (pool) => {
+      const poolAlias = pool.alias;
       const client = zkClients[poolAlias];
       if (!client) return { poolAlias, address: null };
 
@@ -120,7 +119,7 @@ export default () => {
     });
 
     setShieldedAddresses(addressesMap);
-  }, [zkAccount, zkClients]);
+  }, [zkAccount, zkClients, availablePools]);
 
   const getRefreshIcon = () => {
     if (isLoadingBalance) {
@@ -147,8 +146,8 @@ export default () => {
             </AccountName>
           </HeaderTitle>
           <AddressesContainer>
-            {Object.keys(config.pools).map(poolAlias => {
-              const pool = config.pools[poolAlias];
+            {availablePools.map(pool => {
+              const poolAlias = pool.alias;
               const address = shieldedAddresses[poolAlias];
               const tokenSymbol = pool.tokenSymbol;
 

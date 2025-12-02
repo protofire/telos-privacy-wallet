@@ -11,8 +11,7 @@ import Link from 'components/Link';
 import CreatePrivateAccountButton from 'components/CreatePrivateAccount';
 import Skeleton from 'components/Skeleton';
 
-import { ZkAccountContext, WalletContext, ModalContext } from 'contexts';
-import config from 'config';
+import { ZkAccountContext, WalletContext, ModalContext, PoolContext } from 'contexts';
 
 import shieldIcon from 'assets/shield.svg';
 import globeIcon from 'assets/globe.svg';
@@ -23,6 +22,7 @@ export default () => {
   const location = useLocation();
   const { address: account } = useContext(WalletContext);
   const { openCreateAccountModal } = useContext(ModalContext);
+  const { availablePools } = useContext(PoolContext);
   const {
     histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
@@ -30,14 +30,14 @@ export default () => {
 
   const isLoading = isLoadingZkAccount || isLoadingHistory;
 
-  // Combine histories from all pools
+  // Combine histories from all pools (off-chain operation)
   const allTransactions = useMemo(() => {
     if (!histories) return [];
 
-    const poolAliases = Object.keys(config.pools);
     const combined = [];
 
-    poolAliases.forEach(poolAlias => {
+    availablePools.forEach(pool => {
+      const poolAlias = pool.alias;
       const poolHistory = histories[poolAlias] || [];
       const pendingDeposits = (pendingDirectDepositsByPool && pendingDirectDepositsByPool[poolAlias]) || [];
 
@@ -45,7 +45,7 @@ export default () => {
       const poolTransactions = pendingDeposits.concat(poolHistory).map(tx => ({
         ...tx,
         poolAlias,
-        pool: config.pools[poolAlias],
+        pool,
       }));
 
       combined.push(...poolTransactions);
@@ -53,7 +53,7 @@ export default () => {
 
     // Sort by timestamp (most recent first)
     return combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-  }, [histories, pendingDirectDepositsByPool]);
+  }, [histories, pendingDirectDepositsByPool, availablePools]);
 
   const last3Actions = allTransactions.slice(0, 3);
   const isLatest5HistoryEmpty = last3Actions.length === 0;

@@ -1,6 +1,7 @@
 import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useSwitchNetwork } from 'wagmi';
 
 import Dropdown from 'components/Dropdown';
 import OptionButtonDefault from 'components/OptionButton';
@@ -11,16 +12,31 @@ import { NETWORKS } from 'constants';
 
 import config from 'config';
 
-import { ModalContext } from 'contexts';
+import { ModalContext, PoolContext } from 'contexts';
 
 const chainIds = Object.keys(config.chains).map(chainId => Number(chainId));
 
-const Content = () => {
+const Content = ({ closeDropdown }) => {
   const { t } = useTranslation();
-  const handleClick = useCallback(chainId => {
+  const { activeChainId } = useContext(PoolContext);
+  const { switchNetworkAsync } = useSwitchNetwork();
+
+  const handleClick = useCallback(async (chainId) => {
     const external = config.chains[chainId]?.external;
-    if (external) window.open(external);
-  }, []);
+    if (external) {
+      window.open(external);
+      return;
+    }
+
+    if (chainId === activeChainId) return;
+
+    try {
+      await switchNetworkAsync?.(chainId);
+      closeDropdown();
+    } catch (error) {
+      console.error('Failed to switch network:', error);
+    }
+  }, [activeChainId, switchNetworkAsync, closeDropdown]);
 
   return (
     <Container>
@@ -29,7 +45,7 @@ const Content = () => {
         <OptionButton
           key={chainId}
           onClick={() => handleClick(chainId)}
-          className="active"
+          className={chainId === activeChainId ? 'active' : ''}
         >
           <RowSpaceBetween>
             <Row>
@@ -58,7 +74,7 @@ export default ({ children }) => {
       open={openNetworkDropdown}
       close={closeNetworkDropdown}
       content={() => (
-        <Content />
+        <Content closeDropdown={closeNetworkDropdown} />
       )}
     >
       {children}

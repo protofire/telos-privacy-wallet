@@ -11,8 +11,7 @@ import PrivateAddress from 'components/AdressWithCopy';
 
 import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
-import { ZkAccountContext, ModalContext, WalletContext } from 'contexts';
-import config from 'config';
+import { ZkAccountContext, ModalContext, WalletContext, PoolContext } from 'contexts';
 
 const Content = ({
   zkClients, getSeed, setPassword,
@@ -24,14 +23,15 @@ const Content = ({
   // const [showQRCode, setShowQRCode] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { disconnect } = useContext(WalletContext);
+  const { allPools } = useContext(PoolContext);
 
   // const { hasPassword } = getSeed();
 
   const generatePrivateAddress = useCallback(async () => {
     if (!zkAccount || !zkClients) return;
 
-    const poolAliases = Object.keys(config.pools);
-    const addressPromises = poolAliases.map(async (poolAlias) => {
+    const addressPromises = allPools.map(async (pool) => {
+      const poolAlias = pool.alias;
       const client = zkClients[poolAlias];
       if (!client) return { poolAlias, address: null };
 
@@ -51,7 +51,7 @@ const Content = ({
     });
 
     setShieldedAddresses(addressesMap);
-  }, [zkAccount, zkClients]);
+  }, [zkAccount, zkClients, allPools]);
 
   // const generateQRCode = useCallback(async () => {
   //   await generatePrivateAddress();
@@ -142,8 +142,8 @@ const Content = ({
       </Button> */}
       {hasAddresses ? (
         <AddressesContainer>
-          {Object.keys(config.pools).map(poolAlias => {
-            const pool = config.pools[poolAlias];
+          {allPools.map(pool => {
+            const poolAlias = pool.alias;
             const address = shieldedAddresses[poolAlias];
             const tokenSymbol = pool.tokenSymbol;
 

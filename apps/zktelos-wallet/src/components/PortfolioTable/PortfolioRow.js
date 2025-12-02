@@ -9,7 +9,8 @@ import Tooltip from 'components/Tooltip';
 import Dropdown from 'components/Dropdown';
 import OptionButtonDefault from 'components/OptionButton';
 import { BalanceVisibilityContext } from 'contexts';
-import { calculateValue, formatBalance, formatPrice, formatValue, formatFullValue } from './formatters';
+import { calculateValue, formatPrice, formatValue, formatFullValue } from './formatters';
+import { formatNumber } from '../../utils';
 
 const PortfolioRow = ({
   asset,
@@ -25,10 +26,11 @@ const PortfolioRow = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const value = useMemo(() => calculateValue(balance, price, tokenDecimals), [balance, price, tokenDecimals]);
-  const formattedBalance = formatBalance(balance, tokenDecimals);
+  const formattedBalance = formatNumber(balance, tokenDecimals, 2);
   const formattedPrice = formatPrice(price);
   const formattedValue = useMemo(() => formatValue(value), [value]);
   const fullValue = formatFullValue(value);
+  const fullBalance = formatNumber(balance, tokenDecimals, 18);
 
   if (!balance || balance.isZero()) {
     return null;
@@ -47,7 +49,11 @@ const PortfolioRow = ({
         {isLoading ? (
           <Skeleton width={60} height={16} />
         ) : (
-          <BalanceDisplay value={formattedBalance} hiddenPlaceholder="••••••" />
+          <Tooltip content={fullBalance} placement="top" delay={0} trigger={['hover']}>
+            <span>
+              <BalanceDisplay value={formattedBalance} hiddenPlaceholder="••••••" />
+            </span>
+          </Tooltip>
         )}
       </BalanceCell>
       <ValueCell>
