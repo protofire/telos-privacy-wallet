@@ -91,8 +91,10 @@ export const ZkAccountContextProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    // Create all zkClients in parallel if not already created
-    const poolAliases = Object.keys(config.pools);
+    // Create all zkClients in parallel if not already created of the pools belonging to the default chain.
+    const defaultPool = config.pools[config.defaultPool];
+    const defaultChainId = defaultPool.chainId;
+    const poolAliases = Object.keys(config.pools).filter(alias => config.pools[alias].chainId === defaultChainId);
     const allClientsExist = poolAliases.every(alias => zkClients[alias]);
     if (allClientsExist || !supportId) return;
 
