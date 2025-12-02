@@ -156,7 +156,6 @@ export default () => {
                 onSelect={handlePoolSelect}
               />
             </SelectorInline>
-            {t('deposit.suffix')}
           </Title>
         </TitleRow>
         <Note>{t('deposit.note', { symbol: currentPool.tokenSymbol })}</Note>

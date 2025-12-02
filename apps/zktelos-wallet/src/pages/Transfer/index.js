@@ -57,7 +57,6 @@ export default () => {
                 onSelect={handlePoolSelect}
               />
             </SelectorInline>
-            {t('transfer.suffix')}
           </Title>
           <Row>
             <Text>{t('multitransfer.title')}</Text>

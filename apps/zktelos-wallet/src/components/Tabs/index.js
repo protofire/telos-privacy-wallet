@@ -36,7 +36,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
             data-tour={tab.dataTour}
           >
             <IconWrapper><TabIcon width={14} height={14} /></IconWrapper>
-            <MenuText>{t(tab.i18nKey)} {tab.suffix && t(tab.suffix)}</MenuText>
+            <MenuText>{t(tab.i18nKey)}</MenuText>
           </MenuItem>
         );
       })}

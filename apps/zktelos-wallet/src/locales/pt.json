@@ -79,7 +79,7 @@
     "getToken": "Obter {{symbol}}"
   },
   "home": {
-    "title": "Visão geral",
+    "title": "Início",
     "titleOffline": "Crie sua Conta Privada",
     "portfolio": "Meu portfólio",
     "latestTransactions": "Últimas transações",
@@ -92,16 +92,12 @@
     "value": "Valor"
   },
   "deposit": {
-    "title": "Tornar",
-    "suffix": "privado",
+    "title": "Depositar",
     "note": "{{symbol}} será depositado em sua conta zkAccount. Uma vez recebido, você pode transferir {{symbol}} de forma privada.",
     "ddNote": "O depósito de {{symbol}} pode levar até 10 minutos."
   },
   "transfer": {
-    "title": "Enviar privadamente",
-    "suffix": "",
-    "menuTitle": "Transferir de forma privada",
-    "betweenLabel": "Entre",
+    "title": "Transferir",
     "note": "A transferência será realizada de forma privada. Remetente, destinatário e valor nunca são revelados.",
     "addressInputPlaceholder": "Inserir endereço do destinatário zkTelos",
     "addressInputHint": "O endereço pode ser gerado na janela de modal da conta"
@@ -121,8 +117,7 @@
     "hasBeenTransferredTo": "foi transferido para {{count}} endereço zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
-    "title": "Tornar",
-    "suffix": "público",
+    "title": "Sacar",
     "fromLabel": "De",
     "note": "{{symbol}} será retirado do zkTelos e depositado no endereço da carteira fornecido.",
     "addressInputPlaceholder": "Inserir endereço {{network}} do destinatário",

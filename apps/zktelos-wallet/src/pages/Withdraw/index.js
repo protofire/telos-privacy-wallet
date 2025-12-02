@@ -128,7 +128,6 @@ export default () => {
                 onSelect={handlePoolSelect}
               />
             </SelectorInline>
-            {t('withdraw.suffix')}
           </Title>
         </TitleRow>
         <Note>{t('withdraw.note', { symbol: currentPool.tokenSymbol })}</Note>

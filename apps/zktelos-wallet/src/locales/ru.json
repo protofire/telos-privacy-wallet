@@ -79,7 +79,7 @@
     "getToken": "Получить {{symbol}}"
   },
   "home": {
-    "title": "Обзор",
+    "title": "Главная",
     "titleOffline": "Создайте свой Приватный Аккаунт",
     "portfolio": "Мой портфель",
     "latestTransactions": "Последние транзакции",
@@ -92,15 +92,12 @@
     "value": "Стоимость"
   },
   "deposit": {
-    "title": "Сделать",
-    "suffix": "приватным",
+    "title": "Депозит",
     "note": "{{symbol}} будет внесен на ваш zk-Аккаунт. После получения, вы сможете переводить {{symbol}} конфиденциально.",
     "ddNote": "Пополнение {{symbol}} может занять до 10 минут."
   },
   "transfer": {
-    "title": "Отправить конфиденциально",
-    "suffix": "",
-    "betweenLabel": "Между",
+    "title": "Перевод",
     "note": "Перевод будет выполнен конфиденциально. Отправитель, получатель и сумма никогда не будут раскрыты.",
     "addressInputPlaceholder": "Введите адрес получателя zkTelos",
     "addressInputHint": "Адрес можно сгенерировать в окне аккаунта"
@@ -120,8 +117,7 @@
     "hasBeenTransferredTo": "Было переведено на {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
-    "title": "Сделать",
-    "suffix": "публичным",
+    "title": "Вывод",
     "fromLabel": "Из",
     "note": "{{symbol}} будет выведен из zkTelos и зачислен на указанный адрес кошелька.",
     "addressInputPlaceholder": "Введите {{network}} адрес получателя",
