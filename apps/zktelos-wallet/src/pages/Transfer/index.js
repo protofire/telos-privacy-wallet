@@ -46,7 +46,7 @@ export default () => {
 
   return isPending ? <PendingAction /> : (
     <ContentContainer>
-      <Card style={{ width: '550px' }}>
+      <Card>
         <TitleRow>
           <Title>
             {t('transfer.title')}
@@ -178,6 +178,6 @@ const ContentContainer = styled.div`
   padding: 16px 12px;
 
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    margin: 15px 0;
   }
 `;

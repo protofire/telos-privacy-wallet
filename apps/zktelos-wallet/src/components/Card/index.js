@@ -1,25 +1,30 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useWindowDimensions } from 'hooks';
 
-export default ({ title, icon, note, children, style, titleStyle }) => (
-  <Card style={style}>
-    {(title || icon) && (
-      <Header>
-        {icon && <Icon src={icon} />}
-        {title && <Title style={titleStyle}>{title}</Title>}
-      </Header>
-    )}
-    {children}
-    {note && <Note>{note}</Note>}
-  </Card>
-);
+export default ({ title, icon, note, children, style, titleStyle }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width <= 800;
+  return (
+    <Card style={style} $isMobile={isMobile}>
+      {(title || icon) && (
+        <Header>
+          {icon && <Icon src={icon} />}
+          {title && <Title style={titleStyle}>{title}</Title>}
+        </Header>
+      )}
+      {children}
+      {note && <Note>{note}</Note>}
+    </Card>
+  );
+};
 
 const Card = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 24px;
   padding: 16px;
-  width: 480px;
+  width: ${props => props.$isMobile ? 'fill-available' : '480px'};
   max-width: 100%;
   box-sizing: border-box;
   & > * {

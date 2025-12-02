@@ -23,10 +23,10 @@ import LatestAction from 'components/LatestAction';
 import Limits from 'components/Limits';
 import DemoCard from 'components/DemoCard';
 import IncreasedLimitsBanner from 'components/IncreasedLimitsBanner';
-import DefaultLink from 'components/Link';
+// import DefaultLink from 'components/Link';
 import PoolSelector from 'components/PoolSelector';
 
-import { ReactComponent as WargingIcon } from 'assets/warning.svg';
+// import { ReactComponent as WargingIcon } from 'assets/warning.svg';
 
 import { useFee, useParsedAmount, useLatestAction, useApproval } from 'hooks';
 import { useDepositLimit, useMaxAmountExceeded } from './hooks';
@@ -294,20 +294,20 @@ const Note = styled.p`
 `;
 
 
-const MessageContainer = styled(Row)`
-  justify-content: center;
-  flex-wrap: wrap;
-  background: #FBEED0;
-  border-radius: 10px;
-  padding: 7px 10px;
-  font-size: 14px;
-  font-weight: ${props => props.theme.text.weight.bold};
-  color: ${props => props.theme.text.color.secondary};
-`;
+// const MessageContainer = styled(Row)`
+//   justify-content: center;
+//   flex-wrap: wrap;
+//   background: #FBEED0;
+//   border-radius: 10px;
+//   padding: 7px 10px;
+//   font-size: 14px;
+//   font-weight: ${props => props.theme.text.weight.bold};
+//   color: ${props => props.theme.text.color.secondary};
+// `;
 
-const Link = styled(DefaultLink)`
-  font-weight: ${props => props.theme.text.weight.bold};
-`;
+// const Link = styled(DefaultLink)`
+//   font-weight: ${props => props.theme.text.weight.bold};
+// `;
 
 const ContentContainer = styled.div`
   display: flex;
@@ -319,6 +319,6 @@ const ContentContainer = styled.div`
   padding: 16px 12px;
 
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    margin: 15px 0;
   }
 `;

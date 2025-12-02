@@ -158,7 +158,7 @@ const CardsContainer = styled.div`
   border: 2px solid ${props => props.theme.color.black};
 
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    margin: 15px 0;
   }
 `;
 
@@ -183,5 +183,8 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  @media only screen and (max-width: 560px) {
+    gap: 0;
+  }
 `;
 

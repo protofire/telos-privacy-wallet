@@ -56,8 +56,12 @@ const MenuAndPageContainer = styled.div`
   flex: 1;
   gap: 32px;
   position: relative;
+
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    gap: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
