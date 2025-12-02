@@ -68,14 +68,8 @@ export default () => {
         actions: [
           {
             id: 'deposit',
-            label: t('deposit.title') + ' ' + t('deposit.suffix'),
+            label: t('deposit.title'),
             onClick: () => goToDeposit(nativeSymbol),
-          },
-          {
-            id: 'wrap',
-            label: t('buttonText.wrap'),
-            onClick: () => openWrapModal('wrap'),
-            disabled: wrapDisabled,
           },
         ],
       });
@@ -100,7 +94,7 @@ export default () => {
           actions: [
             {
               id: 'deposit',
-              label: t('deposit.title') + ' ' + t('deposit.suffix'),
+              label: t('deposit.title'),
               onClick: () => {
                 setCurrentPool(poolAlias);
                 goToDeposit(tokenSymbol);

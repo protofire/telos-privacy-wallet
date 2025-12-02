@@ -75,12 +75,12 @@ export default () => {
         actions: [
           {
             id: 'withdraw',
-            label: t('withdraw.title') + ' ' + t('withdraw.suffix'),
+            label: t('withdraw.title'),
             onClick: () => handleWithdraw(poolAlias),
           },
           {
             id: 'transfer',
-            label: t('transfer.menuTitle'),
+            label: t('transfer.title'),
             onClick: () => handleTransfer(poolAlias),
           },
         ],
