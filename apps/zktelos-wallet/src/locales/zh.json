@@ -35,6 +35,7 @@
     "enterAmount": "输入金额",
     "enterAddress": "输入地址",
     "invalidAddress": "无效地址",
+    "invalidAddressWrongPool": "无效地址，此地址属于 {{pool}} 池",
     "loading": "正在载入……",
     "loadingZkAccount": "正在载入zk账户……",
     "loadingPercentage": "正在载入({{percentage}}%)",
@@ -110,6 +111,7 @@
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} })与$t(glossary.addresses, {\"count\": {{count}} })错误，或格式化 $t(glossary.issues, {\"count\": {{count}} })。",
       "duplicates": "地址重复。",
+      "wrongPool": "{{count}} $t(glossary.addresses, {\"count\": {{count}} })属于 {{pools}} 池。",
       "insufficientBalance": "余额不足：需要{{amount}} {{symbol}} ({{fee}} 作为手续费。"
     },
     "addressesList": "地址列表",

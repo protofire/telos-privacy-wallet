@@ -24,13 +24,13 @@ export default ({ poolOptions = [], onPoolSelect }) => {
   const { t } = useTranslation();
   const {
     zkAccount, balance, transfer, isLoadingState,
-    isPending, minTxAmount, verifyShieldedAddress, switchToPool
+    isPending, minTxAmount, verifyShieldedAddressWithPoolInfo, switchToPool
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const [receiver, setReceiver] = useState('');
-  const [isAddressValid, setIsAddressValid] = useState(false);
+  const [addressValidation, setAddressValidation] = useState({ isValid: false, poolInfo: null });
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const { fee, relayerFee, numberOfTxs, isLoadingFee } = useFee(amount, TxType.Transfer);
   const maxTransferable = useMaxTransferable(TxType.Transfer, relayerFee, amount);
@@ -58,12 +58,16 @@ export default ({ poolOptions = [], onPoolSelect }) => {
 
   useEffect(() => {
     async function checkAddress(address) {
-      setIsAddressValid(false);
-      const isValid = await verifyShieldedAddress(address);
-      setIsAddressValid(isValid);
+      if (!address) {
+        setAddressValidation({ isValid: false, poolInfo: null });
+        return;
+      }
+
+      const result = await verifyShieldedAddressWithPoolInfo(address);
+      setAddressValidation(result);
     }
     checkAddress(receiver);
-  }, [receiver, verifyShieldedAddress]);
+  }, [receiver, verifyShieldedAddressWithPoolInfo]);
 
   useEffect(() => {
     setDisplayAmount('');
@@ -85,8 +89,11 @@ export default ({ poolOptions = [], onPoolSelect }) => {
       button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>
     } else if (!receiver) {
       button = <Button disabled>{t('buttonText.enterAddress')}</Button>;
-    } else if (!isAddressValid) {
-      button = <Button disabled>{t('buttonText.invalidAddress')}</Button>;
+    } else if (!addressValidation.isValid) {
+      const errorMessage = addressValidation.poolInfo
+        ? t('buttonText.invalidAddressWrongPool', { pool: addressValidation.poolInfo.tokenSymbol })
+        : t('buttonText.invalidAddress');
+      button = <Button disabled>{errorMessage}</Button>;
     } else {
       button = (
         <Button onClick={() => setIsConfirmModalOpen(true)} data-ga-id="initiate-operation-transfer">

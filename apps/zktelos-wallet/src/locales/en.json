@@ -35,6 +35,7 @@
     "enterAmount": "Enter amount",
     "enterAddress": "Enter address",
     "invalidAddress": "Invalid address",
+    "invalidAddressWrongPool": "Invalid address, this belongs to {{pool}} pool",
     "loading": "Loading...",
     "loadingZkAccount": "Loading zkAccount...",
     "loadingPercentage": "Loading ({{percentage}}%)",
@@ -112,6 +113,7 @@
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} }) with incorrect $t(glossary.addresses, {\"count\": {{count}} }) or formatting $t(glossary.issues, {\"count\": {{count}} }).",
       "duplicates": "Duplicate addresses found.",
+      "wrongPool": "{{count}} $t(glossary.addresses, {\"count\": {{count}} }) belong to {{pools}} pool(s).",
       "insufficientBalance": "Insufficient balance: {{amount}} {{symbol}} ({{fee}} fee) is required."
     },
     "addressesList": "Addresses list",

@@ -497,6 +497,42 @@ export const ZkAccountContextProvider = ({ children }) => {
     return zkClient.verifyShieldedAddress(address);
   }, [zkClient, zkAccount]);
 
+  const verifyShieldedAddressWithPoolInfo = useCallback(async (address) => {
+    if (!zkAccount || !address) {
+      return { isValid: false, poolInfo: null };
+    }
+
+    try {
+      const isValid = await zkClient.verifyShieldedAddress(address);
+      if (isValid) {
+        return { isValid: true, poolInfo: null };
+      }
+    } catch (error) {
+      console.debug('Address verification failed for current pool:', error);
+    }
+
+    const poolAliases = Object.keys(config.pools);
+
+    for (const alias of poolAliases) {
+      if (alias === currentPool.alias) continue;
+
+      const client = zkClients[alias];
+      if (!client) continue;
+
+      try {
+        const isValidForPool = await client.verifyShieldedAddress(address);
+        if (isValidForPool) {
+          const pool = config.pools[alias];
+          return { isValid: false, poolInfo: { alias, tokenSymbol: pool.tokenSymbol || alias } };
+        }
+      } catch (err) {
+        console.debug(`Could not verify address for pool ${alias}:`, err);
+      }
+    }
+
+    return { isValid: false, poolInfo: null };
+  }, [zkAccount, zkClient, zkClients, currentPool.alias]);
+
   const estimateFee = useCallback(async (amounts, txType, amountToConvert = ethers.constants.Zero) => {
     if (!zkClient) return null;
     try {
@@ -753,7 +789,7 @@ export const ZkAccountContextProvider = ({ children }) => {
         removeZkAccountMnemonic, updatePoolData, minTxAmount, loadingPercentage,
         estimateFee, isLoadingLimits, limits, calcMaxTransferable,
         setPassword, verifyPassword, removePassword, pendingDirectDeposits,
-        verifyShieldedAddress, decryptMnemonic, relayerVersion, isDemo, updateLimits, lockAccount,
+        verifyShieldedAddress, verifyShieldedAddressWithPoolInfo, decryptMnemonic, relayerVersion, isDemo, updateLimits, lockAccount,
         switchToPool, giftCard, initializeGiftCard, deleteGiftCard, redeemGiftCard, isPendingIncoming,
       }}
     >
