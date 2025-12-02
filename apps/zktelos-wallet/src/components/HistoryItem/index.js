@@ -94,7 +94,7 @@ const Fee = ({ fee, highFee, isMobile, tokenSymbol, tokenDecimals }) => {
           })}
         </FeeText>
       )}
-      {highFee && (
+      {/* {highFee && (
         <Tooltip
           content={
             <span>
@@ -110,7 +110,7 @@ const Fee = ({ fee, highFee, isMobile, tokenSymbol, tokenDecimals }) => {
         >
           <InfoIcon />
         </Tooltip>
-      )}
+      )} */}
     </>
   );
 };

@@ -215,7 +215,7 @@ export default () => {
             return <Button onClick={onDeposit} data-ga-id="initiate-operation-deposit">{t('buttonText.deposit')}</Button>;
           }
         })()}
-        {isNativeTokenUsed && (
+        {/* {isNativeTokenUsed && (
           <MessageContainer>
             <WargingIcon />
             <span style={{ margin: '0 4px 0 8px' }}>
@@ -223,7 +223,7 @@ export default () => {
             </span>
             <Link href="https://docs.zkbob.com/zkbob-overview/zkbob-pools/eth-pool-on-optimism">{t('common.learnMore')}</Link>
           </MessageContainer>
-        )}
+        )} */}
       </Card>
       {(increasedLimitsStatus && !!currentPool.kycUrls) &&
         <IncreasedLimitsBanner
