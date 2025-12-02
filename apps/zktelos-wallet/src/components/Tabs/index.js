@@ -54,7 +54,13 @@ const MenuContainer = styled.div`
   border-radius: 8px;
   border: 2px solid ${props => props.theme.color.black};
   
+  @media only screen and (max-width: 768px) {
+    width: fill-available;
+    max-width: 240px;
+  }
+
   @media only screen and (max-width: 560px) {
+    width: 240px;
     flex-direction: row;
     align-items: center;
     justify-content: center;

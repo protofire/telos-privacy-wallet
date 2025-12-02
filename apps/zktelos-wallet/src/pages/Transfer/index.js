@@ -113,6 +113,7 @@ const Row = styled.div`
 const TitleRow = styled(Row)`
   flex-wrap: wrap;
   margin-bottom: 12px;
+  gap: 8px;
 `;
 
 const Title = styled.span`

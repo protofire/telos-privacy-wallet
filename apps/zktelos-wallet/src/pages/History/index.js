@@ -173,5 +173,10 @@ const ContentContainer = styled.div`
 
   @media only screen and (max-width: 560px) {
     margin: 15px 0;
+    min-width: 350px;
+  }
+
+  @media only screen and (max-width: 350px) {
+    min-width: 280px;
   }
 `;

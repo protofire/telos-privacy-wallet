@@ -45,15 +45,15 @@ const createSteps = (t) => [
     ]
   },
   {
-    id: 'home-overview',
-    title: t('onboardingTutorial.steps.homeOverview.title'),
-    text: `<div class="home-overview-content">
-      <p>${t('onboardingTutorial.steps.homeOverview.content.paragraph1')}</p>
-      <p>${t('onboardingTutorial.steps.homeOverview.content.paragraph2')}</p>
+    id: 'supported-tokens',
+    title: t('onboardingTutorial.steps.supportedTokens.title'),
+    text: `<div class="supported-tokens-content">
+      <p>${t('onboardingTutorial.steps.supportedTokens.content.paragraph1')}</p>
+      <p>${t('onboardingTutorial.steps.supportedTokens.content.paragraph2')}</p>
     </div>`,
     attachTo: {
-      element: '[data-tour="home-overview"]',
-      on: 'top'
+      element: '[data-tour="supported-tokens"]',
+      on: 'bottom'
     },
     buttons: [
       {
@@ -72,15 +72,15 @@ const createSteps = (t) => [
     ]
   },
   {
-    id: 'supported-tokens',
-    title: t('onboardingTutorial.steps.supportedTokens.title'),
-    text: `<div class="supported-tokens-content">
-      <p>${t('onboardingTutorial.steps.supportedTokens.content.paragraph1')}</p>
-      <p>${t('onboardingTutorial.steps.supportedTokens.content.paragraph2')}</p>
+    id: 'home-overview',
+    title: t('onboardingTutorial.steps.homeOverview.title'),
+    text: `<div class="home-overview-content">
+      <p>${t('onboardingTutorial.steps.homeOverview.content.paragraph1')}</p>
+      <p>${t('onboardingTutorial.steps.homeOverview.content.paragraph2')}</p>
     </div>`,
     attachTo: {
-      element: '[data-tour="supported-tokens"]',
-      on: 'bottom'
+      element: '[data-tour="home-overview"]',
+      on: 'top'
     },
     buttons: [
       {

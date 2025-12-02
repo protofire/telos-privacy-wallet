@@ -25,6 +25,7 @@ import { ReactComponent as DotsIcon } from 'assets/dots.svg';
 // import { formatNumber } from 'utils';
 import { NETWORKS } from 'constants';
 import { useWindowDimensions } from 'hooks';
+import { useHistory } from 'react-router-dom';
 
 import {
   ZkAccountContext, ModalContext,
@@ -50,6 +51,7 @@ export default ({ empty }) => {
   const { t } = useTranslation();
   const { address: account } = useContext(WalletContext);
   const { updateBalance, isLoadingBalance } = useContext(TokenBalanceContext);
+  const history = useHistory();
   const {
     zkAccount, isLoadingZkAccount,
     updatePoolData, isPoolSwitching, isLoadingState,
@@ -151,7 +153,7 @@ export default ({ empty }) => {
     <>
       <Row>
         <LogoSection>
-          <Logo />
+          <Logo onClick={() => history.push('/')} />
         </LogoSection>
         <AccountSection data-tour="create-zkaccount">
           {!isMobile && networkDropdown}
@@ -230,6 +232,7 @@ const Logo = styled(LogoDefault)`
     height: 35px;
     width: 135px;
     margin-left: 10px;
+    cursor: pointer;
 `;
 
 const AccountSection = styled(Row)`
