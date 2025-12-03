@@ -99,13 +99,9 @@ export default class Metamask extends BasePage implements MetamaskMethods {
     await this.page.locator(mainPageElements.accountMenu.button).click();
     await this.page.locator(mainPageElements.accountMenu.settingsButton).click();
     await this.page.locator(settingsPageElements.networksButton).click();
-
-    await this.page
-      .locator(networksPageElements.networksListItem, { hasText: params.networkName })
-      .click();
+    await this.page.locator(".networks-tab__add-network-header-button-wrapper").click();
 
     await this.page.waitForTimeout(2000);
-
     await this.page
       .locator(updateNetworkPageElements.networkNameUpdateInput)
       .fill(params.networkName);
@@ -122,9 +118,7 @@ export default class Metamask extends BasePage implements MetamaskMethods {
   async selectNetwork(network: CustomNetworksNames) {
     await this.focus();
     await this.page.locator(mainPageElements.networkSwitcher.button).click();
-    await this.page
-      .locator(mainPageElements.networkSwitcher.dropdownMenuItem, { hasText: network })
-      .click();
+    await this.page.locator(mainPageElements.networkSwitcher.dropdownMenuItem, { hasText: network }).click();
     await this.page.locator(mainPageElements.LOGO).click();
   }
 

@@ -29,12 +29,11 @@ export default class OperationsWithTokenPages extends BasePage{
 
     async Deposit(): Promise<void> {
       await this.focus();
-      await expect(this.locator('//button[text()="Enter an amount"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
-      await this.locator(OperationsWithTokenElementsLocators.input_amount_in_deposit_tab).type('1');
+      await expect(this.locator('//button[text()="Enter amount"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
+      await this.locator(OperationsWithTokenElementsLocators.input_amount_in_deposit_tab).type('0.5');
       const [popup] = await Promise.all([this.waitForPage(), this.locator(OperationsWithTokenElementsLocators.button_deposit).click()]);
-      await popup.locator('//button[text()="Sign"]').click();
-      await expect(this.locator('//span[text()="Deposit sent"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
-      await this.locator('//button[text()="Got it!"]').click();
+      await popup.locator('//button[text()="Confirm"]').click();
+      await this.locator('//button[text()="Got it"]').click();
       await expect(this.locator('//span[text()="Please wait for your transaction"]')).not.toBeVisible({timeout: TIMEOUTS.oneMinute});
     }
 
