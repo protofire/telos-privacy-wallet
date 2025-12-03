@@ -1,7 +1,7 @@
 import React, { useState, useContext, useCallback, useEffect } from 'react';
 import { TxType } from 'zkbob-client-js';
 import { ethers } from 'ethers';
-import { isMobile } from 'react-device-detect';
+// import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 
 import AccountSetUpButton from 'containers/AccountSetUpButton';
@@ -127,7 +127,6 @@ export default ({ poolOptions = [], onPoolSelect }) => {
         hint={t('transfer.addressInputHint')}
         value={receiver}
         onChange={setReceiver}
-        qrCode={isMobile}
       />
       {button}
       <ConfirmTransactionModal

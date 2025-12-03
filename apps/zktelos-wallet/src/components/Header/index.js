@@ -143,7 +143,7 @@ export default ({ empty }) => {
       disabled={isLoadingZkAccount}
       onClick={openAccessAccountModal}
       data-ga-id="zkaccount-header"
-      className="create-zkaccount"
+      data-tour="create-zkaccount"
     >
       {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.accessPrivateAccount')}
     </Button>
@@ -155,7 +155,7 @@ export default ({ empty }) => {
         <LogoSection>
           <Logo onClick={() => history.push('/')} />
         </LogoSection>
-        <AccountSection data-tour="create-zkaccount">
+        <AccountSection>
           {!isMobile && networkDropdown}
           {/* <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}

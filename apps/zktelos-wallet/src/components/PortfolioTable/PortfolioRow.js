@@ -51,7 +51,7 @@ const PortfolioRow = ({
         ) : (
           <Tooltip content={fullBalance} placement="top" delay={0} trigger={['hover']}>
             <span>
-              <BalanceDisplay value={formattedBalance} hiddenPlaceholder="••••••" />
+              <BalanceDisplay value={formattedBalance} />
             </span>
           </Tooltip>
         )}
@@ -63,12 +63,12 @@ const PortfolioRow = ({
           isVisible ? (
             <Tooltip content={fullValue} placement="top" delay={0} trigger={['hover']}>
               <span>
-                <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+                <BalanceDisplay value={formattedValue} />
               </span>
             </Tooltip>
           ) : (
             <span>
-              <BalanceDisplay value={formattedValue} hiddenPlaceholder="••••••" />
+              <BalanceDisplay value={formattedValue} />
             </span>
           )
         )}
@@ -121,6 +121,10 @@ const TableRow = styled.tr`
 const AssetCell = styled.td`
   padding: 8px 12px;
   vertical-align: middle;
+
+  @media only screen and (max-width: 560px) {
+    padding: 4px 0px;
+  }
 `;
 
 const TokenIcon = styled.img`

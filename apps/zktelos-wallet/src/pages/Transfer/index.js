@@ -47,8 +47,8 @@ export default () => {
   return isPending ? <PendingAction /> : (
     <ContentContainer>
       <Card>
-        <TitleRow>
-          <Title>
+        <CardTitle>
+          <TitleWithPoolSelector>
             {t('transfer.title')}
             <SelectorInline>
               <PoolSelector
@@ -57,8 +57,8 @@ export default () => {
                 onSelect={handlePoolSelect}
               />
             </SelectorInline>
-          </Title>
-          <Row>
+          </TitleWithPoolSelector>
+          <MultiTransferSwitch>
             <Text>{t('multitransfer.title')}</Text>
             <Switch
               checked={isMulti}
@@ -83,8 +83,8 @@ export default () => {
                 <InfoIcon />
               </Tooltip>
             </CsvButtonContainer>
-          </Row>
-        </TitleRow>
+          </MultiTransferSwitch>
+        </CardTitle>
         <Note>{t('transfer.note')}</Note>
         {isMulti ? <MultiTransfer ref={multitransferRef} /> : (
           <SingleTransfer
@@ -105,14 +105,30 @@ export default () => {
   );
 };
 
-const Row = styled.div`
+const CardTitle = styled.div`
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+
+  @media only screen and (max-width: 560px) {
+    align-items: flex-start;
+    padding-left: 8px;
+    flex-direction: column;
+  }
 `;
 
-const TitleRow = styled(Row)`
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+const TitleWithPoolSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const MultiTransferSwitch = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 8px;
 `;
 
@@ -153,7 +169,10 @@ const InfoIcon = styled(InfoIconDefault)`
   }
 `;
 
-const CsvButtonContainer = styled(Row)`
+const CsvButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-left: 12px;
   opacity: ${props => props.disabled ? 0.2 : 1};
   position: relative;

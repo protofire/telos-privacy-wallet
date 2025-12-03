@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { BalanceVisibilityContext } from 'contexts';
+import { HIDDEN_BALANCE_PLACEHOLDER } from 'constants';
 
 const BalanceDisplay = ({
   value,
-  hiddenPlaceholder = '••••••',
+  hiddenPlaceholder = HIDDEN_BALANCE_PLACEHOLDER,
   fontSize,
   fontWeight,
   color,
