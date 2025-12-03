@@ -162,7 +162,7 @@ export default ({ empty }) => {
           </BridgeButton> */}
           {/* {!isMobile && walletDropdown} */}
           {(account || zkAccount) && <IconWrapper onClick={toggleVisibility}>
-            {isVisible ? <StyledEyeIcon /> : <StyledEyeClosedIcon />}
+            {isVisible ? <StyledEyeIcon width={24} height={24} /> : <StyledEyeClosedIcon width={24} height={24} />}
           </IconWrapper>}
           {!isMobile && zkAccountDropdown}
           {(zkAccount && !isMobile) && (
