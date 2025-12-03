@@ -1,7 +1,7 @@
 import { test } from '../fixtures/testContextFixture';
 
-test('Import wallet', async ({app, metamask}) => {
+test('Create zkAccount from Metamask', async ({app, metamask}) => {
   await metamask.importWallet()
   await app.open('/')
-  await app.connectMetamask()
+  await app.createZkAccountFromMetamask()
 });

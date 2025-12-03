@@ -11,11 +11,10 @@ export default class App extends BasePage {
     super(page);
   }
 
-  async connectMetamask(): Promise<void> {
+  async createZkAccountFromMetamask(): Promise<void> {
     await this.focus();
 
     await this.locator('text=Connect wallet').click();
-    await this.locator(`text=Agree`).click();
 
     const [popup] = await Promise.all([this.waitForPage(), this.locator(`text=MetaMask`).click()]);
 
@@ -23,5 +22,8 @@ export default class App extends BasePage {
     await metamaskNotification.grantAccess();
 
     await this.locator(`text=0x`).isVisible()
+    // Private account section
+    await this.locator(`text=PUSD:`).isVisible()
+    await this.locator(`text=TLOS:`).isVisible()
   }
 }

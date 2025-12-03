@@ -3,6 +3,7 @@ const nextButton = `text=Next`;
 const connectButton = `//button[text()="Connect"]`;
 const approveChangeNetwork = `text=Approve`;
 const allowToSwitchNetwork = `text=Switch network`;
+const signButton = `${notificationPage} [data-testid="request-signature__sign"]`;
 const allowToSpendButton = `${notificationPage} [data-testid="page-container-footer-next"]`;
 const rejectToSpendButton = `${notificationPage} [data-testid="page-container-footer-cancel"]`;
 export const notificationPageElements = {
@@ -13,6 +14,7 @@ export const notificationPageElements = {
   connectButton,
   allowToSpendButton,
   rejectToSpendButton,
+  signButton,
 };
 
 const confirmSignatureRequestButton = `${notificationPage} .request-signature__footer__sign-button`;
