@@ -124,7 +124,6 @@ export default ({ item, zkAccount, isMobile }) => {
   const { t } = useTranslation();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  // Use pool from item metadata (added in Home/History pages)
   const itemPool = item.pool;
   const currentChainId = itemPool.chainId;
   const tokenSymbol = useHistoricalTokenSymbol(itemPool, item);

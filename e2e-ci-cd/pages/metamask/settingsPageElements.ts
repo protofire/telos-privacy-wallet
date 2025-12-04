@@ -1,6 +1,6 @@
 const SETTINGS_PAGE = '.settings-page';
-const advancedButton = `${SETTINGS_PAGE} button:nth-child(2)`;
-const networksButton = `${SETTINGS_PAGE} button:nth-child(6)`;
+const advancedButton = `${SETTINGS_PAGE} button:has-text("Advanced")`;
+const networksButton = `${SETTINGS_PAGE} button:has-text("Networks")`;
 const closeButton = `${SETTINGS_PAGE} .settings-page__close-button`;
 export const settingsPageElements = {
   SETTINGS_PAGE,

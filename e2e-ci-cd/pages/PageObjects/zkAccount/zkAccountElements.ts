@@ -19,11 +19,14 @@ export default class zkAccountPage extends BasePage{
     this.ZKACCOUNT_SEED_PHRASE = process.env.ZKACCOUNT_SEED_PHRASE as string;
   }
 
-    async button_zkAccount(): Promise<void> {
+    async button_ConnectWallet(): Promise<void> {
       await this.focus();
-      await this.locator(zkAccountElementsLocators.button_zkAccount).click();
+      await this.locator(zkAccountElementsLocators.button_ConnectWallet).click();
     }
-    
+
+    async button_CreateAccount(): Promise<void> {
+      await this.locator(zkAccountElementsLocators.button_CreateAccount).click();
+    }
     async button_Agree(): Promise<void> {
       await this.locator(zkAccountElementsLocators.button_Agree).click();
     }
@@ -36,7 +39,7 @@ export default class zkAccountPage extends BasePage{
     }
     
     async CreateWithSecretRecoveryPhrase(): Promise<void> {
-      await this.locator(zkAccountElementsLocators.button_CreateWithSecretRecoveryPhrase).click();
+      await this.locator(zkAccountElementsLocators.button_InstantAccount).click();
       
       // Copy seed phrase
       for (let num = 1; num < 13; num++){
@@ -53,9 +56,6 @@ export default class zkAccountPage extends BasePage{
       }
 
       await this.locator(zkAccountElementsLocators.button_Verify).click();
-
-      await this.CreatePasswordForzkAccount();
-
     }
 
     async ConnectMetaMaskWallet(): Promise<void> {
@@ -71,7 +71,7 @@ export default class zkAccountPage extends BasePage{
     }
 
     async GenerateKey(): Promise<void> {
-      await this.button_zkAccount()
+      await this.button_ConnectWallet()
       await this.locator(zkAccountElementsLocators.button_CreateWithWeb3Wallet).click();
 
       const [popup] = await Promise.all([this.waitForPage(), this.locator(zkAccountElementsLocators.button_GenerateKey).click()]);
@@ -87,7 +87,8 @@ export default class zkAccountPage extends BasePage{
     }
     
     async CheckAccount(): Promise<void> {
-      await expect(this.locator('//div//span[contains(text(), "zk")]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
+      await expect(this.locator('//div//span[contains(text(), "PUSD:")]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
+      await expect(this.locator('//div//span[contains(text(), "TLOS:")]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
 
     }
 

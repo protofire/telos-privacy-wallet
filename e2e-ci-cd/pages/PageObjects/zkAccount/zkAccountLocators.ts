@@ -8,6 +8,8 @@ const button_MetaMaskWallet = '//div/span[text()="MetaMask"]';
 const button_ConnectWallet = '//span[text()="Create account"]//..//button[text()="Connect wallet"]';
 const button_GenerateKey = '//button[text()="Generate key"]';
 const button_RestoreAccount = '//button[text()="Restore account"]';
+const button_CreateAccount = '//span[text()="Create Private Account"]';
+const button_InstantAccount = '//span[text()="Instant Account (seed phrase)"]';
 
 export const zkAccountElementsLocators = {
     button_zkAccount,
@@ -19,7 +21,9 @@ export const zkAccountElementsLocators = {
     button_MetaMaskWallet,
     button_ConnectWallet,
     button_GenerateKey,
-    button_RestoreAccount
+    button_RestoreAccount,
+    button_CreateAccount,
+    button_InstantAccount
 }
 
 

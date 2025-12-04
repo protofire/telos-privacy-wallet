@@ -22,66 +22,44 @@ export default class OperationsWithTokenPages extends BasePage{
       await this.focus();
       await this.page.reload();
       await this.focus();
-      await this.locator(OperationsWithTokenElementsLocators.input_password).type(this.ZKACCOUNT_PASSWORD);
-      await this.locator(OperationsWithTokenElementsLocators.button_sign_in).click();
-      await expect(this.locator('//div//span[contains(text(), "zk")]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
+      await expect(this.locator('//div//span[contains(text(), "zkAccount")]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
     }
 
     async Deposit(): Promise<void> {
       await this.focus();
-      await expect(this.locator('//button[text()="Enter an amount"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
+      await expect(this.locator('//button[text()="Enter amount"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
       await this.locator(OperationsWithTokenElementsLocators.input_amount_in_deposit_tab).type('1');
       const [popup] = await Promise.all([this.waitForPage(), this.locator(OperationsWithTokenElementsLocators.button_deposit).click()]);
-      await popup.locator('//button[text()="Sign"]').click();
-      await expect(this.locator('//span[text()="Deposit sent"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
-      await this.locator('//button[text()="Got it!"]').click();
+      await popup.locator('//button[text()="Confirm"]').click();
+      await this.locator('//button[text()="Got it"]').click();
       await expect(this.locator('//span[text()="Please wait for your transaction"]')).not.toBeVisible({timeout: TIMEOUTS.oneMinute});
     }
 
     async Transfer(): Promise<void> {
-
-      await this.locator(OperationsWithTokenElementsLocators.tab_transfer).click();
-      expect(this.page.url()).toContain('/transfer');
       await this.locator(OperationsWithTokenElementsLocators.input_amount_in_transfer_tab).type('1');
       await this.locator(OperationsWithTokenElementsLocators.enter_receiver_address).click();
       await this.locator(OperationsWithTokenElementsLocators.enter_receiver_address).type(this.ZKBOB_RECEIVER_ADDRESS);
       await this.locator(OperationsWithTokenElementsLocators.button_transfer).click();
       await this.locator(OperationsWithTokenElementsLocators.button_confirm).click();
-      await expect(this.locator('//span[text()="Transfer sent"]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
-      await expect(this.locator('//span[text()="Please wait for your transaction"]')).not.toBeVisible({timeout: TIMEOUTS.tenMinutes})
-
+      await expect(this.locator('//span[text()="Transfer is in progress"]')).toBeVisible({timeout: TIMEOUTS.oneMinute});
+      await this.locator(OperationsWithTokenElementsLocators.close_transaction_modal).click();
       }
 
     async CheckTransfer(): Promise<void> {
       await this.ReloadPage()
-
-      // Change account from restore
-      await expect (this.locator('//div//span[contains(text(), "zk")]')).toBeVisible({timeout:TIMEOUTS.fiveMinutes});
-      await this.locator('//div//span[contains(text(), "zk")]').click();
-      await this.locator('//button[text()="Switch account"]').click();
-      await this.locator(zkAccountElementsLocators.button_RestoreAccount).click();
-      await this.locator('//span[text()="Input your saved seed phrase to restore an existing account"]//../textarea').type(this.ZKACCOUNT_SEED_PHRASE);
-      await this.locator(zkAccountElementsLocators.button_RestoreAccount).click();
-      await this.locator(zkAccountCreatePasswordLocators.input_NewPassword).type(this.ZKACCOUNT_PASSWORD);
-      await this.locator(zkAccountCreatePasswordLocators.input_RepeatPassword).type(this.ZKACCOUNT_PASSWORD);
-      await this.locator(zkAccountElementsLocators.button_Verify).click();
-
-      // Check last transfer
-      await this.locator(OperationsWithTokenElementsLocators.tab_history).click();
-      await expect(this.locator('(//span[text()="History"]//..//div[1]/span/span)[1]')).toHaveText('1', {timeout:TIMEOUTS.oneMinute});
-
-      }
+      await expect(this.locator('//span[contains(text(), "Latest Transfer")]')).toBeVisible({timeout:TIMEOUTS.thirtySeconds});
+      await expect(this.locator("text=/^\\s*1\\s*TLOS\\s*$/")).toBeVisible({ timeout: TIMEOUTS.thirtySeconds });
+    }
 
     async Withdraw(): Promise<void> {
-
-      await this.locator(OperationsWithTokenElementsLocators.tab_withdraw).click();
-      expect(this.page.url()).toContain('/withdraw');
       await this.locator(OperationsWithTokenElementsLocators.input_amount_in_withdraw_tab).type('1');
-      await this.locator(OperationsWithTokenElementsLocators.enter_web3_address).type(this.ADDRESS_METAMASK_ACCOUNT);
+      await this.locator(OperationsWithTokenElementsLocators.add_current_wallet_address).click();
       await this.locator(OperationsWithTokenElementsLocators.button_withdraw).click({timeout:TIMEOUTS.tenMinutes});
       await this.locator(OperationsWithTokenElementsLocators.button_confirm).click();
-      await expect(this.locator('//span[text()="Withdrawal sent"]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
-      
+      await expect(this.locator('//span[text()="Withdrawal is in progress"]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
+      await this.locator(OperationsWithTokenElementsLocators.close_transaction_modal).click();
+      await expect(this.locator('//span[contains(text(), "Latest Withdrawal")]')).toBeVisible({timeout:TIMEOUTS.thirtySeconds});
+      await expect(this.locator("text=/^\\s*1\\s*TLOS\\s*$/")).toBeVisible({ timeout: TIMEOUTS.thirtySeconds });
     }
     
 
