@@ -45,7 +45,7 @@ export default abstract class BasePage {
     await this.page.bringToFront();
   }
 
-  public async sleep(timeout = TIMEOUTS.medium): Promise<void> {
+  public async sleep(timeout = TIMEOUTS.fiveSeconds): Promise<void> {
     await this.page.waitForTimeout(timeout);
   }
 

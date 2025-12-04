@@ -1,17 +1,16 @@
 import { test } from '../fixtures/testContextFixture';
+import OperationsWithTokenPages from '../pages/PageObjects/OperationsWithToken/OperationsWithTokenElements';
 
-test.beforeEach(async ({metamask, zkAccount}) => {
+test.beforeEach(async ({metamask, app}) => {
   await metamask.importWallet()
-  await zkAccount.open('/')
-  await zkAccount.button_zkAccount()
-  await zkAccount.button_Agree()
-  await zkAccount.ConnectMetaMaskWallet()
-  await zkAccount.GenerateKey()
-  await zkAccount.CreatePassword()
-  await zkAccount.CheckAccount()
+  await app.open('/#/Transfer')
+  
 });
 
-test('Transfer', async({OperationsWithToken}) => {
-  await OperationsWithToken.Transfer()
-  await OperationsWithToken.CheckTransfer()
+test('Transfer', async({app}) => {
+  await app.delay(2000);
+  await app.createZkAccountFromMetamask();
+  const operations = new OperationsWithTokenPages(app['page']);
+  await operations.Transfer()
+  await operations.CheckTransfer()
 })

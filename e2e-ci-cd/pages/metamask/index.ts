@@ -37,13 +37,13 @@ export default class Metamask extends BasePage implements MetamaskMethods {
   private async startImportWalletFlow() {
     await this.page
       .locator(firstTimeFlowPageElements.importWalletButton)
-      .click({ timeout: TIMEOUTS.medium });
+      .click({ timeout: TIMEOUTS.fiveSeconds });
   }
 
   private async rejectAnalitycs() {
     await this.page
       .locator(metametricsPageElements.optOutAnalyticsButton)
-      .click({ timeout: TIMEOUTS.medium }); // no thanks
+      .click({ timeout: TIMEOUTS.fiveSeconds }); // no thanks
   }
 
   async clickElementJS(locator: string): Promise<void> {
@@ -79,7 +79,7 @@ export default class Metamask extends BasePage implements MetamaskMethods {
 
     await this.page
       .locator(mainPageElements.walletOverview)
-      .waitFor({ state: 'visible', timeout: TIMEOUTS.big });
+      .waitFor({ state: 'visible', timeout: TIMEOUTS.thirtySeconds });
   }
 
   async showTestNetworks() {

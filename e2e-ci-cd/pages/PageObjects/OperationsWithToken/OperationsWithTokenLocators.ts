@@ -15,11 +15,12 @@ const input_amount_in_deposit_tab = '//span[text()="Deposit"]/ancestor::div//inp
 const input_amount_in_transfer_tab = '//span[text()="Transfer"]/ancestor::div//input[@placeholder="0"]';
 const input_amount_in_withdraw_tab = '//span[text()="Withdraw"]/ancestor::div//input[@placeholder="0"]';
 const input_password = '//input[@placeholder="Password"]';
-const enter_receiver_address = '//div//textarea[@placeholder="Enter address of zkBob receiver"]';
+const enter_receiver_address = '//div//textarea[@placeholder="Enter address of zkTelos receiver"]';
 
-
+const close_transaction_modal = '.close-modal-icon';
 export const OperationsWithTokenElementsLocators = {
     tab_deposit,
+    close_transaction_modal,
     button_deposit,
     button_transfer,
     button_withdraw,

@@ -15,7 +15,7 @@ test.beforeEach(async ({ metamask, app }) => {
   await app.open('/#/Deposit');
 });
 
-test.only('Deposit', async ({ app }) => {
+test('Deposit', async ({ app }) => {
   await app.delay(2000);
   await app.createZkAccountFromMetamask();
   const operations = new OperationsWithTokenPages(app['page']);
