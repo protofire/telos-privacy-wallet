@@ -8,6 +8,7 @@ import { IZkBobService, ServiceType,
 import { Proof, TreeNode } from 'libzkbob-rs-wasm-web';
 import { CONSTANTS } from "../constants";
 import { NetworkBackend } from "../networks";
+import { ethers } from "ethers";
 
 const RELAYER_VERSION_REQUEST_THRESHOLD = 3600; // relayer's version expiration (in seconds)
 
@@ -320,7 +321,7 @@ export class ZkBobRelayer implements IZkBobService {
   
   public async fee(idx?: number): Promise<RelayerFee> {
     const headers = defaultHeaders(this.supportId);
-    const url = new URL('/fee', this.url(idx));
+    const url = new URL('/fee-telos', this.url(idx));
 
     const proxyFee = await fetchJson(url.toString(), {headers}, this.type());
 
@@ -331,7 +332,9 @@ export class ZkBobRelayer implements IZkBobService {
       throw new ServiceError(this.type(), 200, 'Incorrect response for dynamic fees');
     }
 
+    
     const feeResp = proxyFee.fee ?? proxyFee.baseFee;
+
     if (typeof feeResp === 'object' &&
         feeResp.hasOwnProperty('deposit') &&
         feeResp.hasOwnProperty('transfer') &&
@@ -352,15 +355,16 @@ export class ZkBobRelayer implements IZkBobService {
                 typeof feeResp === 'number' ||
                 typeof feeResp === 'bigint'
     ) {
+      const parsedFee = ethers.BigNumber.from("0x" + feeResp);
       return {
         fee: {
-          deposit: BigInt(feeResp),
-          transfer: BigInt(feeResp),
-          withdrawal: BigInt(feeResp),
-          permittableDeposit: BigInt(feeResp),
+          deposit: parsedFee.toBigInt(),
+          transfer: parsedFee.toBigInt(),
+          withdrawal: parsedFee.toBigInt(),
+          permittableDeposit: parsedFee.toBigInt(),
         },
-        oneByteFee: BigInt(proxyFee.oneByteFee ?? '0'),
-        nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? '0'),
+        oneByteFee: BigInt(proxyFee.oneByteFee ?? "0"),
+        nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? "0"),
       };
     } else {
       throw new ServiceError(this.type(), 200, 'Incorrect fee field');
