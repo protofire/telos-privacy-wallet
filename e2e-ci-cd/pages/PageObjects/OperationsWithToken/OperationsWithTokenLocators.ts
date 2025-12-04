@@ -18,6 +18,7 @@ const input_password = '//input[@placeholder="Password"]';
 const enter_receiver_address = '//div//textarea[@placeholder="Enter address of zkTelos receiver"]';
 
 const close_transaction_modal = '.close-modal-icon';
+const add_current_wallet_address = '//span[contains(text(), "Add current wallet:")]';
 export const OperationsWithTokenElementsLocators = {
     tab_deposit,
     close_transaction_modal,
@@ -34,6 +35,7 @@ export const OperationsWithTokenElementsLocators = {
     enter_web3_address,
     button_confirm,
     input_password,
-    button_sign_in
+    button_sign_in,
+    add_current_wallet_address
 }
 

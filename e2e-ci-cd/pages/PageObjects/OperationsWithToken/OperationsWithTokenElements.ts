@@ -28,7 +28,7 @@ export default class OperationsWithTokenPages extends BasePage{
     async Deposit(): Promise<void> {
       await this.focus();
       await expect(this.locator('//button[text()="Enter amount"]')).toBeVisible({timeout: TIMEOUTS.fiveMinutes});
-      await this.locator(OperationsWithTokenElementsLocators.input_amount_in_deposit_tab).type('0.5');
+      await this.locator(OperationsWithTokenElementsLocators.input_amount_in_deposit_tab).type('1');
       const [popup] = await Promise.all([this.waitForPage(), this.locator(OperationsWithTokenElementsLocators.button_deposit).click()]);
       await popup.locator('//button[text()="Confirm"]').click();
       await this.locator('//button[text()="Got it"]').click();
@@ -52,15 +52,14 @@ export default class OperationsWithTokenPages extends BasePage{
     }
 
     async Withdraw(): Promise<void> {
-
-      await this.locator(OperationsWithTokenElementsLocators.tab_withdraw).click();
-      expect(this.page.url()).toContain('/withdraw');
       await this.locator(OperationsWithTokenElementsLocators.input_amount_in_withdraw_tab).type('1');
-      await this.locator(OperationsWithTokenElementsLocators.enter_web3_address).type(this.ADDRESS_METAMASK_ACCOUNT);
+      await this.locator(OperationsWithTokenElementsLocators.add_current_wallet_address).click();
       await this.locator(OperationsWithTokenElementsLocators.button_withdraw).click({timeout:TIMEOUTS.tenMinutes});
       await this.locator(OperationsWithTokenElementsLocators.button_confirm).click();
-      await expect(this.locator('//span[text()="Withdrawal sent"]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
-      
+      await expect(this.locator('//span[text()="Withdrawal is in progress"]')).toBeVisible({timeout: TIMEOUTS.tenMinutes});
+      await this.locator(OperationsWithTokenElementsLocators.close_transaction_modal).click();
+      await expect(this.locator('//span[contains(text(), "Latest Withdrawal")]')).toBeVisible({timeout:TIMEOUTS.thirtySeconds});
+      await expect(this.locator("text=/^\\s*1\\s*TLOS\\s*$/")).toBeVisible({ timeout: TIMEOUTS.thirtySeconds });
     }
     
 
