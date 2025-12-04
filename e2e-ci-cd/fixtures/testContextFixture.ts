@@ -43,32 +43,41 @@ export const test = base.extend<TestContextFixture>({
     { scope: 'test', auto: true },
   ],
   metamask: [
-    ({ metamaskContext: context }, use) => {
-      context.on('page', async (page) => {
-        await page.waitForLoadState();
-        if ((await page.title()) === 'MetaMask') {
-          await page.reload();
-          await page.waitForLoadState();
-          await use(new Metamask(page));
-        }
-      });
+    async ({ metamaskContext: context }, use) => {
+      let metamaskPage = context
+        .pages()
+        .find((p) => p.url().startsWith('chrome-extension://'));
+
+      if (!metamaskPage) {
+        metamaskPage = await context.waitForEvent('page', {
+          predicate: (p) => p.url().startsWith('chrome-extension://'),
+          timeout: 30000,
+        });
+      }
+
+      await metamaskPage.waitForLoadState();
+      if ((await metamaskPage.title()) === 'MetaMask') {
+        await metamaskPage.reload();
+        await metamaskPage.waitForLoadState();
+      }
+      await use(new Metamask(metamaskPage));
     },
     { scope: 'test' },
   ],
 
   app: async ({ metamaskContext: context }, use) => {
-    await use(new App(context.pages()[0]));
-    await context.close();
+    const page = await context.newPage();
+    await use(new App(page));
   },
 
   zkAccount: async ({ metamaskContext: context }, use) => {
-    await use(new zkAccountPage(context.pages()[0]));
-    await context.close();
+    const page = await context.newPage();
+    await use(new zkAccountPage(page));
   },
 
   OperationsWithToken: async ({ metamaskContext: context }, use) => {
-    await use(new OperationsWithTokenPages(context.pages()[0]));
-    await context.close();
+    const page = await context.newPage();
+    await use(new OperationsWithTokenPages(page));
   },
 
 

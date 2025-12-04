@@ -7,45 +7,46 @@ A privacy-focused wallet application for the Telos ecosystem, forked from [zkBob
 - 🔒 **Privacy-First**: Zero-knowledge proof technology for private transactions
 - 🌐 **Multi-Platform**: Web application and Electron desktop apps (macOS, Windows, Linux)
 - 🔗 **WalletConnect Support**: Connect with mobile wallets via QR code
-- 💰 **Multi-Token Support**: Support for PUSD, WTELOS, and more
-- 📱 **Telos Testnet**: Full support for Telos Testnet (chainId 41)
-- 🔐 **Secure Storage**: Encrypted local storage for seed phrases
+- 💰 **Multi-Token Support**: Support for ERC20 tokens and native tokens
 
 ## Project Structure
 
 This project is a **monorepo** managed with Yarn Workspaces, containing:
 
 ```
-telos-privacy-wallet/
-├── apps/
-│   └── zktelos-wallet/          # Main zkTelos Wallet application
-│       ├── src/                  # React application source code
-│       ├── public/               # Static assets
-│       ├── electron/             # Electron desktop app configuration
-│       └── package.json
-├── packages/
-│   └── zkbob-client-js/         # Forked zkBob client library (local)
-│       ├── src/                  # TypeScript source code
-│       ├── lib/                  # Compiled JavaScript output
-│       └── package.json
-├── package.json                  # Root workspace configuration
-└── yarn.lock
+    telos-privacy-wallet/
+    ├── apps/
+    │   └── zktelos-wallet/          # Main zkTelos Wallet application
+    │       ├── src/                  # React application source code
+    │       ├── public/               # Static assets
+    │       ├── electron/             # Electron desktop app configuration
+    │       └── package.json
+    ├── packages/
+    │   ├── zkbob-client-js/         # Forked zkBob client library (local)
+    │   │   ├── src/                  # TypeScript source code
+    │   │   ├── lib/                  # Compiled JavaScript output
+    │   │   └── package.json
+    │   └── libzkbob-rs-node/        # Rust bindings for zkBob (Neon)
+    │       ├── src/                  # Rust source code
+    │       └── package.json
+    ├── package.json                  # Root workspace configuration
+    └── yarn.lock
 ```
 
 ### Workspaces
-
-- **`apps/zktelos-wallet`**: The main React application (web and Electron)
+  - **`apps/zktelos-wallet`**: The main React application (web and Electron)
 - **`packages/zkbob-client-js`**: A local fork of the zkBob client library with custom modifications for Telos
+- **`packages/libzkbob-rs-node`**: Node.js bindings for the zkBob Rust library
 
 ## Installation
 
 ### Desktop Applications
 
-Download the latest release from the [Releases](https://github.com/protofire/telos-privacy-wallet/releases) page:
+Download the latest release from the [Releases](https://github.com/protofire/telos-privacy-wallet/releases) page to get the desktop applications.
 
-- **macOS**: `zkTelos Wallet-0.0.1-mac-arm64.dmg`
-- **Windows**: `zkTelos Wallet Setup 0.0.1.exe`
-- **Linux**: `zkTelos Wallet-0.0.1-arm64.AppImage` or `zkTelos-wallet_0.0.1_arm64.deb`
+- **macOS**
+- **Windows**
+- **Linux**
 
 #### macOS Installation
 1. Download the `.dmg` file
@@ -92,13 +93,6 @@ sudo dpkg -i zkTelos-wallet_0.0.1_arm64.deb
    
    This will install dependencies for all workspaces.
 
-3. **Create a `.env` file** in the root directory:
-   ```env
-   REACT_APP_CONFIG=dev          # or "prod"
-   REACT_APP_BUILD_TARGET=       # set to "electron" for desktop builds
-   REACT_APP_WALLETCONNECT_PROJECT_ID=<your-project-id>
-   REACT_APP_LOCK_TIMEOUT=100000 # optional: auto-lock timeout in milliseconds
-   ```
 
 ### Development Commands
 
@@ -166,11 +160,10 @@ Built applications will be available in the `apps/zktelos-wallet/dist/` director
 
 #### Running Tests
 
-```bash
-yarn test
-```
+**E2E Tests:**
+See [e2e-ci-cd/README.md](e2e-ci-cd/README.md) for instructions on running end-to-end tests with Playwright.
 
-### Working with zkbob-client-js
+#### Working with zkbob-client-js
 
 The `zkbob-client-js` package is a local fork of the zkBob client library, located in `packages/zkbob-client-js/`.
 
@@ -227,64 +220,21 @@ yarn workspace zktelos-wallet test
 
 - `REACT_APP_CONFIG`: Set to `"dev"` for development or `"prod"` for production
 - `REACT_APP_BUILD_TARGET`: Set to `"electron"` when building desktop applications
-- `REACT_APP_WALLETCONNECT_PROJECT_ID`: Your WalletConnect Cloud project ID
-- `REACT_APP_LOCK_TIMEOUT`: Auto-lock timeout in milliseconds (default: 900000)
+    - `REACT_APP_WALLETCONNECT_PROJECT_ID`: Your WalletConnect Cloud project ID
+    - `REACT_APP_LOCK_TIMEOUT`: Auto-lock timeout in milliseconds (default: 900000)
 
-### Supported Networks
+    **Sentry Configuration (Optional):**
+    - `REACT_APP_SENTRY_PUBLIC_KEY`: Sentry Public Key
+    - `REACT_APP_SENTRY_PRIVATE_KEY`: Sentry Private Key
+    - `REACT_APP_SENTRY_PROJECT_ID`: Sentry Project ID
+
+    Sentry integration includes tracking of a unique `support_id` (generated in `SupportIdContext`) and user IP address (via ipapi.co) for troubleshooting.
+
+    ### Supported Networks
 
 - **Telos Testnet** (chainId: 41) - Development environment
 - **Telos Mainnet** (chainId: 40) - Production (coming soon)
-
-## Architecture
-
-### Core Components
-
-- **ZkAccountContext**: Manages zero-knowledge account state and private transactions
-- **WalletContext**: Handles EVM wallet connections via wagmi
-- **PoolContext**: Manages liquidity pool configurations
-- **TransactionModalContext**: Controls transaction UI flows
-
-### Privacy Operations
-
-All private operations use zero-knowledge proofs:
-- **Deposit**: Convert public tokens to private balance
-- **Transfer**: Private peer-to-peer transfers
-- **Withdraw**: Convert private balance back to public tokens
-
-### Monorepo Benefits
-
-- **Local Library Development**: Modify `zkbob-client-js` without publishing to npm
-- **Shared Dependencies**: Yarn Workspaces hoist common dependencies
-- **Atomic Changes**: Make changes across multiple packages in a single commit
-- **Hot Reload**: Development workflow supports automatic recompilation
-
-## Troubleshooting
-
-### Dependency Issues
-
-If you encounter dependency issues:
-
-```bash
-# Clean and reinstall everything
-rm -rf node_modules yarn.lock
-rm -rf apps/*/node_modules packages/*/node_modules
-yarn install
-```
-
-### Build Memory Issues
-
-If the build fails with "JavaScript heap out of memory", the build script already includes increased memory allocation. If issues persist, you can manually increase it:
-
-```bash
-NODE_OPTIONS=--max-old-space-size=16384 yarn build
-```
-
-### View Workspace Information
-
-```bash
-yarn workspaces info
-```
-
+- 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

@@ -1,7 +1,7 @@
-const tab_deposit = '//div[text()="Deposit"]';
-const tab_transfer = '//div[text()="Transfer"]';
-const tab_withdraw = '//div[text()="Withdraw"]';
-const tab_history = '//div[text()="History"]';
+const tab_deposit = '//span[text()="Deposit"]';
+const tab_transfer = '//span[text()="Transfer"]';
+const tab_withdraw = '//span[text()="Withdraw"]';
+const tab_history = '//span[text()="Activity"]';
 
 
 const button_deposit = '//button[text()="Deposit"]';

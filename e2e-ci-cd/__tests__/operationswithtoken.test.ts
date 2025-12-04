@@ -1,5 +1,7 @@
+import { TIMEOUTS } from "../constants";
 import { test } from "../fixtures/testContextFixture";
 import OperationsWithTokenPages from "../pages/PageObjects/OperationsWithToken/OperationsWithTokenElements";
+import { OperationsWithTokenElementsLocators } from "../pages/PageObjects/OperationsWithToken/OperationsWithTokenLocators";
 
 test.beforeAll(async ({ metamask }) => {
   await metamask.importWallet();
@@ -15,28 +17,46 @@ test.beforeAll(async ({ metamask }) => {
 });
 
 
-test("Deposit", async ({ app }) => {
+test("User Operations with Token", async ({ app }) => {
   await app.open("/#/Deposit");
   await app.delay(2000);
   await app.createZkAccountFromMetamask();
   const operations = new OperationsWithTokenPages(app["page"]);
   await operations.Deposit();
-});
-
-test("Transfer", async ({ app }) => {
-  await app.open("/#/Transfer");
-  await app.delay(2000);
-  await app.createZkAccountFromMetamask();
-  const operations = new OperationsWithTokenPages(app["page"]);
+  
+  await app.sleep(TIMEOUTS.oneSecond)
+  await app.locator(OperationsWithTokenElementsLocators.tab_transfer).click();
   await operations.Transfer();
   await operations.CheckTransfer();
-});
-
-
-test("Withdraw", async ({ app }) => {
-  await app.open("/#/Withdraw");
-  await app.delay(2000);
-  await app.createZkAccountFromMetamask();
-  const operations = new OperationsWithTokenPages(app["page"]);
+  
+  await app.sleep(TIMEOUTS.oneSecond)
+  await app.locator(OperationsWithTokenElementsLocators.tab_withdraw).click();
   await operations.Withdraw();
 });
+
+
+// test("Deposit", async ({ app }) => {
+//   await app.open("/#/Deposit");
+//   await app.delay(2000);
+//   await app.createZkAccountFromMetamask();
+//   const operations = new OperationsWithTokenPages(app["page"]);
+//   await operations.Deposit();
+// });
+
+// test("Transfer", async ({ app }) => {
+//   await app.open("/#/Transfer");
+//   await app.delay(2000);
+//   await app.createZkAccountFromMetamask();
+//   const operations = new OperationsWithTokenPages(app["page"]);
+//   await operations.Transfer();
+//   await operations.CheckTransfer();
+// });
+
+
+// test("Withdraw", async ({ app }) => {
+//   await app.open("/#/Withdraw");
+//   await app.delay(2000);
+//   await app.createZkAccountFromMetamask();
+//   const operations = new OperationsWithTokenPages(app["page"]);
+//   await operations.Withdraw();
+// });
