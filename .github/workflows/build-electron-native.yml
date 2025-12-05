@@ -78,10 +78,12 @@ jobs:
           target: x86_64-pc-windows-msvc
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          yarn config set network-timeout 600000
+          yarn install --frozen-lockfile --network-concurrency 1
 
       - name: Build zkbob-client-js
-        run: npm run build --workspace=zkbob-client-js
+        run: yarn workspace zkbob-client-js build
 
       - name: Build Rust library
         run: yarn workspace libzkbob-rs-node build
@@ -100,7 +102,8 @@ jobs:
         env:
           CI: false
           NODE_OPTIONS: --max-old-space-size=8192
-        run: npm run electron:build:win
+          GENERATE_SOURCEMAP: false
+        run: yarn workspace zktelos-wallet electron:build:win
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
