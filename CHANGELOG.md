@@ -5,6 +5,68 @@ All notable changes to zkTelos Wallet will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2025-12-05
+
+### Added
+
+- **Unified Pool Experience**: Implemented Proof of Concept for a unified pool interaction flow (#32)
+
+### Changed
+
+- **Mobile UX**: Extensive adjustments to mobile UI, card layouts, and responsiveness
+- Improved error messaging for invalid addresses
+- Updated fee endpoint configuration (#33)
+- Updated menu text literals
+
+### Removed
+
+- Removed "Wrap" functionality
+- Removed legacy zkBob references and external links
+- Removed "zkRandom" name generation features
+
+### Fixed
+
+- Fixed End-to-End (E2E) test suite (#34)
+
+## [0.0.2] - 2025-11-25
+
+### Added
+
+- Native Rust library integration for improved performance on macOS and Linux (#28)
+- New Home page dashboard (#18)
+- Onboarding tutorial and interactive tour for new users
+- Wrap/Unwrap functionality for public accounts
+- USD balance display for Global and zkAccount views (#13, #16)
+- Support for wTelos pool
+- Dropdown action menu for private accounts
+- Web deployment scripts for S3
+- New application logo
+- Linux (.deb) and Windows x64 (.exe) installer support
+
+### Changed
+
+- **UI/UX Redesign**: Moved navigation menu to the left sidebar, updated content card styles, and standardized on squared buttons
+- Deposit mechanism updated to use "approve" scheme instead of permit
+- Updated transfer parameters and token permit logic
+- Improved privacy features: Added ability to toggle visibility of balances
+- Updated Relayer configuration for Telos integration
+- Removed adress prefixes for the private accounts
+
+### Fixed
+
+- Duplicate "Connect" buttons appearing on mobile view
+- Hardcoded deposit fee calculation logic
+- Address formatting issues on the Home page
+- Translation updates and missing keys
+- Build warnings and unused component cleanup
+- Issues with localhost API calls
+
+### Technical Details
+
+- Node.js v22.12.0
+- Electron 27.0.0
+- Integrated native Rust library for cryptographic operations
+
 ## [0.0.1] - 2025-11-11
 
 ### Added
