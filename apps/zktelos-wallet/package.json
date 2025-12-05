@@ -1,6 +1,6 @@
 {
   "name": "zktelos-wallet",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "author": "Protofire <info@protofire.io>",
   "main": "electron/main.js",
@@ -8,12 +8,13 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 react-app-rewired build",
+    "build:win": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "electron:dev": "electron .",
     "electron:build:prod": "yarn build && electron-builder",
     "electron:build:mac": "yarn electron:build:prod --mac",
-    "electron:build:win": "yarn electron:build:prod --win",
+    "electron:build:win": "yarn build:win && electron-builder --win",
     "electron:build:linux": "yarn electron:build:prod --linux"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.1",
     "js-md5": "^0.7.3",
+    "libzkbob-rs-node": "*",
     "lodash.shuffle": "^4.2.0",
     "moment": "^2.29.3",
     "rc-tooltip": "^5.2.2",
@@ -67,8 +69,7 @@
     "wagmi": "^0.12.1",
     "web-vitals": "^1.0.1",
     "webpack": "^5.70.0",
-    "zkbob-client-js": "*",
-    "libzkbob-rs-node": "*"
+    "zkbob-client-js": "*"
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.20.0",

@@ -51,7 +51,7 @@ export default ({ children, isOpen, onClose, title, onBack, width, style, contai
         <ModalContent width={width} style={style}>
           <Title>{title}</Title>
           {onBack && <BackIcon onClick={onBack} />}
-          {onClose && <CrossIcon onClick={onClose} />}
+          {onClose && <CrossIcon className="close-modal-icon" onClick={onClose} />}
           {children}
         </ModalContent>
       </Modal>

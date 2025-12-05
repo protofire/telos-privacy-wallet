@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -10,16 +10,16 @@ import { actions, getSign } from 'components/HistoryItem';
 import Button from 'components/Button';
 import AccountSetUpButton from 'containers/AccountSetUpButton';
 
-import { PoolContext, ZkAccountContext } from 'contexts';
+import { ZkAccountContext, PoolContext } from 'contexts';
 import { useWindowDimensions } from 'hooks';
 
 export default () => {
   const { t } = useTranslation();
   const {
-    history, zkAccount, pendingDirectDeposits,
+    histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
+  const { availablePools } = useContext(PoolContext);
   const { width } = useWindowDimensions();
   const isMobile = width <= 500;
 
@@ -29,19 +29,42 @@ export default () => {
   const isLoading = isLoadingZkAccount || isLoadingHistory;
   const title = t('history.title');
 
-  const items = pendingDirectDeposits.concat(history);
+  const items = useMemo(() => {
+    if (!histories) return [];
+
+    const combined = [];
+
+    availablePools.forEach(pool => {
+      const poolAlias = pool.alias;
+      const poolHistory = histories[poolAlias] || [];
+      const pendingDeposits = (pendingDirectDepositsByPool && pendingDirectDepositsByPool[poolAlias]) || [];
+
+      // Add poolAlias metadata to each transaction
+      const poolTransactions = pendingDeposits.concat(poolHistory).map(tx => ({
+        ...tx,
+        poolAlias,
+        pool,
+      }));
+
+      combined.push(...poolTransactions);
+    });
+
+    // Sort by timestamp (most recent first)
+    return combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }, [histories, pendingDirectDepositsByPool, availablePools]);
+
   const isHistoryEmpty = items.length === 0;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [zkAccount, currentPool]);
+  }, [zkAccount]);
 
 
   const exportData = () => {
     const headers = ['amount', 'from', 'to', 'toYourself', 'commitment', 'extraInfo', 'failed', 'fee', 'from', 'txHash', 'type', 'state', 'failureReason', 'timestamp'];
     let csvContent = items.map(item => {
       let result = item.actions.map(action => {
-        console.log("action", action);
+
         return [
           getSign(item) + action.amount.toString(),
           action.from,
@@ -91,7 +114,7 @@ export default () => {
         {!isHistoryEmpty && (
           <>
             {items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item, index) =>
-              <HistoryItem key={index} item={item} zkAccount={zkAccount} currentPool={currentPool} isMobile={isMobile} />
+              <HistoryItem key={index} item={item} zkAccount={zkAccount} isMobile={isMobile} />
             )}
             {items.length > pageSize && (
               <Pagination
@@ -149,6 +172,11 @@ const ContentContainer = styled.div`
   padding: 16px 12px;
 
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    margin: 15px 0;
+    min-width: 350px;
+  }
+
+  @media only screen and (max-width: 350px) {
+    min-width: 280px;
   }
 `;

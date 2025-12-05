@@ -1,7 +1,7 @@
-const tab_deposit = '//div[text()="Deposit"]';
-const tab_transfer = '//div[text()="Transfer"]';
-const tab_withdraw = '//div[text()="Withdraw"]';
-const tab_history = '//div[text()="History"]';
+const tab_deposit = '//span[text()="Deposit"]';
+const tab_transfer = '//span[text()="Transfer"]';
+const tab_withdraw = '//span[text()="Withdraw"]';
+const tab_history = '//span[text()="Activity"]';
 
 
 const button_deposit = '//button[text()="Deposit"]';
@@ -15,11 +15,13 @@ const input_amount_in_deposit_tab = '//span[text()="Deposit"]/ancestor::div//inp
 const input_amount_in_transfer_tab = '//span[text()="Transfer"]/ancestor::div//input[@placeholder="0"]';
 const input_amount_in_withdraw_tab = '//span[text()="Withdraw"]/ancestor::div//input[@placeholder="0"]';
 const input_password = '//input[@placeholder="Password"]';
-const enter_receiver_address = '//div//textarea[@placeholder="Enter address of zkBob receiver"]';
+const enter_receiver_address = '//div//textarea[@placeholder="Enter address of zkTelos receiver"]';
 
-
+const close_transaction_modal = '.close-modal-icon';
+const add_current_wallet_address = '//span[contains(text(), "Add current wallet:")]';
 export const OperationsWithTokenElementsLocators = {
     tab_deposit,
+    close_transaction_modal,
     button_deposit,
     button_transfer,
     button_withdraw,
@@ -33,6 +35,7 @@ export const OperationsWithTokenElementsLocators = {
     enter_web3_address,
     button_confirm,
     input_password,
-    button_sign_in
+    button_sign_in,
+    add_current_wallet_address
 }
 

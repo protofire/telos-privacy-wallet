@@ -4,7 +4,7 @@ import { HashRouter, Switch, Route, Redirect, useLocation } from 'react-router-d
 import { createBrowserHistory } from 'history';
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
-import { useIdleTimer } from 'react-idle-timer';
+// import { useIdleTimer } from 'react-idle-timer';
 
 import Tabs from 'containers/Tabs';
 import TransactionModal from 'containers/TransactionModal';
@@ -97,18 +97,18 @@ const Routes = ({ showWelcome, params }) => (
     <SentryRoute exact strict path="/history">
       <History />
     </SentryRoute>
-    <Redirect to={'/transfer' + params} />
+    <Redirect to={'/home' + params} />
   </Switch>
 );
 
 const MainApp = () => {
-  const { zkAccount, isLoadingZkAccount, isDemo, lockAccount } = useContext(ZkAccountContext);
+  const { zkAccount, isLoadingZkAccount } = useContext(ZkAccountContext);
   const location = useLocation();
-  const showWelcome = (!zkAccount && !isLoadingZkAccount && !window.localStorage.getItem('seed')) || isDemo;
-  useIdleTimer({
-    timeout: Number(process.env.REACT_APP_LOCK_TIMEOUT) || (1000 * 60 * 15),
-    onIdle: () => lockAccount(),
-  });
+  const showWelcome = (!zkAccount && !isLoadingZkAccount && !window.localStorage.getItem('seed'));
+  // useIdleTimer({
+  //   timeout: Number(process.env.REACT_APP_LOCK_TIMEOUT) || (1000 * 60 * 15),
+  //   onIdle: () => lockAccount(),
+  // });
 
 
   return (

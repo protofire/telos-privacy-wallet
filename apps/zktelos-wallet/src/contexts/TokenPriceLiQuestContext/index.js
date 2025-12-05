@@ -15,12 +15,6 @@ const tokens = [
 const baseUrl = "https://li.quest/v1/token";
 const refreshInterval = 30_000;
 
-const getChainId = (chainId) => {
-  if (chainId === 40 || chainId === 41) {
-    return 1;
-  }
-  return chainId;
-};
 
 export const TokenPriceLiQuestProvider = ({ children }) => {
   const { currentPool } = useContext(PoolContext);
@@ -40,11 +34,10 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
       abortControllerRef.current = new AbortController();
       setIsLoading(true);
 
-      const chainId = getChainId(currentPool.chainId);
       const signal = abortControllerRef.current.signal;
 
       const pricePromises = tokens.map(async ({ address, symbol }) => {
-        const url = `${baseUrl}?chain=${chainId}&token=${address}`;
+        const url = `${baseUrl}?chain=1&token=${address}`;
         const response = await fetch(url, { signal });
         const data = await response.json();
         return { symbol, price: data.priceUSD ? parseFloat(data.priceUSD) : null };

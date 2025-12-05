@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -11,7 +11,7 @@ import Link from 'components/Link';
 import CreatePrivateAccountButton from 'components/CreatePrivateAccount';
 import Skeleton from 'components/Skeleton';
 
-import { PoolContext, ZkAccountContext, WalletContext, ModalContext } from 'contexts';
+import { ZkAccountContext, WalletContext, ModalContext, PoolContext } from 'contexts';
 
 import shieldIcon from 'assets/shield.svg';
 import globeIcon from 'assets/globe.svg';
@@ -22,15 +22,40 @@ export default () => {
   const location = useLocation();
   const { address: account } = useContext(WalletContext);
   const { openCreateAccountModal } = useContext(ModalContext);
+  const { availablePools } = useContext(PoolContext);
   const {
-    history: fullHistory, zkAccount, pendingDirectDeposits,
+    histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
 
   const isLoading = isLoadingZkAccount || isLoadingHistory;
 
-  const last3Actions = pendingDirectDeposits.concat(fullHistory).slice(0, 3);
+  // Combine histories from all pools (off-chain operation)
+  const allTransactions = useMemo(() => {
+    if (!histories) return [];
+
+    const combined = [];
+
+    availablePools.forEach(pool => {
+      const poolAlias = pool.alias;
+      const poolHistory = histories[poolAlias] || [];
+      const pendingDeposits = (pendingDirectDepositsByPool && pendingDirectDepositsByPool[poolAlias]) || [];
+
+      // Add poolAlias metadata to each transaction
+      const poolTransactions = pendingDeposits.concat(poolHistory).map(tx => ({
+        ...tx,
+        poolAlias,
+        pool,
+      }));
+
+      combined.push(...poolTransactions);
+    });
+
+    // Sort by timestamp (most recent first)
+    return combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }, [histories, pendingDirectDepositsByPool, availablePools]);
+
+  const last3Actions = allTransactions.slice(0, 3);
   const isLatest5HistoryEmpty = last3Actions.length === 0;
 
   const handleViewAll = () => {
@@ -96,7 +121,6 @@ export default () => {
                 <LatestTransactions
                   transactions={last3Actions}
                   zkAccount={zkAccount}
-                  currentPool={currentPool}
                 />
               )}
             </Card>
@@ -134,7 +158,7 @@ const CardsContainer = styled.div`
   border: 2px solid ${props => props.theme.color.black};
 
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    margin: 15px 0;
   }
 `;
 
@@ -159,5 +183,8 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  @media only screen and (max-width: 560px) {
+    gap: 0;
+  }
 `;
 

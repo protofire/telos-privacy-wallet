@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback } from 'react';
+import { createContext, useCallback } from 'react';
 import { ethers } from 'ethers';
 
 import {
@@ -7,29 +7,27 @@ import {
   useSwitchNetwork,
 } from 'wagmi';
 
-
-import PoolContext from 'contexts/PoolContext';
-
 const WalletContext = createContext({});
 
 export default WalletContext;
 
-const useEvmWallet = pool => {
+const useEvmWallet = () => {
   const { address, connector } = useAccount();
-  const provider = useProvider({ chainId: pool.chainId });
+  const { chain } = useNetwork();
+  const provider = useProvider({ chainId: chain?.id });
   const { signMessageAsync } = useSignMessage();
   const { connectAsync, connectors } = useConnect();
   const { disconnectAsync } = useDisconnect();
   const { refetch } = useBalance({
     address,
-    chainId: pool.chainId,
+    chainId: chain?.id,
     enabled: Boolean(address),
     watch: Boolean(address),
   });
-  const { data: signer } = useSigner({ chainId: pool.chainId });
-  const { chain } = useNetwork();
+  const { data: signer } = useSigner({ chainId: chain?.id });
+
   const { switchNetworkAsync } = useSwitchNetwork({
-    chainId: pool.chainId,
+    chainId: chain?.id,
     throwForSwitchChainNotSupported: true,
   });
 
@@ -86,11 +84,12 @@ const useEvmWallet = pool => {
 
 
 export const WalletContextProvider = ({ children }) => {
-  const { currentPool } = useContext(PoolContext);
-  const evmWallet = useEvmWallet(currentPool);
+  const evmWallet = useEvmWallet();
 
   return (
-    <WalletContext.Provider value={{ ...evmWallet }}>
+    <WalletContext.Provider value={{
+      ...evmWallet,
+    }}>
       {children}
     </WalletContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import React, { useState, useCallback, useContext, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { TxType } from 'zkbob-client-js';
 import { HistoryTransactionType } from 'zkbob-client-js';
@@ -20,6 +20,7 @@ import LatestAction from 'components/LatestAction';
 import Limits from 'components/Limits';
 import DemoCard from 'components/DemoCard';
 import ConvertOptions from 'components/ConvertOptions';
+import PoolSelector from 'components/PoolSelector';
 
 import { useFee, useParsedAmount, useLatestAction, useMaxTransferable } from 'hooks';
 
@@ -34,8 +35,9 @@ export default () => {
   const {
     zkAccount, balance, withdraw, isLoadingState,
     isPending, isDemo, limits, isLoadingLimits, minTxAmount,
+    switchToPool,
   } = useContext(ZkAccountContext);
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, availablePools } = useContext(PoolContext);
   const { isAddress, address, connector } = useContext(WalletContext);
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
@@ -47,6 +49,20 @@ export default () => {
   const maxWithdrawable = useMaxTransferable(TxType.Withdraw, relayerFee, amountToConvert);
   const maxAmountExceeded = useMaxAmountExceeded(amount, maxWithdrawable, limits.dailyWithdrawalLimit?.available);
   const convertionDetails = useConvertion(currentPool);
+  // Filter to active chain pools for consistency with the rest of the UI
+  const poolOptions = useMemo(
+    () => availablePools.map(pool => ({
+      alias: pool.alias,
+      tokenSymbol: pool.tokenSymbol,
+      label: pool.tokenSymbol,
+    })),
+    [availablePools],
+  );
+
+  const handlePoolSelect = useCallback(alias => {
+    if (alias === currentPool.alias) return;
+    switchToPool(alias);
+  }, [currentPool.alias, switchToPool]);
 
 
   const onWihdrawal = useCallback(() => {
@@ -101,10 +117,20 @@ export default () => {
   }
   return isPending ? <PendingAction /> : (
     <ContentContainer>
-      <Card
-        title={t('withdraw.title')}
-        note={t('withdraw.note', { symbol: currentPool.tokenSymbol })}
-      >
+      <Card>
+        <TitleRow>
+          <Title>
+            {t('withdraw.title')}
+            <SelectorInline>
+              <PoolSelector
+                options={poolOptions}
+                selectedAlias={currentPool.alias}
+                onSelect={handlePoolSelect}
+              />
+            </SelectorInline>
+          </Title>
+        </TitleRow>
+        <Note>{t('withdraw.note', { symbol: currentPool.tokenSymbol })}</Note>
         <TransferInput
           balance={zkAccount ? balance : null}
           isLoadingBalance={isLoadingState}
@@ -117,6 +143,9 @@ export default () => {
           isLoadingFee={isLoadingFee}
           currentPool={currentPool}
           gaIdPostfix="withdraw"
+          poolOptions={poolOptions}
+          selectedPoolAlias={currentPool.alias}
+          onPoolSelect={handlePoolSelect}
         />
         {convertionDetails.exist && (
           <ConvertOptions
@@ -199,7 +228,7 @@ const Text = styled.span`
   display: flex;
   align-items: center;
   gap: 4px;
-  color: ${props => props.theme.text.color.primary};
+  color: ${props => props.theme.card.note.color};
   text-align: center;
   & > b, & > strong {
     font-weight: 600;
@@ -220,6 +249,33 @@ const ContentContainer = styled.div`
   padding: 16px 12px;
 
   @media only screen and (max-width: 560px) {
-    margin: 30px 0;
+    margin: 15px 0;
   }
+`;
+
+const TitleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 4px 10px;
+`;
+
+const Title = styled.span`
+  font-size: 20px;
+  color: ${props => props.theme.card.title.color};
+  font-weight: ${props => props.theme.text.weight.normal};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const SelectorInline = styled.span`
+  display: inline-flex;
+  align-items: center;
+`;
+
+const Note = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.card.note.color};
+  margin: 0 4px 16px;
 `;

@@ -56,7 +56,7 @@ const Container = styled.div`
   border-radius: 16px;
   margin-top: 20px;
   padding: 12px;
-  width: 480px;
+  width: fill-available;
   max-width: 100%;
   box-sizing: border-box;
   & > * {

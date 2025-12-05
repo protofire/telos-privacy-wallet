@@ -11,6 +11,7 @@ const walletOverview = '.wallet-overview';
 const popup = {
   container: '.popover-container',
   closeButton: '.popover-header__button',
+  pageContainerHeaderClose: '.page-container__header-close',
 };
 
 const accountMenu = {

@@ -109,4 +109,9 @@ const WelcomeCard = styled.div`
   & > :last-child {
     margin-bottom: 0;
   }
+
+  @media only screen and (max-width: 560px) {
+    margin-top: 15px;
+    width: 100%;
+  }
 `;

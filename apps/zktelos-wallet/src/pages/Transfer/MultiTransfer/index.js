@@ -24,13 +24,14 @@ export default forwardRef((props, ref) => {
   const { t } = useTranslation();
   const {
     zkAccount, isLoadingState, transferMulti,
-    estimateFee, verifyShieldedAddress,
+    estimateFee, verifyShieldedAddressWithPoolInfo,
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const [data, setData] = useState('');
   const [parsedData, setParsedData] = useState([]);
   const [errors, setErrors] = useState([]);
   const [errorType, setErrorType] = useState(null);
+  const [wrongPoolAddresses, setWrongPoolAddresses] = useState([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [totalAmount, setTotalAmount] = useState(ethers.constants.Zero);
@@ -42,7 +43,9 @@ export default forwardRef((props, ref) => {
     try {
       setParsedData([]);
       setErrorType(null);
+      setWrongPoolAddresses([]);
       let errors = [];
+      const wrongPools = [];
       const rows = data.split('\n');
       const parsedData = await Promise.all(rows.map(async (row, index) => {
         try {
@@ -50,8 +53,13 @@ export default forwardRef((props, ref) => {
           const [address, amount] = rowData;
           if (!address || !amount || rowData.length !== 2) throw Error;
 
-          const isValidAddress = await verifyShieldedAddress(address);
-          if (!isValidAddress || !(Number(amount) > 0)) throw Error;
+          const addressValidation = await verifyShieldedAddressWithPoolInfo(address);
+          if (!addressValidation.isValid || !(Number(amount) > 0)) {
+            if (addressValidation.poolInfo) {
+              wrongPools.push({ index, pool: addressValidation.poolInfo.tokenSymbol });
+            }
+            throw Error;
+          }
 
           return { address, amount: ethers.utils.parseUnits(amount, currentPool.tokenDecimals) };
         } catch (err) {
@@ -60,8 +68,9 @@ export default forwardRef((props, ref) => {
         }
       }));
       setErrors(errors);
+      setWrongPoolAddresses(wrongPools);
       if (errors.length > 0) {
-        setErrorType('syntax');
+        setErrorType(wrongPools.length > 0 ? 'wrong_pool' : 'syntax');
         return;
       }
 
@@ -92,13 +101,13 @@ export default forwardRef((props, ref) => {
       console.error(error);
       Sentry.captureException(error, { tags: { method: 'MultiTransfer.validate' } });
     }
-  }, [data, estimateFee, verifyShieldedAddress, currentPool.tokenDecimals]);
+  }, [data, estimateFee, verifyShieldedAddressWithPoolInfo, currentPool.tokenDecimals]);
 
   useImperativeHandle(ref, () => ({
     handleFileUpload(event) {
       try {
         const reader = new FileReader();
-        reader.onload = function() {
+        reader.onload = function () {
           setData(reader.result.replace(/\n+$/, ''));
           event.target.value = null;
         }
@@ -131,6 +140,7 @@ export default forwardRef((props, ref) => {
     setParsedData([]);
     setErrors([]);
     setErrorType(null);
+    setWrongPoolAddresses([]);
   }, [currentPool.alias]);
 
   return (
@@ -148,7 +158,13 @@ export default forwardRef((props, ref) => {
           <CrossIcon />
           <Error>
             {(() => {
-              if (errorType === 'syntax') {
+              if (errorType === 'wrong_pool') {
+                const uniquePools = [...new Set(wrongPoolAddresses.map(wp => wp.pool))];
+                return t('multitransfer.errors.wrongPool', {
+                  count: wrongPoolAddresses.length,
+                  pools: uniquePools.join(', ')
+                });
+              } else if (errorType === 'syntax') {
                 return t('multitransfer.errors.syntax', { count: errors.length });
               } else if (errorType === 'duplicates') {
                 return t('multitransfer.errors.duplicates');
@@ -164,31 +180,31 @@ export default forwardRef((props, ref) => {
         </ErrorRow>
       }
       {(() => {
-          if (!zkAccount) return <AccountSetUpButton />
-          else if (isLoadingState) return <ButtonLoading />
-          else if (!data) return <Button disabled>{t('buttonText.proceed')}</Button>
-          else return <Button onClick={validate} data-ga-id="initiate-operation-multitransfer">{t('buttonText.proceed')}</Button>;
-        })()}
-        <ConfirmTransactionModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => setIsConfirmModalOpen(false)}
-          onConfirm={onTransfer}
-          isMultitransfer={true}
-          transfers={parsedData}
-          openDetails={openDetailsModal}
-          fee={fee}
-          isLoadingFee={isLoadingFee}
-          numberOfTxs={numberOfTxs}
-          type="multitransfer"
-          currentPool={currentPool}
-        />
-        <MultitransferDetailsModal
-          isOpen={isDetailsModalOpen}
-          onBack={closeDetailsModal}
-          transfers={parsedData}
-          zkAccount={zkAccount}
-          currentPool={currentPool}
-        />
+        if (!zkAccount) return <AccountSetUpButton />
+        else if (isLoadingState) return <ButtonLoading />
+        else if (!data) return <Button disabled>{t('buttonText.proceed')}</Button>
+        else return <Button onClick={validate} data-ga-id="initiate-operation-multitransfer">{t('buttonText.proceed')}</Button>;
+      })()}
+      <ConfirmTransactionModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={onTransfer}
+        isMultitransfer={true}
+        transfers={parsedData}
+        openDetails={openDetailsModal}
+        fee={fee}
+        isLoadingFee={isLoadingFee}
+        numberOfTxs={numberOfTxs}
+        type="multitransfer"
+        currentPool={currentPool}
+      />
+      <MultitransferDetailsModal
+        isOpen={isDetailsModalOpen}
+        onBack={closeDetailsModal}
+        transfers={parsedData}
+        zkAccount={zkAccount}
+        currentPool={currentPool}
+      />
     </>
   );
 });

@@ -5,7 +5,7 @@
     "fee": "费用",
     "copied": "已复制！",
     "balance": "余额",
-    "poolBalance": "资金池余额",
+    "poolBalance": "zk余额",
     "supportId": "Support ID",
     "web": "网页",
     "library": "库",
@@ -35,6 +35,7 @@
     "enterAmount": "输入金额",
     "enterAddress": "输入地址",
     "invalidAddress": "无效地址",
+    "invalidAddressWrongPool": "无效地址，此地址属于 {{pool}} 池",
     "loading": "正在载入……",
     "loadingZkAccount": "正在载入zk账户……",
     "loadingPercentage": "正在载入({{percentage}}%)",
@@ -110,6 +111,7 @@
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} })与$t(glossary.addresses, {\"count\": {{count}} })错误，或格式化 $t(glossary.issues, {\"count\": {{count}} })。",
       "duplicates": "地址重复。",
+      "wrongPool": "{{count}} $t(glossary.addresses, {\"count\": {{count}} })属于 {{pools}} 池。",
       "insufficientBalance": "余额不足：需要{{amount}} {{symbol}} ({{fee}} 作为手续费。"
     },
     "addressesList": "地址列表",
@@ -117,7 +119,8 @@
     "hasBeenTransferredTo": "已发送至{{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
   },
   "withdraw": {
-    "title": "提现",
+    "title": "提款",
+    "fromLabel": "从",
     "note": "{{symbol}}将会从zkTelos中取出并存入到您提供的钱包地址",
     "addressInputPlaceholder": "输入收款人的{{network}}地址",
     "convertion": "提款时将一部分 {{from}} 转化为 {{to}}",

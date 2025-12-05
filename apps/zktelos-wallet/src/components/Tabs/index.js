@@ -53,6 +53,20 @@ const MenuContainer = styled.div`
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
   border: 2px solid ${props => props.theme.color.black};
+  
+  @media only screen and (max-width: 768px) {
+    width: fill-available;
+    max-width: 240px;
+  }
+
+  @media only screen and (max-width: 560px) {
+    width: 240px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
 `;
 
 const MenuItem = styled.div`
@@ -90,6 +104,10 @@ const MenuItem = styled.div`
 const MenuText = styled.span`
   font-size: 16px;
   white-space: nowrap;
+  
+  @media only screen and (max-width: 560px) {
+    display: none;
+  }
 `;
 
 const IconWrapper = styled.div`

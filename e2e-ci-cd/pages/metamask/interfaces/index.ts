@@ -9,7 +9,7 @@ export interface MetamaskMethods {
   addNetwork?(network: string): Promise<void>;
 }
 
-export type CustomNetworksNames = 'Binance Smart Chain' | 'Localhost 8545';
+export type CustomNetworksNames = 'Binance Smart Chain' | 'Localhost 8545' | 'Telos Testnet';
 
 export interface NetworkParameters {
   networkName: CustomNetworksNames;

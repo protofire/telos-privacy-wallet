@@ -58,9 +58,9 @@ export default () => {
             </Tooltip>
           </PaymentLinkContainer>
         </CopyToClipboard>
-        <Link href="https://docs.zkbob.com/zkbob-overview/readme" size={16}>
+        {/* <Link href="https://docs.zkbob.com/zkbob-overview/readme" size={16}>
           {t('paymentLinkModal.getMoreInfo')}
-        </Link>
+        </Link> */}
       </Container>
     </Modal>
   );

@@ -147,7 +147,7 @@ const InProgressScreen = ({ supportId }) => {
       <StatusTitle style={{ marginBottom: 16, marginTop: 0 }}>
         {t('reedeemGifCardModal.inProgress.title')}
       </StatusTitle>
-      {progress > 99 && (
+      {/* {progress > 99 && (
         <>
           <Description style={{ marginBottom: 16 }}>
             <Trans
@@ -159,7 +159,7 @@ const InProgressScreen = ({ supportId }) => {
           </Description>
           <SupportId supportId={supportId} />
         </>
-      )}
+      )} */}
     </>
   );
 }
@@ -197,11 +197,11 @@ const FailedScreen = ({ error, supportId }) => {
         </Description>
       }
       <SupportId supportId={supportId} />
-      {!isClaimed &&
+      {/* {!isClaimed &&
         <Button onClick={() => window.open('https://zkbob.canny.io/report-issue/', '_blank')}>
           {t('common.contactSupport')}
         </Button>
-      }
+      } */}
     </>
   );
 };

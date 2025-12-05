@@ -5,7 +5,7 @@
     "fee": "Комиссия",
     "copied": "Скопировано!",
     "balance": "Баланс",
-    "poolBalance": "Баланс в пуле",
+    "poolBalance": "zk Баланс",
     "supportId": "Идентификатор поддержки",
     "web": "Web",
     "library": "Библиотека",
@@ -35,6 +35,7 @@
     "enterAmount": "Введите сумму",
     "enterAddress": "Введите адрес",
     "invalidAddress": "Некорректный адрес",
+    "invalidAddressWrongPool": "Некорректный адрес, он принадлежит пулу {{pool}}",
     "loading": "Загрузка...",
     "loadingZkAccount": "Загрузка zk-Аккаунта...",
     "loadingPercentage": "Загрузка ({{percentage}}%)",
@@ -92,7 +93,7 @@
     "value": "Стоимость"
   },
   "deposit": {
-    "title": "Пополнение",
+    "title": "Депозит",
     "note": "{{symbol}} будет внесен на ваш zk-Аккаунт. После получения, вы сможете переводить {{symbol}} конфиденциально.",
     "ddNote": "Пополнение {{symbol}} может занять до 10 минут."
   },
@@ -110,6 +111,7 @@
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} }) с неправильным $t(glossary.addresses, {\"count\": {{count}} }) или форматированием $t(glossary.issues, {\"count\": {{count}} }).",
       "duplicates": "Найдены дублирующиеся адреса.",
+      "wrongPool": "{{count}} $t(glossary.addresses, {\"count\": {{count}} }) принадлежат пулу {{pools}}.",
       "insufficientBalance": "Недостаточный баланс: требуется {{amount}} {{symbol}} ({{fee}} комиссия)."
     },
     "addressesList": "Список адресов",
@@ -118,6 +120,7 @@
   },
   "withdraw": {
     "title": "Вывод",
+    "fromLabel": "Из",
     "note": "{{symbol}} будет выведен из zkTelos и зачислен на указанный адрес кошелька.",
     "addressInputPlaceholder": "Введите {{network}} адрес получателя",
     "convertion": "Конвертировать часть {{from}} в {{to}} при выводе",

@@ -12,7 +12,7 @@ import { INCREASED_LIMITS_STATUSES } from 'constants';
 export default ({ status, account, openModal, kycUrls }) => {
   const { t } = useTranslation();
   let component;
-  switch(status) {
+  switch (status) {
     default:
     case null:
     case INCREASED_LIMITS_STATUSES.INACTIVE:
@@ -56,13 +56,14 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 36px;
-  width: 480px;
+  width: fill-available;
   max-width: 100%;
   border-radius: 10px;
   background: ${props => props.theme.color.yellow};
   margin: 20px 0 -10px;
   padding: 5px 10px;
   box-sizing: border-box;
+  
 `;
 
 const Text = styled.span`

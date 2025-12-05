@@ -1,6 +1,6 @@
 import React, { useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
+// import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
 
 import ButtonDefault from 'components/Button';
@@ -9,8 +9,8 @@ import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
 import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
-import Skeleton from 'components/Skeleton';
-import BalanceDisplay from 'components/BalanceDisplay';
+// import Skeleton from 'components/Skeleton';
+// import BalanceDisplay from 'components/BalanceDisplay';
 
 import { ReactComponent as StyledEyeIcon } from 'assets/eye.svg';
 import { ReactComponent as StyledEyeClosedIcon } from 'assets/eye-off.svg';
@@ -22,9 +22,10 @@ import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
 
-import { formatNumber } from 'utils';
-import { NETWORKS, TOKENS_ICONS } from 'constants';
+// import { formatNumber } from 'utils';
+import { NETWORKS } from 'constants';
 import { useWindowDimensions } from 'hooks';
+import { useHistory } from 'react-router-dom';
 
 import {
   ZkAccountContext, ModalContext,
@@ -32,26 +33,27 @@ import {
   WalletContext,
 } from 'contexts';
 
-const { parseUnits } = ethers.utils;
+// const { parseUnits } = ethers.utils;
 
-const formatBalance = (balance, tokenDecimals, isMobile) => {
-  const decimals = (isMobile && balance.gte(parseUnits('1000', tokenDecimals))) ? 0 : null;
-  return formatNumber(balance, tokenDecimals, decimals);
-};
+// const formatBalance = (balance, tokenDecimals, isMobile) => {
+//   const decimals = (isMobile && balance.gte(parseUnits('1000', tokenDecimals))) ? 0 : null;
+//   return formatNumber(balance, tokenDecimals, decimals);
+// };
 
-const BalanceSkeleton = isMobile => (
-  <Skeleton
-    width={isMobile ? 60 : 80}
-    style={{ marginLeft: isMobile ? 5 : 0 }}
-  />
-);
+// const BalanceSkeleton = isMobile => (
+//   <Skeleton
+//     width={isMobile ? 60 : 80}
+//     style={{ marginLeft: isMobile ? 5 : 0 }}
+//   />
+// );
 
 export default ({ empty }) => {
   const { t } = useTranslation();
   const { address: account } = useContext(WalletContext);
   const { updateBalance, isLoadingBalance } = useContext(TokenBalanceContext);
+  const history = useHistory();
   const {
-    zkAccount, isLoadingZkAccount, balance: poolBalance,
+    zkAccount, isLoadingZkAccount,
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
   const { openAccessAccountModal } = useContext(ModalContext);
@@ -82,8 +84,7 @@ export default ({ empty }) => {
     <NetworkDropdown>
       <NetworkDropdownButton $refreshing={isPoolSwitching || isLoadingState} data-tour="supported-tokens">
         <NetworkIcon src={NETWORKS[currentPool.chainId].icon} />
-        <Divider />
-        <NetworkIcon src={TOKENS_ICONS[currentPool.tokenSymbol]} />
+        <NetworkLabel>{NETWORKS[currentPool.chainId].name}</NetworkLabel>
         {isPoolSwitching ? (
           <Spinner size={12} style={{ marginLeft: 10 }} />
         ) : (
@@ -130,18 +131,7 @@ export default ({ empty }) => {
         <Row>
           <ZkAvatar seed={zkAccount} size={16} />
           <Address><ZkName seed={zkAccount} /></Address>
-          {isLoadingState ? (
-            <BalanceSkeleton isMobile={isMobile} />
-          ) : (
-            <>
-              <Balance>
-                <BalanceDisplay
-                  value={`${formatBalance(poolBalance, currentPool.tokenDecimals, isMobile)} ${currentPool.tokenSymbol}`}
-                />
-              </Balance>
-              <DropdownIcon />
-            </>
-          )}
+          <DropdownIcon />
         </Row>
       </AccountDropdownButton>
     </ZkAccountDropdown>
@@ -153,7 +143,7 @@ export default ({ empty }) => {
       disabled={isLoadingZkAccount}
       onClick={openAccessAccountModal}
       data-ga-id="zkaccount-header"
-      className="create-zkaccount"
+      data-tour="create-zkaccount"
     >
       {isLoadingZkAccount ? (isMobile ? t('buttonText.loading') : t('buttonText.loadingZkAccount')) : t('common.accessPrivateAccount')}
     </Button>
@@ -163,16 +153,16 @@ export default ({ empty }) => {
     <>
       <Row>
         <LogoSection>
-          <Logo />
+          <Logo onClick={() => history.push('/')} />
         </LogoSection>
-        <AccountSection data-tour="create-zkaccount">
+        <AccountSection>
           {!isMobile && networkDropdown}
           {/* <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton> */}
           {/* {!isMobile && walletDropdown} */}
           {(account || zkAccount) && <IconWrapper onClick={toggleVisibility}>
-            {isVisible ? <StyledEyeIcon /> : <StyledEyeClosedIcon />}
+            {isVisible ? <StyledEyeIcon width={24} height={24} /> : <StyledEyeClosedIcon width={24} height={24} />}
           </IconWrapper>}
           {!isMobile && zkAccountDropdown}
           {(zkAccount && !isMobile) && (
@@ -242,6 +232,7 @@ const Logo = styled(LogoDefault)`
     height: 35px;
     width: 135px;
     margin-left: 10px;
+    cursor: pointer;
 `;
 
 const AccountSection = styled(Row)`
@@ -328,21 +319,18 @@ const AccountDropdownButton = styled(NetworkDropdownButton)`
 const Address = styled.span`
   margin-left: 8px;
   margin-right: 8px;
-  @media only screen and (max-width: 1100px) {
-    display: none;
-  }
 `;
 
-const Balance = styled.span`
-  font-weight: ${props => props.theme.text.weight.extraBold};
-  @media only screen and (max-width: 1100px) {
-    margin-left: 8px;
-  }
-  @media only screen and (max-width: 800px) {
-    font-weight: ${props => props.theme.text.weight.bold};
-    font-size: 14px;
-  }
-`;
+// const Balance = styled.span`
+//   font-weight: ${props => props.theme.text.weight.extraBold};
+//   @media only screen and (max-width: 1100px) {
+//     margin-left: 8px;
+//   }
+//   @media only screen and (max-width: 800px) {
+//     font-weight: ${props => props.theme.text.weight.bold};
+//     font-size: 14px;
+//   }
+// `;
 
 const Spinner = styled(SpinnerDefault)`
   path {
@@ -388,13 +376,10 @@ const NetworkIcon = styled.img`
   height: 24px;
 `;
 
-const Divider = styled.span`
-  ::before {
-    content: '/';
-    font-size: 16px;
-    color: ${props => props.theme.text.color.primary};
-    margin: 0 4px;
-  }
+const NetworkLabel = styled.span`
+  margin-left: 8px;
+  font-size: 14px;
+  color: ${props => props.theme.text.color.primary};
 `;
 
 const IconWrapper = styled.div`

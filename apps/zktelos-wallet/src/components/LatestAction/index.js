@@ -51,7 +51,7 @@ export default ({ type, data, currentPool }) => {
 const Row = styled.div`
   display: flex;
   align-items: center;
-  width: 480px;
+  width: fill-available;
   max-width: 100%;
   padding: 0 12px;
   margin-top: 25px;

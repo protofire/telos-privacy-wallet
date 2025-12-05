@@ -94,7 +94,7 @@ const Fee = ({ fee, highFee, isMobile, tokenSymbol, tokenDecimals }) => {
           })}
         </FeeText>
       )}
-      {highFee && (
+      {/* {highFee && (
         <Tooltip
           content={
             <span>
@@ -110,7 +110,7 @@ const Fee = ({ fee, highFee, isMobile, tokenSymbol, tokenDecimals }) => {
         >
           <InfoIcon />
         </Tooltip>
-      )}
+      )} */}
     </>
   );
 };
@@ -120,12 +120,13 @@ const Date = ({ timestamp }) => {
   return <DateText>{date}</DateText>;
 };
 
-export default ({ item, zkAccount, currentPool, isMobile }) => {
+export default ({ item, zkAccount, isMobile }) => {
   const { t } = useTranslation();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const currentChainId = currentPool.chainId;
-  const tokenSymbol = useHistoricalTokenSymbol(currentPool, item);
+  const itemPool = item.pool;
+  const currentChainId = itemPool.chainId;
+  const tokenSymbol = useHistoricalTokenSymbol(itemPool, item);
 
   const onCopy = useCallback((text, result) => {
     if (result) {
@@ -136,8 +137,8 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
 
   const isPending = [0, 1].includes(item.state);
   const isPaymentLabelShown = item.type === DirectDeposit && (
-    (item.sender && item.sender === currentPool.paymentContractAddress?.toLowerCase()) ||
-    (item.actions[0]?.from && item.actions[0].from === currentPool.paymentContractAddress?.toLowerCase())
+    (item.sender && item.sender === itemPool.paymentContractAddress?.toLowerCase()) ||
+    (item.actions[0]?.from && item.actions[0].from === itemPool.paymentContractAddress?.toLowerCase())
   );
 
   return (
@@ -157,8 +158,8 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
                 {(() => {
                   const total = item.actions.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero);
                   return (
-                    <Tooltip content={formatNumber(total, currentPool.tokenDecimals, 18)} placement="top">
-                      <span>{formatNumber(total, currentPool.tokenDecimals, 4)}</span>
+                    <Tooltip content={formatNumber(total, itemPool.tokenDecimals, 18)} placement="top">
+                      <span>{formatNumber(total, itemPool.tokenDecimals, 4)}</span>
                     </Tooltip>
                   );
                 })()}
@@ -171,7 +172,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
                   fee={item.fee}
                   highFee={item.highFee}
                   tokenSymbol={tokenSymbol}
-                  tokenDecimals={currentPool.tokenDecimals}
+                  tokenDecimals={itemPool.tokenDecimals}
                 />
               </FeeDesktop>
             )}
@@ -195,7 +196,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
               fee={item.fee}
               highFee={item.highFee}
               tokenSymbol={tokenSymbol}
-              tokenDecimals={currentPool.tokenDecimals}
+              tokenDecimals={itemPool.tokenDecimals}
               isMobile
             />
           </FeeMobile>
@@ -311,7 +312,7 @@ export default ({ item, zkAccount, currentPool, isMobile }) => {
           onClose={() => setIsDetailsModalOpen(false)}
           zkAccount={zkAccount}
           isSent={true}
-          currentPool={currentPool}
+          currentPool={itemPool}
         />
       )}
     </Container>

@@ -12,7 +12,7 @@ import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
 import { formatNumber } from 'utils';
 import { useDisplayedFee } from 'hooks';
 
-import { TOKENS_ICONS } from 'constants';
+import { TOKENS_ICONS, HIDDEN_BALANCE_PLACEHOLDER } from 'constants';
 import { BalanceVisibilityContext } from 'contexts';
 
 export default ({
@@ -92,9 +92,9 @@ export default ({
             {isLoadingBalance ? (
               <Skeleton width={80} />
             ) : (
-              <Row style={{ visibility: isVisible ? 'visible' : 'hidden' }}>
+              <Row>
                 <Text>
-                  {formatNumber(isNativeTokenUsed ? nativeBalance : balance, currentPool.tokenDecimals)}{' '}
+                  {isVisible ? formatNumber(isNativeTokenUsed ? nativeBalance : balance, currentPool.tokenDecimals) : HIDDEN_BALANCE_PLACEHOLDER}{' '}
                   {displayedSymbol}
                 </Text>
                 <MaxButton
@@ -198,6 +198,7 @@ const TokenContainer = styled.div`
   padding: 10px 0;
   margin-left: 15px;
 `;
+
 
 const InfoIcon = styled(InfoIconDefault)`
   margin-left: 2px;

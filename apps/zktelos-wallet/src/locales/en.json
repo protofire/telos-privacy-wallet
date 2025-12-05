@@ -5,7 +5,7 @@
     "fee": "Fee",
     "copied": "Copied!",
     "balance": "Balance",
-    "poolBalance": "Pool balance",
+    "poolBalance": "zk Balance",
     "supportId": "Support ID",
     "web": "Web",
     "library": "Library",
@@ -35,6 +35,7 @@
     "enterAmount": "Enter amount",
     "enterAddress": "Enter address",
     "invalidAddress": "Invalid address",
+    "invalidAddressWrongPool": "Invalid address, this belongs to {{pool}} pool",
     "loading": "Loading...",
     "loadingZkAccount": "Loading zkAccount...",
     "loadingPercentage": "Loading ({{percentage}}%)",
@@ -112,6 +113,7 @@
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} }) with incorrect $t(glossary.addresses, {\"count\": {{count}} }) or formatting $t(glossary.issues, {\"count\": {{count}} }).",
       "duplicates": "Duplicate addresses found.",
+      "wrongPool": "{{count}} $t(glossary.addresses, {\"count\": {{count}} }) belong to {{pools}} pool(s).",
       "insufficientBalance": "Insufficient balance: {{amount}} {{symbol}} ({{fee}} fee) is required."
     },
     "addressesList": "Addresses list",
@@ -120,6 +122,7 @@
   },
   "withdraw": {
     "title": "Withdraw",
+    "fromLabel": "From",
     "note": "{{symbol}} will be withdrawn from zkTelos and deposited into the provided wallet address.",
     "addressInputPlaceholder": "Enter {{network}} address of receiver",
     "convertion": "Convert some {{from}} to {{to}} on withdrawal",
@@ -314,7 +317,7 @@
     "title": "Extended limits",
     "paragraph1": "To increase personal deposit limits you need to own a BAB token on the BNB Smart chain. What's a BAB token? <1>Find out now.</1>",
     "paragraph2": "Verify your BAB:",
-    "step1": "Connect the Metamask or WalletConnect wallet containing your BAB token to zkBob. You DO NOT need to switch networks, stay on Polygon.",
+    "step1": "Connect the Metamask or WalletConnect wallet containing your BAB token to Telos zkWallet. You DO NOT need to switch networks, stay on Telos.",
     "step2": "Click Verify my BAB token below.",
     "paragraph3": "That's it. Your deposit limits will automatically increase if your connected wallet contains a BAB token.",
     "button": "Verify my BAB token"
@@ -409,7 +412,7 @@
       "transferredMulti": "Your <strong>{{amount}} {{symbol}}</strong> multitransfer within the zero knowledge pool is in progress.",
       "withdrawn": "Your <strong>{{amount}} {{symbol}}</strong> withdrawal from the zero knowledge pool is in progress.",
       "signatureExpired": "Your signature has expired. Please try again.",
-      "suspiciousAccountDeposit": "We found that your wallet was involved in suspicious activities. Because of this, you can't use this wallet at zkBob. Please, try another wallet.",
+      "suspiciousAccountDeposit": "We found that your wallet was involved in suspicious activities. Because of this, you can't use this wallet at Telos zkWallet. Please, try another wallet.",
       "suspiciousAccountWithdrawal": "We found that the recipient's address was involved in suspicious activities. Because of this, you can't withdraw funds to this address.",
       "wrongNetwork": "Failed to switch the network. Please connect your wallet to {{network}} and try again.",
       "approved": "Your approval was successful. Now you can deposit your tokens.",

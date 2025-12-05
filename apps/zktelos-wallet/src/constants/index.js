@@ -23,6 +23,7 @@ export const NETWORKS = {
   40: {
     name: 'Telos',
     icon: require('assets/telos.svg').default,
+    nativeSymbol: 'TLOS',
     blockExplorerUrls: {
       address: 'https://teloscan.io/address/%s',
       tx: 'https://teloscan.io/tx/%s',
@@ -31,6 +32,7 @@ export const NETWORKS = {
   41: {
     name: 'Telos Testnet',
     icon: require('assets/telos.svg').default,
+    nativeSymbol: 'TLOS',
     blockExplorerUrls: {
       address: 'https://testnet.teloscan.io/address/%s',
       tx: 'https://testnet.teloscan.io/tx/%s',
@@ -77,3 +79,5 @@ export const INCREASED_LIMITS_STATUSES = {
 export const PERMIT2_CONTRACT_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
 export const SUPPORT_URL = 'https://discord.com/channels/1095673887389392916/1112786753133220042';
+
+export const HIDDEN_BALANCE_PLACEHOLDER = '••••••';

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useCallback, useEffect } from 'react';
 import { TxType } from 'zkbob-client-js';
 import { ethers } from 'ethers';
-import { isMobile } from 'react-device-detect';
+// import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 
 import AccountSetUpButton from 'containers/AccountSetUpButton';
@@ -20,17 +20,17 @@ import { useFee, useParsedAmount, useMaxTransferable } from 'hooks';
 import { formatNumber } from 'utils';
 import { useMaxAmountExceeded } from './hooks';
 
-export default () => {
+export default ({ poolOptions = [], onPoolSelect }) => {
   const { t } = useTranslation();
   const {
     zkAccount, balance, transfer, isLoadingState,
-    isPending, minTxAmount, verifyShieldedAddress,
+    isPending, minTxAmount, verifyShieldedAddressWithPoolInfo, switchToPool
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const [receiver, setReceiver] = useState('');
-  const [isAddressValid, setIsAddressValid] = useState(false);
+  const [addressValidation, setAddressValidation] = useState({ isValid: false, poolInfo: null });
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const { fee, relayerFee, numberOfTxs, isLoadingFee } = useFee(amount, TxType.Transfer);
   const maxTransferable = useMaxTransferable(TxType.Transfer, relayerFee, amount);
@@ -47,14 +47,27 @@ export default () => {
     setDisplayAmount(ethers.utils.formatUnits(maxTransferable, currentPool.tokenDecimals));
   }, [maxTransferable, currentPool.tokenDecimals]);
 
+  const handlePoolSelect = useCallback(alias => {
+    if (alias === currentPool.alias) return;
+    if (onPoolSelect) {
+      onPoolSelect(alias);
+    } else {
+      switchToPool(alias);
+    }
+  }, [currentPool.alias, onPoolSelect, switchToPool]);
+
   useEffect(() => {
     async function checkAddress(address) {
-      setIsAddressValid(false);
-      const isValid = await verifyShieldedAddress(address);
-      setIsAddressValid(isValid);
+      if (!address) {
+        setAddressValidation({ isValid: false, poolInfo: null });
+        return;
+      }
+
+      const result = await verifyShieldedAddressWithPoolInfo(address);
+      setAddressValidation(result);
     }
     checkAddress(receiver);
-  }, [receiver, verifyShieldedAddress]);
+  }, [receiver, verifyShieldedAddressWithPoolInfo]);
 
   useEffect(() => {
     setDisplayAmount('');
@@ -73,11 +86,14 @@ export default () => {
     } else if (amount.gt(balance)) {
       button = <Button disabled>{t('buttonText.insufficientBalance', { symbol: currentPool.tokenSymbol })}</Button>;
     } else if (amount.gt(maxTransferable)) {
-      button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals)})}</Button>
+      button = <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>
     } else if (!receiver) {
       button = <Button disabled>{t('buttonText.enterAddress')}</Button>;
-    } else if (!isAddressValid) {
-      button = <Button disabled>{t('buttonText.invalidAddress')}</Button>;
+    } else if (!addressValidation.isValid) {
+      const errorMessage = addressValidation.poolInfo
+        ? t('buttonText.invalidAddressWrongPool', { pool: addressValidation.poolInfo.tokenSymbol })
+        : t('buttonText.invalidAddress');
+      button = <Button disabled>{errorMessage}</Button>;
     } else {
       button = (
         <Button onClick={() => setIsConfirmModalOpen(true)} data-ga-id="initiate-operation-transfer">
@@ -102,13 +118,15 @@ export default () => {
         isLoadingFee={isLoadingFee}
         currentPool={currentPool}
         gaIdPostfix="transfer"
+        poolOptions={poolOptions}
+        selectedPoolAlias={currentPool.alias}
+        onPoolSelect={handlePoolSelect}
       />
       <MultilineInput
         placeholder={t('transfer.addressInputPlaceholder')}
         hint={t('transfer.addressInputHint')}
         value={receiver}
         onChange={setReceiver}
-        qrCode={isMobile}
       />
       {button}
       <ConfirmTransactionModal
