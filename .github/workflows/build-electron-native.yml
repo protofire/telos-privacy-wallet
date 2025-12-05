@@ -40,10 +40,18 @@ jobs:
       - name: Build Rust library
         run: yarn workspace libzkbob-rs-node build
 
+      - name: Create .env file
+        run: |
+          echo "REACT_APP_CONFIG=dev" > apps/zktelos-wallet/.env
+          echo "REACT_APP_BUILD_TARGET=electron" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_WALLETCONNECT_PROJECT_ID=${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_LOCK_TIMEOUT=100000" >> apps/zktelos-wallet/.env
+
       - name: Build Electron app
         env:
           CI: false
           NODE_OPTIONS: --max-old-space-size=8192
+          GENERATE_SOURCEMAP: false
         run: yarn electron:build:mac
 
       - name: Upload macOS artifacts
@@ -148,10 +156,18 @@ jobs:
       - name: Build Rust library
         run: yarn workspace libzkbob-rs-node build
 
+      - name: Create .env file
+        run: |
+          echo "REACT_APP_CONFIG=dev" > apps/zktelos-wallet/.env
+          echo "REACT_APP_BUILD_TARGET=electron" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_WALLETCONNECT_PROJECT_ID=${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_LOCK_TIMEOUT=100000" >> apps/zktelos-wallet/.env
+
       - name: Build Electron app
         env:
           CI: false
           NODE_OPTIONS: --max-old-space-size=8192
+          GENERATE_SOURCEMAP: false
         run: yarn electron:build:linux
 
       - name: Upload Linux artifacts
@@ -193,19 +209,15 @@ jobs:
             ### Downloads
 
             **macOS:**
-            - `.dmg` - Instalador estándar (recomendado)
-            - `.zip` - Versión portátil
+            - `.dmg` - Installer standard (recommended)
+            - `.zip` - Portable version
 
             **Windows:**
-            - `.exe` - Instalador NSIS para Windows x64
+            - `.exe` - NSIS installer for Windows x64
 
             **Linux:**
-            - `.AppImage` - Aplicación portátil (no requiere instalación)
-            - `.deb` - Paquete Debian/Ubuntu
-
-            ### Cambios en esta versión
-            - Addon nativo de Rust integrado
-            - Soporte para WalletConnect mejorado
+            - `.AppImage` - Portable application (no requires installation)
+            - `.deb` - Debian/Ubuntu package
 
             ---
 
