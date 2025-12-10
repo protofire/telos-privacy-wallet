@@ -16,11 +16,14 @@ import { ReactComponent as StyledEyeIcon } from 'assets/eye.svg';
 import { ReactComponent as StyledEyeClosedIcon } from 'assets/eye-off.svg';
 
 import { BalanceVisibilityContext } from 'contexts';
+import ThemeContext from 'contexts/ThemeContext';
 
 import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
 import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 import { ReactComponent as DotsIcon } from 'assets/dots.svg';
+import { ReactComponent as MoonIcon } from 'assets/moon.svg';
+import { ReactComponent as SunIcon } from 'assets/sun.svg';
 
 // import { formatNumber } from 'utils';
 import { NETWORKS } from 'constants';
@@ -58,6 +61,7 @@ export default ({ empty }) => {
   } = useContext(ZkAccountContext);
   const { openAccessAccountModal } = useContext(ModalContext);
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const { currentPool } = useContext(PoolContext);
 
   const refresh = useCallback(e => {
@@ -164,6 +168,11 @@ export default ({ empty }) => {
           {(account || zkAccount) && <IconWrapper onClick={toggleVisibility}>
             {isVisible ? <StyledEyeIcon width={24} height={24} /> : <StyledEyeClosedIcon width={24} height={24} />}
           </IconWrapper>}
+
+          <IconWrapper onClick={toggleTheme}>
+            {theme === 'light' ? <MoonIcon width={24} height={24} /> : <SunIcon width={24} height={24} />}
+          </IconWrapper>
+
           {!isMobile && zkAccountDropdown}
           {(zkAccount && !isMobile) && (
             <RefreshButtonContainer onClick={refresh}>

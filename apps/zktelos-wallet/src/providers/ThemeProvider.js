@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { ThemeProvider } from 'styled-components';
+import ThemeContext from 'contexts/ThemeContext';
 
 const white = '#FFFFFF';
 const grey = '#F4F3F8';
@@ -21,6 +22,16 @@ const black = '#000000';
 const success = '#00D100';
 const telosGradient = 'linear-gradient(147.39deg, #FFA1E5 16.02%, #6F9AE3 85.63%)';
 const telosGradientSoft = 'linear-gradient(135deg, rgba(0, 242, 243, 0.1) 0%, rgba(79, 172, 254, 0.1) 33%, rgba(196, 113, 245, 0.1) 66%)';
+
+// Dark Theme Colors
+const darkBlack = '#121212';
+const darkCard = '#1E1E24';
+const darkTextPrimary = '#E0E0E0';
+const darkTextSecondary = '#A0A0B0';
+const darkBorder = '#333340';
+const darkInput = '#252530';
+const telosGradientDark = 'radial-gradient(circle at 0 120%,#8b3f98,transparent 50%),radial-gradient(circle at 100% 120%,#8b3f98,transparent 50%),radial-gradient(circle at 100% 0%,#348dcc,transparent 40%),radial-gradient(circle at 20% 0%,#73c58f,transparent 40%),#000000';
+
 
 const light = {
   color: {
@@ -56,6 +67,7 @@ const light = {
     },
   },
   button: {
+    background: telosGradientSoft,
     primary: {
       background: {
         default: black,
@@ -175,14 +187,135 @@ const light = {
       },
     },
   },
-  background: 'linear-gradient(135deg, rgba(0, 242, 243, 0.1) 0%, rgba(79, 172, 254, 0.1) 33%, rgba(196, 113, 245, 0.1) 66%)',
+  background: telosGradientSoft
 };
 
+const dark = {
+  ...light,
+  color: {
+    ...light.color,
+    white: darkCard,
+    grey: darkBlack,
+    darkGrey: darkBorder,
+    black: white,
+    telosGradientSoft: telosGradientDark,
+  },
+  text: {
+    ...light.text,
+    color: {
+      ...light.text.color,
+      primary: darkTextPrimary,
+      secondary: darkTextSecondary,
+    },
+  },
+  button: {
+    ...light.button,
+    background: 'linear-gradient(0.4turn,#071033,#6039a4)',
+    primary: {
+      ...light.button.primary,
+      background: {
+        ...light.button.primary.background,
+        default: white, // White buttons in dark mode
+        disabled: 'rgba(255, 255, 255, 0.2)',
+      },
+      text: {
+        ...light.button.primary.text,
+        color: {
+          ...light.button.primary.text.color,
+          default: black,
+        },
+      },
+    },
+  },
+  tab: {
+    background: {
+      default: darkCard,
+      active: '#2D2D3A',
+    },
+  },
+  networkLabel: {
+    background: '#2D2D3A',
+  },
+  card: {
+    background: darkCard,
+    title: {
+      color: darkTextPrimary,
+    },
+    note: {
+      color: darkTextSecondary,
+    },
+  },
+  input: {
+    ...light.input,
+    background: {
+      primary: darkInput,
+      secondary: darkCard,
+      checked: purple,
+    },
+    border: {
+      ...light.input.border,
+      color: {
+        ...light.input.border.color,
+        default: darkBorder,
+      },
+    },
+    text: {
+      color: {
+        default: darkTextPrimary,
+        placeholder: darkTextSecondary,
+      }
+    },
+  },
+  transferInput: {
+    text: {
+      ...light.transferInput.text,
+      color: {
+        ...light.transferInput.text.color,
+        default: darkTextPrimary,
+        small: darkTextSecondary,
+        placeholder: darkTextSecondary,
+      },
+    },
+  },
+  modal: {
+    background: darkCard,
+    overlay: 'rgba(0, 0, 0, 0.8)',
+  },
+  walletConnectorOption: {
+    background: {
+      default: darkInput,
+      hover: '#2D2D3A',
+    },
+    border: {
+      default: darkBorder,
+      hover: purple,
+      light: darkInput,
+    },
+  },
+  mnemonic: {
+    background: {
+      default: darkCard,
+      active: darkInput,
+    },
+    border: {
+      default: darkBorder,
+      active: darkInput,
+    },
+    text: {
+      color: {
+        default: darkTextPrimary,
+        active: darkTextSecondary,
+      },
+    },
+  },
+  background: telosGradientDark,
+};
 
-
-
-export default ({ children }) => (
-  <ThemeProvider theme={light}>
-    {children}
-  </ThemeProvider>
-);
+export default ({ children }) => {
+  const { theme } = useContext(ThemeContext);
+  return (
+    <ThemeProvider theme={theme === 'dark' ? dark : light}>
+      {children}
+    </ThemeProvider>
+  );
+};
