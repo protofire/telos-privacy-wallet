@@ -205,7 +205,7 @@ const OnlyMobile = styled.div`
   right: 0;
   height: 50px;
   padding: 0 7px;
-  background: #fff;
+  background: ${props => props.theme.modal.background};
   z-index: 1;
   display: flex;
   align-items: center;
