@@ -123,6 +123,7 @@ const TitleWithPoolSelector = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  color: ${props => props.theme.card.title.color};
 `;
 
 const MultiTransferSwitch = styled.div`
