@@ -197,7 +197,8 @@ const light = {
       default: black,
       hover: purpleExtraLight,
     }
-  }
+  },
+  lineNumbers: '#D5D5D5',
 };
 
 const dark = {
@@ -216,7 +217,9 @@ const dark = {
       ...light.text.color,
       primary: darkTextPrimary,
       secondary: darkTextSecondary,
+      contrast: grey,
     },
+
   },
   button: {
     ...light.button,
@@ -228,7 +231,7 @@ const dark = {
       },
       background: {
         ...light.button.primary.background,
-        default: white, // White buttons in dark mode
+        default: white,
         disabled: 'rgba(255, 255, 255, 0.2)',
       },
       text: {
@@ -236,7 +239,13 @@ const dark = {
         color: {
           ...light.button.primary.text.color,
           default: black,
+          contrast: grey,
         },
+      },
+    },
+    link: {
+      text: {
+        color: purpleExtraLight,
       },
     },
   },
@@ -330,7 +339,8 @@ const dark = {
       default: white,
       hover: purpleExtraLight,
     }
-  }
+  },
+  lineNumbers: '#263238',
 };
 
 export default ({ children }) => {

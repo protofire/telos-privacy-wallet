@@ -261,10 +261,6 @@ export default () => {
   );
 };
 
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
 
 const TitleRow = styled.div`
   display: flex;
