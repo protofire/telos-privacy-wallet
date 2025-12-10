@@ -12,18 +12,12 @@ import SpinnerDefault from 'components/Spinner';
 // import Skeleton from 'components/Skeleton';
 // import BalanceDisplay from 'components/BalanceDisplay';
 
-import { ReactComponent as StyledEyeIcon } from 'assets/eye.svg';
-import { ReactComponent as StyledEyeClosedIcon } from 'assets/eye-off.svg';
+import { EyeIcon, EyeOffIcon, MoonIcon, SunIcon, EllipsisIcon, RefreshCcwIcon, ChevronDownIcon } from 'lucide-react';
 
 import { BalanceVisibilityContext } from 'contexts';
 import ThemeContext from 'contexts/ThemeContext';
 
 import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
-import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
-import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
-import { ReactComponent as DotsIcon } from 'assets/dots.svg';
-import { ReactComponent as MoonIcon } from 'assets/moon.svg';
-import { ReactComponent as SunIcon } from 'assets/sun.svg';
 
 // import { formatNumber } from 'utils';
 import { NETWORKS } from 'constants';
@@ -165,27 +159,22 @@ export default ({ empty }) => {
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton> */}
           {/* {!isMobile && walletDropdown} */}
-          {(account || zkAccount) && <IconWrapper onClick={toggleVisibility}>
-            {isVisible ? <StyledEyeIcon width={24} height={24} /> : <StyledEyeClosedIcon width={24} height={24} />}
-          </IconWrapper>}
-
-          <IconWrapper onClick={toggleTheme}>
-            {theme === 'light' ? <MoonIcon width={24} height={24} /> : <SunIcon width={24} height={24} />}
-          </IconWrapper>
 
           {!isMobile && zkAccountDropdown}
-          {(zkAccount && !isMobile) && (
+          <RefreshButtonContainer onClick={toggleTheme} >
+            {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+          </RefreshButtonContainer>
+          <RefreshButtonContainer onClick={toggleVisibility} >
+            {(account || zkAccount) && isVisible ? <EyeIcon /> : <EyeOffIcon />}
+          </RefreshButtonContainer>
+          {zkAccount && (
             <RefreshButtonContainer onClick={refresh}>
-              {(isLoadingBalance || isLoadingState) ? (
-                <Spinner size={18} />
-              ) : (
-                <RefreshIcon />
-              )}
+              {(isLoadingBalance || isLoadingState) ? <Spinner size={18} /> : <RefreshCcwIcon />}
             </RefreshButtonContainer>
           )}
           <MoreDropdown>
             <DropdownButton data-ga-id="extra-menu-header">
-              <DotsIcon />
+              <EllipsisIcon />
             </DropdownButton>
           </MoreDropdown>
         </AccountSection>
@@ -275,7 +264,7 @@ const DropdownButton = styled(Row)`
   }
 `;
 
-const DropdownIcon = styled(DropdownIconDefault)`
+const DropdownIcon = styled(ChevronDownIcon)`
   width: 16px !important;
   height: 16px;
   margin-left: 7px;
@@ -362,6 +351,17 @@ const RefreshButtonContainer = styled(Row)`
   @media only screen and (max-width: 1000px) {
     height: 30px;
     border-radius: 16px;
+  }
+
+  svg {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    color: ${props => props.theme.icon.color.default};
+  }
+
+  &:hover svg {
+    color: ${props => props.theme.icon.color.hover};
   }
 `;
 

@@ -13,8 +13,7 @@ import Skeleton from 'components/Skeleton';
 
 import { ZkAccountContext, WalletContext, ModalContext, PoolContext } from 'contexts';
 
-import shieldIcon from 'assets/shield.svg';
-import globeIcon from 'assets/globe.svg';
+import { ShieldCheckIcon, GlobeIcon } from 'lucide-react';
 
 export default () => {
   const { t } = useTranslation();
@@ -90,7 +89,7 @@ export default () => {
           <CardsContainer>
             <Card
               title={t('home.privateAccount')}
-              icon={shieldIcon}
+              icon={<ShieldCheckIcon />}
               titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
             >
               <PrivateAccount />
@@ -100,7 +99,7 @@ export default () => {
           <CardsContainer>
             <Card
               title={t('home.publicAccount')}
-              icon={globeIcon}
+              icon={<GlobeIcon />}
               titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
             >
               <PublicAccount />
