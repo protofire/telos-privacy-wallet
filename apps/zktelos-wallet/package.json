@@ -43,6 +43,7 @@
     "js-md5": "^0.7.3",
     "libzkbob-rs-node": "*",
     "lodash.shuffle": "^4.2.0",
+    "lucide-react": "^0.559.0",
     "moment": "^2.29.3",
     "rc-tooltip": "^5.2.2",
     "react": "^18.2.0",
