@@ -76,7 +76,7 @@ const MenuItem = styled.div`
   gap: 12px;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${props => props.active ? props.theme.color.telosGradientSoft : 'transparent'};
+  background: ${props => props.active ? props.theme.button.background : 'transparent'};
   border: ${props => props.active ? `1px solid rgb(149 126 223 / 40%)` : 'none'};
   color: ${props => props.theme.text.color[props.active ? 'primary' : 'secondary']};
   font-weight: normal;
@@ -84,7 +84,7 @@ const MenuItem = styled.div`
   transition: all 0.2s ease;
   
   &:hover {
-    background: ${props => props.active ? props.theme.color.telosGradientSoft : 'rgba(0, 0, 0, 0.02)'};
+    background: ${props => props.active ? props.theme.button.background : 'rgba(0, 0, 0, 0.02)'};
     color: ${props => props.theme.text.color.primary};
   }
 

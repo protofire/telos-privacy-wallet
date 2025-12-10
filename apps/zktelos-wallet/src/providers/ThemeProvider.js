@@ -31,7 +31,8 @@ const darkTextSecondary = '#A0A0B0';
 const darkBorder = '#333340';
 const darkInput = '#252530';
 const telosGradientDark = 'radial-gradient(circle at 0 120%,#8b3f98,transparent 50%),radial-gradient(circle at 100% 120%,#8b3f98,transparent 50%),radial-gradient(circle at 100% 0%,#348dcc,transparent 40%),radial-gradient(circle at 20% 0%,#73c58f,transparent 40%),#000000';
-
+const dropdownBackgroundLight = '#FFFFFF';
+const dropdownBackgroundDark = '#2D2D3A';
 
 const light = {
   color: {
@@ -75,7 +76,7 @@ const light = {
         contrast: 'rgba(64, 64, 64, 0.1)',
       },
       border: {
-        color: darkGrey,
+        color: 'rgba(149, 126, 223, 0.4)',
       },
       text: {
         color: {
@@ -187,7 +188,16 @@ const light = {
       },
     },
   },
-  background: telosGradientSoft
+  background: telosGradientSoft,
+  dropdown: {
+    background: dropdownBackgroundLight,
+  },
+  icon: {
+    color: {
+      default: black,
+      hover: purpleExtraLight,
+    }
+  }
 };
 
 const dark = {
@@ -213,6 +223,9 @@ const dark = {
     background: 'linear-gradient(0.4turn,#071033,#6039a4)',
     primary: {
       ...light.button.primary,
+      border: {
+        color: '#6039a4',
+      },
       background: {
         ...light.button.primary.background,
         default: white, // White buttons in dark mode
@@ -309,6 +322,15 @@ const dark = {
     },
   },
   background: telosGradientDark,
+  dropdown: {
+    background: dropdownBackgroundDark,
+  },
+  icon: {
+    color: {
+      default: white,
+      hover: purpleExtraLight,
+    }
+  }
 };
 
 export default ({ children }) => {

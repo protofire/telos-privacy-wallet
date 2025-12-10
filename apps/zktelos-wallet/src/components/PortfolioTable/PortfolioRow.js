@@ -183,7 +183,7 @@ const PlainDepositButton = styled.button`
 `;
 
 const ActionButton = styled.button`
-  background: ${props => props.theme.color.telosGradientSoft};
+  background: ${props => props.theme.button.background};
   border: 1px solid ${props => props.theme.color.black};
   font-weight: ${props => props.theme.text.weight.bold};
   padding: 8px;
