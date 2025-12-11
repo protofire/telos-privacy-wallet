@@ -384,18 +384,3 @@ const NetworkLabel = styled.span`
   font-size: 14px;
   color: ${props => props.theme.text.color.primary};
 `;
-
-const IconWrapper = styled.div`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  transition: opacity 0.2s ease;
-  width: 24px;
-  height: 24px;
-
-  &:hover {
-    opacity: 0.7;
-  }
-`;
