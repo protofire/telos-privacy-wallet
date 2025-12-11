@@ -58,12 +58,11 @@ const MenuContainer = styled.div`
   }
 
   @media only screen and (max-width: 560px) {
-    width: 240px;
+    width: auto;
+    max-width: 100%;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding-left: 30px;
-    padding-right: 30px;
   }
 `;
 
