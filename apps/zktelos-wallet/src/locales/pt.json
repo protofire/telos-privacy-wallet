@@ -261,6 +261,10 @@
       "title": "Restaurar com Frase Secreta",
       "description": "Digite sua frase secreta salva para restaurar uma conta existente"
     },
+    "createPassword": {
+      "title": "Proteja sua conta",
+      "description": "Defina uma senha para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
+    },
     "createWithSecret": {
       "title": "Salve sua Frase Secreta",
       "description": "Anote ou copie estas palavras na ordem correta e guarde-as em um local seguro",

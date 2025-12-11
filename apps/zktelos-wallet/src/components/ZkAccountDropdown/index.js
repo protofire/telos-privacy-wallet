@@ -9,23 +9,18 @@ import Button from 'components/Button';
 import PrivateAddress from 'components/AdressWithCopy';
 // import QRCodeReader from 'components/QRCodeReader';
 
-import { ReactComponent as BackIconDefault } from 'assets/back.svg';
+// import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
 import { ZkAccountContext, ModalContext, WalletContext, PoolContext } from 'contexts';
 
 const Content = ({
-  zkClients, getSeed, setPassword,
-  removePassword, logout, close, showSeedPhrase,
-  isLoadingState, zkAccount,
+  zkClients, logout, close, isLoadingState, zkAccount,
 }) => {
   const { t } = useTranslation();
   const [shieldedAddresses, setShieldedAddresses] = useState({});
   // const [showQRCode, setShowQRCode] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const { disconnect } = useContext(WalletContext);
   const { allPools } = useContext(PoolContext);
-
-  // const { hasPassword } = getSeed();
 
   const generatePrivateAddress = useCallback(async () => {
     if (!zkAccount || !zkClients) return;
@@ -80,19 +75,6 @@ const Content = ({
     actions.forEach(action => action());
   }, [close]);
 
-  const settingsOptions = [
-    {
-      text: t('buttonText.showSecretPhrase'),
-      action: showSeedPhrase,
-      gaIdPostfix: 'secret-phrase',
-    },
-    // {
-    //   text: hasPassword ? t('buttonText.disablePassword') : t('buttonText.setPassword'),
-    //   action: hasPassword ? removePassword : setPassword,
-    //   gaIdPostfix: `${hasPassword ? 'disable' : 'enable'}-password`,
-    // },
-  ];
-
   // if (showQRCode) {
   //   return (
   //     <Container>
@@ -108,24 +90,6 @@ const Content = ({
   //     </Container>
   //   );
   // }
-
-  if (showSettings) {
-    return (
-      <Container>
-        <BackIcon onClick={() => setShowSettings(false)} />
-        <Title style={{ marginBottom: 20 }}>{t('common.settings')}</Title>
-        {settingsOptions.map((item, index) =>
-          <OptionButton
-            key={index}
-            onClick={() => handleOptionClick([item.action])}
-            data-ga-id={`zkaccount-settings-${item.gaIdPostfix}`}
-          >
-            {item.text}
-          </OptionButton>
-        )}
-      </Container>
-    )
-  }
 
   const hasAddresses = Object.keys(shieldedAddresses).length > 0;
 
@@ -191,9 +155,6 @@ const Content = ({
           {t('buttonText.redeemGiftCard')}
         </OptionButton>
       </QRCodeReader> */}
-      <OptionButton onClick={() => setShowSettings(true)} data-ga-id="zkaccount-settings">
-        {t('common.settings')}
-      </OptionButton>
       <OptionButton onClick={() => handleOptionClick([logout, disconnect])} data-ga-id="zkaccount-logout">
         {t('buttonText.logout')}
       </OptionButton>
@@ -204,11 +165,10 @@ const Content = ({
 export default ({ children }) => {
   const {
     zkAccount, zkClients,
-    isLoadingState, getSeed,
+    isLoadingState,
   } = useContext(ZkAccountContext);
   const {
-    openSeedPhraseModal, openAccountSetUpModal, openChangePasswordModal,
-    openConfirmLogoutModal, openDisablePasswordModal,
+    openConfirmLogoutModal,
     isZkAccountDropdownOpen, openZkAccountDropdown, closeZkAccountDropdown,
   } = useContext(ModalContext);
 
@@ -222,13 +182,8 @@ export default ({ children }) => {
         <Content
           zkAccount={zkAccount}
           zkClients={zkClients}
-          switchAccount={openAccountSetUpModal}
-          setPassword={openChangePasswordModal}
-          removePassword={openDisablePasswordModal}
           logout={openConfirmLogoutModal}
-          showSeedPhrase={openSeedPhraseModal}
           isLoadingState={isLoadingState}
-          getSeed={getSeed}
           close={closeZkAccountDropdown}
         />
       )}
@@ -254,16 +209,16 @@ const Description = styled.span`
   line-height: 22px;
 `;
 
-const BackIcon = styled(BackIconDefault)`
-  position: absolute;
-  top: 34px;
-  left: 11px;
-  cursor: pointer;
-  padding: 10px;
-  @media only screen and (max-width: 560px) {
-    top: 11px;
-  }
-`;
+// const BackIcon = styled(BackIconDefault)`
+//   position: absolute;
+//   top: 34px;
+//   left: 11px;
+//   cursor: pointer;
+//   padding: 10px;
+//   @media only screen and (max-width: 560px) {
+//     top: 11px;
+//   }
+// `;
 
 const Title = styled.span`
   text-align: center;

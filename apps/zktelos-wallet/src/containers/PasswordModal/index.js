@@ -6,8 +6,10 @@ import PasswordModal from 'components/PasswordModal';
 export default () => {
   const {
     isPasswordModalOpen,
-    openAccountSetUpModal,
-    isAccountSetUpModalOpen,
+    openAccessAccountModal,
+    isAccessAccountModalOpen,
+    isCreateAccountModalOpen,
+    closePasswordModal,
   } = useContext(ModalContext);
   const { unlockAccount } = useContext(ZkAccountContext);
   const [password, setPassword] = useState('');
@@ -42,8 +44,9 @@ export default () => {
 
   const reset = useCallback(async () => {
     setPassword('');
-    openAccountSetUpModal();
-  }, [openAccountSetUpModal]);
+    openAccessAccountModal();
+    closePasswordModal()
+  }, [openAccessAccountModal, closePasswordModal]);
 
   return (
     <PasswordModal
@@ -53,7 +56,7 @@ export default () => {
       confirm={confirm}
       reset={reset}
       error={error}
-      isAccountSetUpModalOpen={isAccountSetUpModalOpen}
+      isAccountSetUpModalOpen={isAccessAccountModalOpen || isCreateAccountModalOpen}
       isLoading={attempt > 0}
     />
   );

@@ -261,6 +261,10 @@
       "title": "使用助记词恢复",
       "description": "输入您保存的助记词以恢复现有账户"
     },
+    "createPassword": {
+      "title": "保护您的账户",
+      "description": "设置密码以在本地加密您的助记词。这增加了一层额外的安全性。"
+    },
     "createWithSecret": {
       "title": "保存您的助记词",
       "description": "请按正确的顺序抄写或复制助记词，并妥善保存",
