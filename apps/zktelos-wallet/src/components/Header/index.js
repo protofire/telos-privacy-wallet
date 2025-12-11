@@ -7,12 +7,11 @@ import ButtonDefault from 'components/Button';
 import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
-import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
 // import Skeleton from 'components/Skeleton';
 // import BalanceDisplay from 'components/BalanceDisplay';
 
-import { EyeIcon, EyeOffIcon, MoonIcon, SunIcon, EllipsisIcon, RefreshCcwIcon, ChevronDownIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, RefreshCcwIcon, ChevronDownIcon, MoonIcon, SunIcon } from 'lucide-react';
 
 import { BalanceVisibilityContext } from 'contexts';
 import ThemeContext from 'contexts/ThemeContext';
@@ -172,11 +171,6 @@ export default ({ empty }) => {
               {(isLoadingBalance || isLoadingState) ? <Spinner size={18} /> : <RefreshCcwIcon />}
             </RefreshButtonContainer>
           )}
-          <MoreDropdown>
-            <DropdownButton data-ga-id="extra-menu-header">
-              <EllipsisIcon />
-            </DropdownButton>
-          </MoreDropdown>
         </AccountSection>
       </Row>
       {isMobile && (

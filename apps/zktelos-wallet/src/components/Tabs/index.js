@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
 
-import { HomeIcon, MoveDownLeftIcon, MoveUpRightIcon, ArrowRightLeftIcon, ListCheckIcon } from 'lucide-react';
+import { HomeIcon, MoveDownLeftIcon, MoveUpRightIcon, ArrowRightLeftIcon, ListCheckIcon, Settings } from 'lucide-react';
 
 export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
@@ -15,6 +15,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
       'Withdraw': MoveUpRightIcon,
       'Transfer': ArrowRightLeftIcon,
       'History': ListCheckIcon,
+      'Settings': Settings,
     };
     return iconMap[tabName];
   };
