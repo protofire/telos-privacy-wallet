@@ -33,6 +33,7 @@ import Withdraw from 'pages/Withdraw';
 import History from 'pages/History';
 import Payment from 'pages/Payment';
 import Home from 'pages/Home';
+import Settings from 'pages/Settings';
 
 import ContextsProvider, { ZkAccountContext } from 'contexts';
 
@@ -96,6 +97,9 @@ const Routes = ({ showWelcome, params }) => (
     </SentryRoute>
     <SentryRoute exact strict path="/history">
       <History />
+    </SentryRoute>
+    <SentryRoute exact strict path="/settings">
+      <Settings />
     </SentryRoute>
     <Redirect to={'/home' + params} />
   </Switch>

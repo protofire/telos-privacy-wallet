@@ -2,7 +2,8 @@ import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { ReactComponent as DotsIconDefault } from 'assets/dots.svg';
+import { EllipsisIcon } from 'lucide-react';
+
 import BalanceDisplay from 'components/BalanceDisplay';
 import Skeleton from 'components/Skeleton';
 import Tooltip from 'components/Tooltip';
@@ -183,7 +184,7 @@ const PlainDepositButton = styled.button`
 `;
 
 const ActionButton = styled.button`
-  background: ${props => props.theme.color.telosGradientSoft};
+  background: ${props => props.theme.button.background};
   border: 1px solid ${props => props.theme.color.black};
   font-weight: ${props => props.theme.text.weight.bold};
   padding: 8px;
@@ -208,9 +209,13 @@ const DropdownOptionButton = styled(OptionButtonDefault)`
   margin-bottom: 0;
 `;
 
-const DotsIcon = styled(DotsIconDefault)`
+const DotsIcon = styled(EllipsisIcon)`
   width: 16px;
   height: 16px;
+  color: ${props => props.theme.icon.color.default};
+  &:hover {
+    color: ${props => props.theme.icon.color.hover};
+  }
 `;
 
 export default PortfolioRow;

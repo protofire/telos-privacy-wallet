@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 import ThemeProvider from 'providers/ThemeProvider';
+import { ThemeProvider as ThemeContextProvider } from 'contexts/ThemeContext'; // Import the provider
 import Web3Provider from 'providers/Web3Provider';
 
 import Pages from 'pages';
@@ -50,7 +51,7 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background-image: ${props => props.theme.background};
+    background: ${props => props.theme.background}; /* Cambiado de background-image a background */
   }
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
@@ -64,10 +65,12 @@ const GlobalStyle = createGlobalStyle`
 
 
 export default () => (
-  <ThemeProvider>
-    <GlobalStyle />
-    <Web3Provider>
-      <Pages />
-    </Web3Provider>
-  </ThemeProvider>
+  <ThemeContextProvider>
+    <ThemeProvider>
+      <GlobalStyle />
+      <Web3Provider>
+        <Pages />
+      </Web3Provider>
+    </ThemeProvider>
+  </ThemeContextProvider>
 );

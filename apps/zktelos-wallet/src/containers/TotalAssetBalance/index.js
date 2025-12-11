@@ -84,7 +84,6 @@ export default () => {
           </Tooltip>
         </>)}
       </ValueRow>
-      <Separator />
     </Container>
   );
 };

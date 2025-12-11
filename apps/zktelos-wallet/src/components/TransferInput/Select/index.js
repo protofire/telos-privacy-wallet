@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import OptionButtonDefault from 'components/OptionButton';
 import Dropdown from 'components/Dropdown';
 
-import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
+import { ChevronDownIcon } from 'lucide-react';
 
 import { TOKENS_ICONS } from 'constants';
 
@@ -92,11 +92,20 @@ const SelectedItemContainer = styled.div`
   cursor: pointer;
   position: relative;
   margin-left: 15px;
+  color: ${props => props.theme.card.title.color};
 `;
 
-const DropdownIcon = styled(DropdownIconDefault)`
+const DropdownIcon = styled(ChevronDownIcon)`
   margin-left: 2px;
   margin-top: 1px;
+  width: 14px;
+  height: 14px;
+
+  color: ${props => props.theme.icon.color.default};
+
+  &:hover {
+    color: ${props => props.theme.icon.color.hover};
+  }
 `;
 
 const OptionButton = styled(OptionButtonDefault)`
