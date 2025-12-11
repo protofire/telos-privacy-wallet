@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { ThemeProvider } from 'styled-components';
 import ThemeContext from 'contexts/ThemeContext';
-import { light, dark } from './ThemeConstants';
+import { light, dark } from '../styles/ThemeConstants';
 
 export default ({ children }) => {
   const { theme } = useContext(ThemeContext);
