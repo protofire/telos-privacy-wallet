@@ -263,6 +263,10 @@
       "title": "Restore with Seedphrase",
       "description": "Input your saved secret phrase to restore an existing account"
     },
+    "createPassword": {
+      "title": "Protect your account",
+      "description": "Set a password to encrypt your seed phrase locally. This adds an extra layer of security."
+    },
     "createWithSecret": {
       "title": "Save Your Seed Phrase",
       "description": "Write down or copy these words in the right order and save them somewhere safe",

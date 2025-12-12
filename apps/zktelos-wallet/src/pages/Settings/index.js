@@ -6,11 +6,19 @@ import { Settings as SettingsIcon } from 'lucide-react';
 import Card from 'components/Card';
 import ThemeContext from 'contexts/ThemeContext';
 import LanguageContext from 'contexts/LanguageContext';
+import { ZkAccountContext, ModalContext } from 'contexts';
 
 const Settings = () => {
   const { t } = useTranslation();
   const { themePreference, setThemePreference } = useContext(ThemeContext);
   const { changeLanguage } = useContext(LanguageContext);
+  const { zkAccount, getSeed } = useContext(ZkAccountContext);
+  const {
+    openSeedPhraseModal,
+    openChangePasswordModal,
+    openDisablePasswordModal
+  } = useContext(ModalContext);
+
   const { i18n } = useTranslation();
   const currentLang = i18n.language;
 
@@ -26,6 +34,8 @@ const Settings = () => {
     { code: 'dark', label: 'Dark' },
     { code: 'system', label: 'System' },
   ];
+
+  const { hasPassword } = getSeed ? getSeed() : { hasPassword: false };
 
   return (
     <Container>
@@ -59,6 +69,19 @@ const Settings = () => {
               ))}
             </ButtonGroup>
           </Section>
+          {zkAccount && (
+            <Section>
+              <SectionTitle>{t('common.zkAccount')}</SectionTitle>
+              <ButtonGroup>
+                <OptionButton onClick={openSeedPhraseModal}>
+                  {t('buttonText.showSecretPhrase')}
+                </OptionButton>
+                <OptionButton onClick={hasPassword ? openDisablePasswordModal : openChangePasswordModal}>
+                  {hasPassword ? t('buttonText.disablePassword') : t('buttonText.setPassword')}
+                </OptionButton>
+              </ButtonGroup>
+            </Section>
+          )}
         </Card>
       </CardContainer>
     </Container>

@@ -6,7 +6,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import Button from 'components/Button';
 import Input from 'components/Input';
 
-export default ({ confirmPassword }) => {
+export default ({ confirmPassword, onSkip }) => {
   const { t } = useTranslation();
   const history = useHistory();
   const [password, setPassword] = useState('');
@@ -38,7 +38,7 @@ export default ({ confirmPassword }) => {
   }, [password, passwordConfirmation, confirmPassword, history]);
 
   const handleKeyPress = useCallback(event => {
-    if(event.key === 'Enter'){
+    if (event.key === 'Enter') {
       confirm();
     }
   }, [confirm]);
@@ -67,6 +67,11 @@ export default ({ confirmPassword }) => {
         <Rule $error={matchError}>{t('password.rule2')}</Rule>
       </RulesContainer>
       <Button onClick={confirm} data-ga-id="password-confirm">{t('buttonText.verify')}</Button>
+      {onSkip && (
+        <SkipButton onClick={onSkip} type="link">
+          {t('buttonText.skip')}
+        </SkipButton>
+      )}
     </Container>
   );
 };
@@ -112,4 +117,8 @@ const Rule = styled.span`
   &:last-child {
     margin-bottom: 0;
   }
+`;
+
+const SkipButton = styled(Button)`
+  margin-top: 8px;
 `;
