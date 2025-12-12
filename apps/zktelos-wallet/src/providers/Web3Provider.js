@@ -1,11 +1,59 @@
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from '@wagmi/core/providers/public'
-import { telos, telosTestnet } from 'wagmi/chains';
+// import { telos, telosTestnet } from 'wagmi/chains';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import config from '../config'
 
+// Custom definitions because telos and telosTestnet from this version of wagmi are not up to date
+const telosTestnet = {
+  id: 41,
+  name: 'Telos Testnet',
+  network: 'telosTestnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Telos',
+    symbol: 'TLOS',
+  },
+  rpcUrls: {
+    public: { http: ['https://rpc.testnet.telos.net'] },
+    default: { http: ['https://rpc.testnet.telos.net'] },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Teloscan (testnet)',
+      url: 'https://testnet.teloscan.io/',
+    },
+  },
+  testnet: true,
+}
+
+const telos = {
+  id: 40,
+  name: 'Telos',
+  network: 'telos',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Telos',
+    symbol: 'TLOS',
+  },
+  rpcUrls: {
+    default: { http: ['https://rpc.telos.net'] },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Teloscan',
+      url: 'https://www.teloscan.io/',
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      blockCreated: 246530709,
+    },
+  },
+}
 
 const getRpcByPriority = (priority) => {
 
