@@ -54,7 +54,7 @@ git push origin dev
 
 ```bash
 # Merge main into dev to get any hotfixes or changes
-git merge origin/main
+git merge -X ours origin/main
 
 # If there are conflicts, resolve them keeping dev changes
 # After resolving conflicts:
