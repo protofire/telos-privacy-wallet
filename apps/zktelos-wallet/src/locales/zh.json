@@ -87,6 +87,8 @@
     "titleOffline": "创建您的私密账户",
     "portfolio": "我的投资组合",
     "latestTransactions": "最新交易",
+    "privateAccount": "私密账户",
+    "publicAccount": "公共账户",
     "description": "生成安全的私密账户并开启隐私保护转账。"
   },
   "portfolio": {
@@ -286,15 +288,7 @@
       "description": "使用已连接的钱包登入您的zk账户。"
     }
   },
-  "password": {
-    "placeholder1": "密码需6位或以上字符",
-    "placeholder2": "确认密码",
-    "rule1": "请输入6位或以上字符",
-    "rule2": "两次输入的密码需匹配"
-  },
   "pin": {
-    "placeholder": "输入4位数字PIN",
-    "placeholder2": "确认PIN",
     "helper": "可用方向键导航或粘贴代码",
     "success": "PIN 已通过",
     "error": "PIN 无效，请重试",
@@ -309,15 +303,16 @@
     "lostPassword": "忘记密码？点击此处恢复"
   },
   "enterPinModal": {
-    "title": "输入PIN",
-    "description": "$t(accountSetupModal.createPin.description)",
+    "title": "解锁zk账户",
+    "description": "输入您的PIN以解锁您的zk账户",
     "lostPin": "忘记PIN？点击此处恢复"
   },
   "setPasswordModal": {
     "title": "设置密码"
   },
   "setPinModal": {
-    "title": "设置PIN"
+    "title": "设置PIN",
+    "description": "设置PIN以在本地加密您的助记词。这增加了一层额外的安全性。"
   },
   "confirmLogoutModal": {
     "title": "登出并清除浏览记录",

@@ -53,6 +53,7 @@ export default () => {
       title={t('setPinModal.title')}
     >
       <Container onKeyPress={handleKeyPress}>
+        <Description>{t('setPinModal.description')}</Description>
         <PinInput
           autoFocus
           value={newPin}
@@ -79,3 +80,9 @@ const Container = styled.div`
   }
 `;
 
+const Description = styled.span`
+  font-size: 14px;
+  color: ${({ theme }) => theme.text.color.secondary};
+  line-height: 20px;
+  text-align: center;
+`;

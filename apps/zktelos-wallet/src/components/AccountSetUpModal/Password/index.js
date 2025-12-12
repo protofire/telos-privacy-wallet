@@ -19,10 +19,6 @@ export default ({ confirmPassword, onSkip }) => {
     setPin(nextValue);
   }, [resetValidation]);
 
-  const handlePinConfirmationChange = useCallback(nextValue => {
-    resetValidation();
-  }, [resetValidation]);
-
   const confirm = useCallback(() => {
     const valid = validate({ pin });
     if (valid) {
@@ -50,7 +46,7 @@ export default ({ confirmPassword, onSkip }) => {
         helperText={errorKey ? t(errorKey) : t('pin.helper')}
       />
 
-      <Button onClick={confirm} data-ga-id="password-confirm">{t('buttonText.verify')}</Button>
+      <Button onClick={confirm} data-ga-id="password-confirm">{t('buttonText.confirm')}</Button>
       {onSkip && (
         <SkipButton onClick={onSkip} type="link">
           {t('buttonText.skip')}

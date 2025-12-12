@@ -78,8 +78,8 @@
     "skip": "Skip",
     "verify": "Verify",
     "restoreAccount": "Restore account",
-    "signIn": "Sign in",
-    "signingIn": "Signing in...",
+    "signIn": "Unlock",
+    "signingIn": "Unlocking...",
     "getToken": "Get {{symbol}}"
   },
   "home": {
@@ -288,17 +288,8 @@
       "description": "Accessing your zkAccount with your connected wallet."
     }
   },
-  "password": {
-    "placeholder1": "Password 6+ characters",
-    "placeholder2": "Verify password",
-    "rule1": "Please enter 6 or more characters",
-    "rule2": "Password should match"
-  },
   "pin": {
-    "placeholder": "Enter 4-digit PIN",
-    "placeholder2": "Confirm PIN",
     "helper": "You can use arrow keys to navigate or paste the code",
-    "success": "PIN accepted",
     "error": "Invalid PIN, try again",
     "error.length": "PIN must be exactly 4 digits",
     "error.digits": "Use digits only",
@@ -311,15 +302,16 @@
     "lostPassword": "Lost password? Click here to restore access"
   },
   "enterPinModal": {
-    "title": "Enter PIN",
-    "description": "$t(accountSetupModal.createPin.description)",
+    "title": "Unlock zkAccount",
+    "description": "Enter your PIN to unlock your zkAccount",
     "lostPin": "Lost PIN? Click here to restore access"
   },
   "setPasswordModal": {
     "title": "Set password"
   },
   "setPinModal": {
-    "title": "Set PIN"
+    "title": "Set PIN",
+    "description": "Set a PIN to encrypt your seed phrase locally. This adds an extra layer of security."
   },
   "confirmLogoutModal": {
     "title": "Log out and clear browsing data",

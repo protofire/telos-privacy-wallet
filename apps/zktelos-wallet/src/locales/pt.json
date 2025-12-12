@@ -87,6 +87,8 @@
     "titleOffline": "Crie sua Conta Privada",
     "portfolio": "Meu portfólio",
     "latestTransactions": "Últimas transações",
+    "privateAccount": "Conta Privada",
+    "publicAccount": "Conta Pública",
     "description": "Gere uma conta privada segura e desbloqueie transferências com preservação de privacidade."
   },
   "portfolio": {
@@ -286,17 +288,11 @@
       "description": "Acessando sua conta zkAccount com sua carteira conectada."
     }
   },
-  "password": {
-    "placeholder1": "Senha com 6+ caracteres",
-    "placeholder2": "Verificar senha",
-    "rule1": "Por favor, insira 6 ou mais caracteres",
-    "rule2": "As senhas devem coincidir"
-  },
+
   "pin": {
-    "placeholder": "Digite o PIN de 4 dígitos",
-    "placeholder2": "Confirme o PIN",
+
+
     "helper": "Use as setas para navegar ou cole o código",
-    "success": "PIN aceito",
     "error": "PIN inválido, tente novamente",
     "error.length": "O PIN deve ter exatamente 4 dígitos",
     "error.digits": "Use apenas dígitos",
@@ -309,15 +305,16 @@
     "lostPassword": "Esqueceu a senha? Clique aqui para recuperar o acesso"
   },
   "enterPinModal": {
-    "title": "Digite o PIN",
-    "description": "$t(accountSetupModal.createPin.description)",
+    "title": "Desbloquear zkAccount",
+    "description": "Digite seu PIN para desbloquear sua zkAccount",
     "lostPin": "Esqueceu o PIN? Clique aqui para recuperar o acesso"
   },
   "setPasswordModal": {
     "title": "Definir senha"
   },
   "setPinModal": {
-    "title": "Definir PIN"
+    "title": "Definir PIN",
+    "description": "Defina um PIN para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
   },
   "confirmLogoutModal": {
     "title": "Sair e limpar os dados de navegação",
