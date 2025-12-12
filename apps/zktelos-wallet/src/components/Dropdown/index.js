@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, useTheme } from 'styled-components';
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 
@@ -50,6 +50,7 @@ export default ({
   children, content, disabled, width, placement,
   style = {}, isOpen, open, close, fullscreen = true, ...props
 }) => {
+  const theme = useTheme();
   return (
     <>
       <GlobalDropdownStyle />
@@ -69,7 +70,7 @@ export default ({
           minHeight: 0,
           padding: '26px 24px',
           borderRadius: '6px',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: theme.dropdown.background,
           width: width || 370,
           boxSizing: 'border-box',
           boxShadow: '4px 10px 20px rgba(0, 0, 0, 0.1)',

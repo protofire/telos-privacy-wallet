@@ -5,15 +5,26 @@ import { useTranslation, Trans } from 'react-i18next';
 import Modal from 'components/Modal';
 import Button from 'components/Button';
 import CopyTextButton from 'components/CopyTextButton';
-import Input from 'components/Input';
+import PinInput from 'components/PinInput';
 import SeedPhrase from 'components/SeedPhrase';
+
+const getUrl = () => {
+  const baseUrl = process.env.REACT_APP_BASE_URL;
+  if (!baseUrl) return '';
+  try {
+    return new URL(baseUrl).toString();
+  } catch {
+    return baseUrl;
+  }
+};
 
 export default ({
   isOpen, onClose, mnemonic,
-  confirm, password, onPasswordChange,
+  confirm, pin, onPinChange,
   onKeyPress, error,
 }) => {
   const { t } = useTranslation();
+  const url = getUrl();
   return (
     <Modal
       isOpen={isOpen}
@@ -22,7 +33,15 @@ export default ({
     >
       <Container onKeyPress={mnemonic ? null : onKeyPress}>
         <Warning>
-          <Trans i18nKey="secretPhraseModal.warning" />
+          <Trans
+            i18nKey="secretPhraseModal.warning"
+            values={{ url }}
+            tOptions={{ interpolation: { escapeValue: false } }}
+            components={{
+              url: <span className="warningUrl" />,
+              br: <br />,
+            }}
+          />
         </Warning>
         <Description>
           {t('secretPhraseModal.description')}
@@ -39,13 +58,12 @@ export default ({
           </>
         ) : (
           <>
-            <Input
+            <PinInput
               autoFocus
-              type="password"
-              placeholder={t('common.password')}
-              value={password}
-              onChange={onPasswordChange}
+              value={pin}
+              onChange={onPinChange}
               error={!!error}
+              helperText={error ? t('pin.error.invalid') : t('pin.helper')}
             />
             <Button onClick={confirm}>
               {t('buttonText.next')}
@@ -87,5 +105,15 @@ const Warning = styled.div`
   line-height: 20px;
   margin-left: -7px;
   margin-right: -7px;
-  text-align: center;
+  text-align: left;
+
+  & .warningUrl {
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+  }
 `;

@@ -12,6 +12,7 @@ import { WalletContext } from 'contexts';
 import Create from './Create';
 import Confirm from './Confirm';
 import Restore from './Restore';
+import Password from './Password';
 
 const STEP = {
   ACCESS_ACCOUNT: 1,
@@ -19,6 +20,7 @@ const STEP = {
   ENTER_SEEDPHRASE: 3,
   CREATE_INSTANT: 4,
   CONFIRM_INSTANT: 5,
+  SUGGEST_PASSWORD: 6,
 };
 
 const AccessAccount = ({ setStep, generate }) => {
@@ -99,6 +101,7 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
   const initialStep = mode === 'create' ? STEP.CREATE_ACCOUNT : STEP.ACCESS_ACCOUNT;
   const [step, setStep] = useState(initialStep);
   const [newMnemonic, setNewMnemonic] = useState();
+  const [isNewAccount, setIsNewAccount] = useState(false);
 
   const closeModal = useCallback(() => {
     setStep(initialStep);
@@ -122,16 +125,15 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
   }, []);
 
   const confirmMnemonic = useCallback(() => {
-    const isNewAccount = true;
-    saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
-    closeModal();
-  }, [newMnemonic, saveZkAccountMnemonic, closeModal]);
+    setIsNewAccount(true);
+    setStep(STEP.SUGGEST_PASSWORD);
+  }, []);
 
   const restore = useCallback(mnemonic => {
-    const isNewAccount = false;
-    saveZkAccountMnemonic(mnemonic, null, isNewAccount);
-    closeModal();
-  }, [saveZkAccountMnemonic, closeModal]);
+    setNewMnemonic(mnemonic);
+    setIsNewAccount(false);
+    setStep(STEP.SUGGEST_PASSWORD);
+  }, []);
 
   const generate = useCallback(async () => {
     try {
@@ -147,16 +149,27 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
         }
         signedMessage = signedMessage.slice(0, -2) + sigV.toString(16);
       }
-      const newMnemonic = ethers.utils.entropyToMnemonic(md5.array(signedMessage));
-      const isNewAccount = !!newMnemonic;
-      saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
+      const mnemonic = ethers.utils.entropyToMnemonic(md5.array(signedMessage));
+      const isNew = !!mnemonic;
+      setNewMnemonic(mnemonic);
+      setIsNewAccount(isNew);
+      setStep(STEP.SUGGEST_PASSWORD);
 
     } catch (error) {
       console.error('Error generating account from signature:', error);
-    } finally {
       closeModal();
     }
-  }, [evmWallet, saveZkAccountMnemonic, closeModal]);
+  }, [evmWallet, closeModal]);
+
+  const handlePasswordSet = useCallback(password => {
+    saveZkAccountMnemonic(newMnemonic, password, isNewAccount);
+    closeModal();
+  }, [newMnemonic, isNewAccount, saveZkAccountMnemonic, closeModal]);
+
+  const handlePasswordSkip = useCallback(() => {
+    saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
+    closeModal();
+  }, [newMnemonic, isNewAccount, saveZkAccountMnemonic, closeModal]);
 
   let title = null;
   let component = null;
@@ -189,6 +202,16 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       component = <Confirm mnemonic={newMnemonic} confirmMnemonic={confirmMnemonic} />;
       prevStep = STEP.CREATE_INSTANT;
       break;
+    case STEP.SUGGEST_PASSWORD:
+      title = t('accountSetupModal.createPin.title'); // Ensure this key exists or add it
+      component = (
+        <Password
+          confirmPassword={handlePasswordSet}
+          onSkip={handlePasswordSkip}
+        />
+      );
+      prevStep = null;
+      break;
   }
 
   return (
@@ -220,7 +243,7 @@ const SectionTitle = styled.h3`
   font-weight: ${({ theme }) => theme.text.weight.normal};
   color: ${({ theme }) => theme.text.color.secondary};
   margin: 0 0 8px 0;
-`;
+  `;
 
 const Divider = styled.div`
   display: flex;

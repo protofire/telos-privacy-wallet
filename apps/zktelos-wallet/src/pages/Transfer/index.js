@@ -10,7 +10,7 @@ import LatestAction from 'components/LatestAction';
 import Switch from 'components/Switch';
 import Button from 'components/Button';
 import Tooltip from 'components/Tooltip';
-import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
+import { InfoIcon as InfoIconDefault } from 'lucide-react';
 
 import SingleTransfer from './SingleTransfer';
 import MultiTransfer from './MultiTransfer';
@@ -123,6 +123,7 @@ const TitleWithPoolSelector = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  color: ${props => props.theme.card.title.color};
 `;
 
 const MultiTransferSwitch = styled.div`
@@ -162,11 +163,13 @@ const Note = styled.p`
 
 const InfoIcon = styled(InfoIconDefault)`
   margin-left: 4px;
+  color: ${props => props.theme.icon.color.default};
+
   &:hover {
-    & > path {
-      fill: ${props => props.theme.color.purple};
-    }
+    color: ${props => props.theme.icon.color.hover};
   }
+  width: 14px;
+  height: 14px;
 `;
 
 const CsvButtonContainer = styled.div`

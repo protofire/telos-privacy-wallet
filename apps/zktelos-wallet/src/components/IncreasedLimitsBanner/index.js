@@ -59,7 +59,7 @@ const Container = styled.div`
   width: fill-available;
   max-width: 100%;
   border-radius: 10px;
-  background: ${props => props.theme.color.yellow};
+  background: ${props => props.theme.dropdown.background};
   margin: 20px 0 -10px;
   padding: 5px 10px;
   box-sizing: border-box;

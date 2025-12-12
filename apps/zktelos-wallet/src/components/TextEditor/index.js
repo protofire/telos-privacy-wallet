@@ -51,6 +51,7 @@ const CodeMirror = styled(CodeMirrorDefault)`
     overflow: hidden;
     outline: none !important;
     clip-path: none !important;
+    background: transparent;
   }
   & .CodeMirror-scroll {
     min-height: 120px;
@@ -61,6 +62,7 @@ const CodeMirror = styled(CodeMirrorDefault)`
   }
   & .CodeMirror-linenumbers {
     width: 40px !important;
+    background-color: ${props => props.theme.lineNumbers};
   }
   & .CodeMirror-linenumber {
     width: 40px !important;

@@ -1,6 +1,6 @@
 {
   "name": "zktelos-wallet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "author": "Protofire <info@protofire.io>",
   "main": "electron/main.js",
@@ -43,6 +43,7 @@
     "js-md5": "^0.7.3",
     "libzkbob-rs-node": "*",
     "lodash.shuffle": "^4.2.0",
+    "lucide-react": "^0.559.0",
     "moment": "^2.29.3",
     "rc-tooltip": "^5.2.2",
     "react": "^18.2.0",
@@ -110,8 +111,20 @@
       "identity": null,
       "icon": "public/icon.icns",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "category": "public.app-category.finance",
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}"

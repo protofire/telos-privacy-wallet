@@ -9,6 +9,9 @@ on:
 env:
   NODE_VERSION: "20.x"
 
+permissions:
+  contents: write
+
 jobs:
   build-macos:
     name: Build macOS (ARM64 & x64)

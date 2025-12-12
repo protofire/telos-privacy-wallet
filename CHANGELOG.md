@@ -5,6 +5,30 @@ All notable changes to zkTelos Wallet will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4] - 2025-12-12
+
+### Added
+
+- **Dark Theme**: Implemented dark/light theme toggle with persistent user preference (#36)
+- **Settings Page**: New dedicated settings page for account management and preferences (#37)
+- **Pool Selector Component**: Enhanced pool selection interface with improved UX
+- **Portfolio Table**: New portfolio view with formatted balance display
+- x64 macOS build script for Intel-based Macs
+
+### Changed
+
+- **Security Enhancement**: Replaced password authentication with PIN-based system for improved security (#38)
+- **Seed Phrase Management**: Moved seed phrase display and management to Settings page (#37)
+- **Network Switching**: Automatic chain switching on wallet connection (#39)
+- **CI/CD Improvements**: Enhanced workflow configurations with proper environment variables
+
+### Fixed
+
+- Fixed copy to clipboard functionality for public addresses (#40)
+- Fixed CI workflow missing environment variables
+- Improved address copying with better visual feedback
+
+
 ## [0.0.3] - 2025-12-05
 
 ### Added

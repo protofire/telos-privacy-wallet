@@ -1,60 +1,47 @@
-import React, { useCallback, useState, useContext} from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import Button from 'components/Button';
-import Input from 'components/Input';
 import Modal from 'components/Modal';
 import { ModalContext, ZkAccountContext } from 'contexts';
+import PinInput from 'components/PinInput';
+import usePinValidation from 'hooks/usePinValidation';
 
 export default () => {
   const { t } = useTranslation();
   const { isChangePasswordModalOpen, closeChangePasswordModal } = useContext(ModalContext);
   const { setPassword } = useContext(ZkAccountContext);
   const history = useHistory();
-  const [newPassword, setNewPassword] = useState('');
-  const [newPasswordConfirmation, setNewPasswordConfirmation] = useState('');
-  const [lengthError, setLengthError] = useState(false);
-  const [matchError, setMatchError] = useState(false);
+  const [newPin, setNewPin] = useState('');
+
+  const { validate, errorKey, resetValidation } = usePinValidation();
 
   const handleNewPasswordChange = useCallback(e => {
-    setLengthError(false);
-    setMatchError(false);
-    setNewPassword(e.target.value);
-  }, []);
-
-  const handleNewPasswordConfirmationChange = useCallback(e => {
-    setLengthError(false);
-    setMatchError(false);
-    setNewPasswordConfirmation(e.target.value);
-  }, []);
+    resetValidation();
+    setNewPin(e);
+  }, [resetValidation]);
 
   const closeModal = useCallback(() => {
-    setLengthError(false);
-    setMatchError(false);
-    setNewPassword('');
-    setNewPasswordConfirmation('');
+    resetValidation();
+    setNewPin('');
     closeChangePasswordModal();
-  }, [closeChangePasswordModal]);
+  }, [closeChangePasswordModal, resetValidation]);
 
   const confirm = useCallback(async () => {
-    const lengthError = !newPassword || newPassword.length < 6;
-    const matchError = newPassword !== newPasswordConfirmation;
-    setLengthError(lengthError);
-    setMatchError(matchError);
-    if (!lengthError && !matchError) {
-      setPassword(newPassword);
+    const valid = validate({ pin: newPin });
+    if (valid) {
+      setPassword(newPin);
       closeModal();
     }
     history.replace(history.location.pathname);
   }, [
-    newPassword, newPasswordConfirmation,
-    setPassword, closeModal, history,
+    closeModal, history, newPin, setPassword, validate,
   ]);
 
   const handleKeyPress = useCallback(event => {
-    if(event.key === 'Enter'){
+    if (event.key === 'Enter') {
       confirm();
     }
   }, [confirm]);
@@ -63,27 +50,17 @@ export default () => {
     <Modal
       isOpen={isChangePasswordModalOpen}
       onClose={closeModal}
-      title={t('setPasswordModal.title')}
+      title={t('setPinModal.title')}
     >
       <Container onKeyPress={handleKeyPress}>
-        <Input
-          type="password"
-          placeholder={t('password.placeholder1')}
-          value={newPassword}
+        <Description>{t('setPinModal.description')}</Description>
+        <PinInput
+          autoFocus
+          value={newPin}
           onChange={handleNewPasswordChange}
-          error={lengthError || matchError}
+          error={!!errorKey}
+          helperText={errorKey ? t(errorKey) : t('pin.helper')}
         />
-        <Input
-          type="password"
-          placeholder={t('password.placeholder2')}
-          value={newPasswordConfirmation}
-          onChange={handleNewPasswordConfirmationChange}
-          error={lengthError || matchError}
-        />
-        <RulesContainer>
-          <Rule $error={lengthError}>{t('password.rule1')}</Rule>
-          <Rule $error={matchError}>{t('password.rule2')}</Rule>
-        </RulesContainer>
         <Button onClick={confirm}>{t('buttonText.confirm')}</Button>
       </Container>
     </Modal>
@@ -103,25 +80,9 @@ const Container = styled.div`
   }
 `;
 
-const RulesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0 25px;
-`;
-
-const Rule = styled.span`
+const Description = styled.span`
   font-size: 14px;
-  color: ${props => props.theme.text.color[props.$error ? 'error' : 'secondary']};
-  position: relative;
-  margin-bottom: 8px;
-  &::before {
-    content: ".";
-    position: absolute;
-    left: -12px;
-    top: -10px;
-    font-size: 20px;
-  }
-  &:last-child {
-    margin-bottom: 0;
-  }
+  color: ${({ theme }) => theme.text.color.secondary};
+  line-height: 20px;
+  text-align: center;
 `;

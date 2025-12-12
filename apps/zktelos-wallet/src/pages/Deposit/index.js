@@ -261,10 +261,6 @@ export default () => {
   );
 };
 
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
 
 const TitleRow = styled.div`
   display: flex;
@@ -281,6 +277,21 @@ const Title = styled.span`
   align-items: center;
   gap: 8px;
 `;
+
+// const MessageContainer = styled(Row)`
+//   justify-content: center;
+//   flex-wrap: wrap;
+//   background: #FBEED0;
+//   border-radius: 10px;
+//   padding: 7px 10px;
+//   font-size: 14px;
+//   font-weight: ${props => props.theme.text.weight.bold};
+//   color: ${props => props.theme.text.color.secondary};
+// `;
+
+// const Link = styled(DefaultLink)`
+//   font-weight: ${props => props.theme.text.weight.bold};
+// `;
 
 const SelectorInline = styled.span`
   display: inline-flex;
