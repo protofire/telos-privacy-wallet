@@ -121,24 +121,6 @@ const OptionButton = styled(OptionButtonDefault)`
   }
 `;
 
-const OptionButtonSmall = styled(OptionButton)`
-  flex: 0 0 calc(50% - 2px);
-  height: 40px;
-  border: 0;
-  &:hover {
-    border: 0;
-  }
-  &.active {
-    background-color: ${props => props.theme.walletConnectorOption.background[props.disabled ? 'default' : 'hover']};
-    border: 0;
-  }
-  &:nth-child(odd) {
-    margin-right: 2px;
-  }
-  &:nth-child(even) {
-    margin-left: 2px;
-  }
-`;
 
 const DropdownIcon = styled(DropdownIconDefault)`
   margin-left: 10px;
