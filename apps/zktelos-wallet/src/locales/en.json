@@ -66,6 +66,8 @@
     "showSecretPhrase": "Show secret phrase",
     "setPassword": "Set password",
     "disablePassword": "Disable password",
+    "setPin": "Set PIN",
+    "disablePin": "Disable PIN",
     "generateQRCode": "Generate QR code address",
     "generateAddress": "Generate receiving address",
     "getPaymentLink": "Get payment link",
@@ -263,9 +265,9 @@
       "title": "Restore with Seedphrase",
       "description": "Input your saved secret phrase to restore an existing account"
     },
-    "createPassword": {
+    "createPin": {
       "title": "Protect your account",
-      "description": "Set a password to encrypt your seed phrase locally. This adds an extra layer of security."
+      "description": "Set a PIN to encrypt your seed phrase locally. This adds an extra layer of security."
     },
     "createWithSecret": {
       "title": "Save Your Seed Phrase",
@@ -292,13 +294,32 @@
     "rule1": "Please enter 6 or more characters",
     "rule2": "Password should match"
   },
+  "pin": {
+    "placeholder": "Enter 4-digit PIN",
+    "placeholder2": "Confirm PIN",
+    "helper": "You can use arrow keys to navigate or paste the code",
+    "success": "PIN accepted",
+    "error": "Invalid PIN, try again",
+    "error.length": "PIN must be exactly 4 digits",
+    "error.digits": "Use digits only",
+    "error.match": "PINs must match",
+    "error.invalid": "Incorrect PIN. Try again"
+  },
   "enterPasswordModal": {
     "title": "Enter password",
-    "description": "$t(accountSetupModal.createPassword.description)",
+    "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "Lost password? Click here to restore access"
+  },
+  "enterPinModal": {
+    "title": "Enter PIN",
+    "description": "$t(accountSetupModal.createPin.description)",
+    "lostPin": "Lost PIN? Click here to restore access"
   },
   "setPasswordModal": {
     "title": "Set password"
+  },
+  "setPinModal": {
+    "title": "Set PIN"
   },
   "confirmLogoutModal": {
     "title": "Log out and clear browsing data",
@@ -307,6 +328,10 @@
   "disablePasswordModal": {
     "title": "Disable password",
     "description": "Please enter the current password"
+  },
+  "disablePinModal": {
+    "title": "Disable PIN",
+    "description": "Please enter the current PIN"
   },
   "demoCard": {
     "title": "Demo version",

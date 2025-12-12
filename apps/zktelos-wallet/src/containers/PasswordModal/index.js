@@ -1,63 +1,73 @@
-import { useContext, useState, useCallback, useEffect } from 'react';
+import { useContext, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ModalContext, ZkAccountContext } from 'contexts';
 import PasswordModal from 'components/PasswordModal';
+import usePinValidation from 'hooks/usePinValidation';
 
 export default () => {
+  const { t } = useTranslation();
   const {
     isPasswordModalOpen,
     openAccessAccountModal,
     isAccessAccountModalOpen,
     isCreateAccountModalOpen,
-    closePasswordModal,
+    closePasswordModal
   } = useContext(ModalContext);
   const { unlockAccount } = useContext(ZkAccountContext);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const [attempt, setAttempt] = useState(0);
+  const [pin, setPin] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
+  const { validate, errorKey, setErrorKey, resetValidation } = usePinValidation();
 
-  const handlePasswordChange = useCallback(e => {
-    setError(null);
-    setPassword(e.target.value);
-  }, []);
+  const handlePinChange = useCallback(nextValue => {
+    setSuccessMessage(null);
+    setErrorKey(null);
+    setPin(nextValue);
+  }, [setErrorKey]);
 
   const confirm = useCallback(() => {
+    if (!validate({ pin })) {
+      return;
+    }
     try {
-      const success = unlockAccount(password);
+      const success = unlockAccount(pin);
       if (success) {
-        setPassword('');
-        setAttempt(0);
+        setSuccessMessage(t('pin.success'));
+        setTimeout(() => {
+          setPin('');
+          resetValidation();
+          setSuccessMessage(null);
+          closePasswordModal();
+        }, 500);
       } else {
-        setAttempt(prev => prev + 1);
+        setErrorKey('pin.error.invalid');
+        setPin('');
       }
     } catch (error) {
-      setError(error);
-      setAttempt(0);
+      setErrorKey('pin.error.invalid');
+      setPin('');
     }
-  }, [password, unlockAccount]);
-
-  useEffect(() => {
-    if (attempt > 0) {
-      setTimeout(confirm, 500);
-    }
-  }, [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [closePasswordModal, pin, resetValidation, setErrorKey, t, unlockAccount, validate]);
 
   const reset = useCallback(async () => {
-    setPassword('');
+    setPin('');
+    resetValidation();
+    setSuccessMessage(null);
     openAccessAccountModal();
     closePasswordModal()
-  }, [openAccessAccountModal, closePasswordModal]);
+  }, [closePasswordModal, openAccessAccountModal, resetValidation]);
 
   return (
     <PasswordModal
       isOpen={isPasswordModalOpen}
-      password={password}
-      onPasswordChange={handlePasswordChange}
+      pin={pin}
+      onPinChange={handlePinChange}
       confirm={confirm}
       reset={reset}
-      error={error}
+      errorKey={errorKey}
+      successMessage={successMessage}
       isAccountSetUpModalOpen={isAccessAccountModalOpen || isCreateAccountModalOpen}
-      isLoading={attempt > 0}
+      isLoading={false}
     />
   );
 }

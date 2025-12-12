@@ -66,6 +66,8 @@
     "showSecretPhrase": "Показать секретную фразу",
     "setPassword": "Установить пароль",
     "disablePassword": "Отключить пароль",
+    "setPin": "Установить PIN",
+    "disablePin": "Отключить PIN",
     "generateQRCode": "Сгенерировать QR-код адреса",
     "generateAddress": "Сгенерировать свой адрес",
     "getPaymentLink": "Получить платежную ссылку",
@@ -262,9 +264,9 @@
       "title": "Восстановить с Секретной Фразой",
       "description": "Введите вашу сохраненную секретную фразу, чтобы восстановить существующий аккаунт"
     },
-    "createPassword": {
+    "createPin": {
       "title": "Защитите свой аккаунт",
-      "description": "Установите пароль для локального шифрования вашей секретной фразы. Это добавит дополнительный уровень безопасности."
+      "description": "Установите PIN для локального шифрования вашей секретной фразы. Это добавит дополнительный уровень безопасности."
     },
     "createWithSecret": {
       "title": "Сохраните вашу Секретную Фразу",
@@ -291,13 +293,32 @@
     "rule1": "Пожалуйста, введите 6 символов или более",
     "rule2": "Пароль должен совпадать"
   },
+  "pin": {
+    "placeholder": "Введите 4-значный PIN",
+    "placeholder2": "Подтвердите PIN",
+    "helper": "Используйте стрелки для навигации или вставьте код",
+    "success": "PIN принят",
+    "error": "Неверный PIN, попробуйте снова",
+    "error.length": "PIN должен содержать ровно 4 цифры",
+    "error.digits": "Используйте только цифры",
+    "error.match": "PIN-коды должны совпадать",
+    "error.invalid": "Неправильный PIN. Попробуйте снова"
+  },
   "enterPasswordModal": {
     "title": "Введите пароль",
-    "description": "$t(accountSetupModal.createPassword.description)",
+    "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "Потеряли пароль? Нажмите здесь, чтобы восстановить доступ"
+  },
+  "enterPinModal": {
+    "title": "Введите PIN",
+    "description": "$t(accountSetupModal.createPin.description)",
+    "lostPin": "Потеряли PIN? Нажмите здесь, чтобы восстановить доступ"
   },
   "setPasswordModal": {
     "title": "Установить пароль"
+  },
+  "setPinModal": {
+    "title": "Установить PIN"
   },
   "confirmLogoutModal": {
     "title": "Выйти и очистить данные браузера",
@@ -306,6 +327,10 @@
   "disablePasswordModal": {
     "title": "Отключить пароль",
     "description": "Пожалуйста, введите текущий пароль"
+  },
+  "disablePinModal": {
+    "title": "Отключить PIN",
+    "description": "Пожалуйста, введите текущий PIN"
   },
   "demoCard": {
     "title": "Демо версия",

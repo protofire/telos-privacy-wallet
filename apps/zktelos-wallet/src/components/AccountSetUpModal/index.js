@@ -203,7 +203,7 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       prevStep = STEP.CREATE_INSTANT;
       break;
     case STEP.SUGGEST_PASSWORD:
-      title = t('accountSetupModal.createPassword.title'); // Ensure this key exists or add it
+      title = t('accountSetupModal.createPin.title'); // Ensure this key exists or add it
       component = (
         <Password
           confirmPassword={handlePasswordSet}

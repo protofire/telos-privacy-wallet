@@ -77,7 +77,7 @@ const Settings = () => {
                   {t('buttonText.showSecretPhrase')}
                 </OptionButton>
                 <OptionButton onClick={hasPassword ? openDisablePasswordModal : openChangePasswordModal}>
-                  {hasPassword ? t('buttonText.disablePassword') : t('buttonText.setPassword')}
+                  {hasPassword ? t('buttonText.disablePin') : t('buttonText.setPin')}
                 </OptionButton>
               </ButtonGroup>
             </Section>

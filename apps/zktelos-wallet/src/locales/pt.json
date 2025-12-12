@@ -66,6 +66,8 @@
     "showSecretPhrase": "Mostrar frase secreta",
     "setPassword": "Definir senha",
     "disablePassword": "Desativar senha",
+    "setPin": "Definir PIN",
+    "disablePin": "Desativar PIN",
     "generateQRCode": "Gerar código QR do endereço",
     "generateAddress": "Gerar endereço de recebimento",
     "getPaymentLink": "Obter link de pagamento",
@@ -261,9 +263,9 @@
       "title": "Restaurar com Frase Secreta",
       "description": "Digite sua frase secreta salva para restaurar uma conta existente"
     },
-    "createPassword": {
+    "createPin": {
       "title": "Proteja sua conta",
-      "description": "Defina uma senha para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
+      "description": "Defina um PIN para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
     },
     "createWithSecret": {
       "title": "Salve sua Frase Secreta",
@@ -290,13 +292,32 @@
     "rule1": "Por favor, insira 6 ou mais caracteres",
     "rule2": "As senhas devem coincidir"
   },
+  "pin": {
+    "placeholder": "Digite o PIN de 4 dígitos",
+    "placeholder2": "Confirme o PIN",
+    "helper": "Use as setas para navegar ou cole o código",
+    "success": "PIN aceito",
+    "error": "PIN inválido, tente novamente",
+    "error.length": "O PIN deve ter exatamente 4 dígitos",
+    "error.digits": "Use apenas dígitos",
+    "error.match": "Os PINs devem coincidir",
+    "error.invalid": "PIN incorreto. Tente novamente"
+  },
   "enterPasswordModal": {
     "title": "Digite a senha",
-    "description": "$t(accountSetupModal.createPassword.description)",
+    "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "Esqueceu a senha? Clique aqui para recuperar o acesso"
+  },
+  "enterPinModal": {
+    "title": "Digite o PIN",
+    "description": "$t(accountSetupModal.createPin.description)",
+    "lostPin": "Esqueceu o PIN? Clique aqui para recuperar o acesso"
   },
   "setPasswordModal": {
     "title": "Definir senha"
+  },
+  "setPinModal": {
+    "title": "Definir PIN"
   },
   "confirmLogoutModal": {
     "title": "Sair e limpar os dados de navegação",
@@ -305,6 +326,10 @@
   "disablePasswordModal": {
     "title": "Desativar senha",
     "description": "Por favor, digite a senha atual"
+  },
+  "disablePinModal": {
+    "title": "Desativar PIN",
+    "description": "Por favor, digite o PIN atual"
   },
   "demoCard": {
     "title": "Versão de demonstração",

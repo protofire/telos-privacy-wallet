@@ -2,13 +2,14 @@ import { useContext, useState, useCallback, useEffect } from 'react';
 
 import { ModalContext, ZkAccountContext } from 'contexts';
 import SeedPhraseModal from 'components/SeedPhraseModal';
+import usePinValidation from 'hooks/usePinValidation';
 
 export default () => {
   const { isSeedPhraseModalOpen, closeSeedPhraseModal } = useContext(ModalContext);
   const { decryptMnemonic, getSeed } = useContext(ZkAccountContext);
-  const [password, setPassword] = useState('');
+  const [pin, setPin] = useState('');
   const [mnemonic, setMnemonic] = useState(null);
-  const [error, setError] = useState(null);
+  const { validate, errorKey, setErrorKey, resetValidation } = usePinValidation();
 
   const { seed, hasPassword } = getSeed();
 
@@ -18,19 +19,23 @@ export default () => {
     }
   }, [seed, hasPassword, isSeedPhraseModalOpen]);
 
-  const handlePasswordChange = useCallback(e => {
-    setError(null);
-    setPassword(e.target.value);
-  }, []);
+  const handlePinChange = useCallback(value => {
+    resetValidation();
+    setPin(value);
+  }, [resetValidation]);
 
   const confirm = useCallback(async () => {
+    if (!validate({ pin })) {
+      return;
+    }
     try {
-      const mnemonic = await decryptMnemonic(password);
+      const mnemonic = await decryptMnemonic(pin);
       setMnemonic(mnemonic);
     } catch (error) {
-      setError(error);
+      setErrorKey('pin.error.invalid');
+      setPin('');
     }
-  }, [password, decryptMnemonic]);
+  }, [pin, decryptMnemonic, validate, setErrorKey]);
 
   const handleKeyPress = useCallback(event => {
     if(event.key === 'Enter'){
@@ -40,20 +45,20 @@ export default () => {
 
   const onClose = useCallback(() => {
     closeSeedPhraseModal();
-    setPassword('');
+    setPin('');
     setMnemonic(null);
-    setError(null);
-  }, [closeSeedPhraseModal]);
+    resetValidation();
+  }, [closeSeedPhraseModal, resetValidation]);
 
   return (
     <SeedPhraseModal
       isOpen={isSeedPhraseModalOpen}
       onClose={onClose}
       confirm={confirm}
-      onPasswordChange={handlePasswordChange}
+      onPinChange={handlePinChange}
       onKeyPress={handleKeyPress}
-      password={password}
-      error={error}
+      pin={pin}
+      error={!!errorKey}
       mnemonic={mnemonic}
     />
   );
