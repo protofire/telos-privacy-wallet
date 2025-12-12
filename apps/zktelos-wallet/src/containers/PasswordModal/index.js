@@ -1,7 +1,8 @@
-import { useContext, useState, useCallback, useEffect } from 'react';
+import { useContext, useState, useCallback } from 'react';
 
 import { ModalContext, ZkAccountContext } from 'contexts';
 import PasswordModal from 'components/PasswordModal';
+import usePinValidation from 'hooks/usePinValidation';
 
 export default () => {
   const {
@@ -9,55 +10,54 @@ export default () => {
     openAccessAccountModal,
     isAccessAccountModalOpen,
     isCreateAccountModalOpen,
-    closePasswordModal,
+    closePasswordModal
   } = useContext(ModalContext);
-  const { unlockAccount } = useContext(ZkAccountContext);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const [attempt, setAttempt] = useState(0);
+  const { unlockAccount, isLoadingZkAccount } = useContext(ZkAccountContext);
+  const [pin, setPin] = useState('');
+  const { validate, errorKey, setErrorKey, resetValidation } = usePinValidation();
 
-  const handlePasswordChange = useCallback(e => {
-    setError(null);
-    setPassword(e.target.value);
-  }, []);
+  const handlePinChange = useCallback(nextValue => {
+    setErrorKey(null);
+    setPin(nextValue);
+  }, [setErrorKey]);
 
-  const confirm = useCallback(() => {
+  const confirm = useCallback(async () => {
+    if (!validate({ pin })) {
+      return;
+    }
     try {
-      const success = unlockAccount(password);
+      const success = await unlockAccount(pin);
       if (success) {
-        setPassword('');
-        setAttempt(0);
+        setPin('');
+        resetValidation();
+        closePasswordModal();
       } else {
-        setAttempt(prev => prev + 1);
+        setErrorKey('pin.error.invalid');
+        setPin('');
       }
     } catch (error) {
-      setError(error);
-      setAttempt(0);
+      setErrorKey('pin.error.invalid');
+      setPin('');
     }
-  }, [password, unlockAccount]);
-
-  useEffect(() => {
-    if (attempt > 0) {
-      setTimeout(confirm, 500);
-    }
-  }, [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [closePasswordModal, pin, resetValidation, setErrorKey, unlockAccount, validate]);
 
   const reset = useCallback(async () => {
-    setPassword('');
+    setPin('');
+    resetValidation();
     openAccessAccountModal();
     closePasswordModal()
-  }, [openAccessAccountModal, closePasswordModal]);
+  }, [closePasswordModal, openAccessAccountModal, resetValidation]);
 
   return (
     <PasswordModal
       isOpen={isPasswordModalOpen}
-      password={password}
-      onPasswordChange={handlePasswordChange}
+      pin={pin}
+      onPinChange={handlePinChange}
       confirm={confirm}
       reset={reset}
-      error={error}
+      errorKey={errorKey}
       isAccountSetUpModalOpen={isAccessAccountModalOpen || isCreateAccountModalOpen}
-      isLoading={attempt > 0}
+      isLoading={isLoadingZkAccount}
     />
   );
 }

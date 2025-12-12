@@ -46,7 +46,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     sign, signTypedData, sendTransaction,
   } = useContext(WalletContext);
   const { openTxModal, setTxStatus, setTxAmount, setTxError } = useContext(TransactionModalContext);
-  const { openPasswordModal, closePasswordModal, closeAllModals } = useContext(ModalContext);
+  const { openPasswordModal, closeAllModals } = useContext(ModalContext);
   const { updateBalance: updateTokenBalance } = useContext(TokenBalanceContext);
   const { supportId, updateSupportId } = useContext(SupportIdContext);
   // Multi-pool state: store zkClients, balances, histories per pool alias
@@ -613,17 +613,17 @@ export const ZkAccountContextProvider = ({ children }) => {
     return mnemonic;
   }, []);
 
-  const unlockAccount = useCallback(password => {
+  const unlockAccount = useCallback(async password => {
     if (!zkClient) return false;
     try {
       const mnemonic = decryptMnemonic(password);
-      closePasswordModal();
-      loadZkAccount(mnemonic);
+      // closePasswordModal();
+      await loadZkAccount(mnemonic);
       return true;
     } catch (error) {
       throw new Error('Incorrect password');
     }
-  }, [zkClient, loadZkAccount, closePasswordModal, decryptMnemonic]);
+  }, [zkClient, loadZkAccount, decryptMnemonic]);
 
   const verifyPassword = useCallback(password => {
     try {

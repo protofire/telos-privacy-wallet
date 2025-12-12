@@ -66,6 +66,8 @@
     "showSecretPhrase": "Show secret phrase",
     "setPassword": "Set password",
     "disablePassword": "Disable password",
+    "setPin": "Set PIN",
+    "disablePin": "Disable PIN",
     "generateQRCode": "Generate QR code address",
     "generateAddress": "Generate receiving address",
     "getPaymentLink": "Get payment link",
@@ -76,8 +78,8 @@
     "skip": "Skip",
     "verify": "Verify",
     "restoreAccount": "Restore account",
-    "signIn": "Sign in",
-    "signingIn": "Signing in...",
+    "signIn": "Unlock",
+    "signingIn": "Unlocking...",
     "getToken": "Get {{symbol}}"
   },
   "home": {
@@ -263,14 +265,14 @@
       "title": "Restore with Seedphrase",
       "description": "Input your saved secret phrase to restore an existing account"
     },
-    "createPassword": {
+    "createPin": {
       "title": "Protect your account",
-      "description": "Set a password to encrypt your seed phrase locally. This adds an extra layer of security."
+      "description": "Set a PIN to encrypt your seed phrase locally. This adds an extra layer of security."
     },
     "createWithSecret": {
       "title": "Save Your Seed Phrase",
       "description": "Write down or copy these words in the right order and save them somewhere safe",
-      "warning": "Never share your secret phrase with anyone,<br/> store it securely!",
+      "warning": "Double check the URL to be <url>{{url}}</url>. <br/>Never share your secret phrase with anyone,<br/> store it securely!",
       "copy": "Copy secret phrase"
     },
     "confirmSecret": {
@@ -286,19 +288,30 @@
       "description": "Accessing your zkAccount with your connected wallet."
     }
   },
-  "password": {
-    "placeholder1": "Password 6+ characters",
-    "placeholder2": "Verify password",
-    "rule1": "Please enter 6 or more characters",
-    "rule2": "Password should match"
+  "pin": {
+    "helper": "You can use arrow keys to navigate or paste the code",
+    "error": "Invalid PIN, try again",
+    "error.length": "PIN must be exactly 4 digits",
+    "error.digits": "Use digits only",
+    "error.match": "PINs must match",
+    "error.invalid": "Incorrect PIN. Try again"
   },
   "enterPasswordModal": {
     "title": "Enter password",
-    "description": "$t(accountSetupModal.createPassword.description)",
+    "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "Lost password? Click here to restore access"
+  },
+  "enterPinModal": {
+    "title": "Unlock zkAccount",
+    "description": "Enter your PIN to unlock your zkAccount",
+    "lostPin": "Lost PIN? Click here to restore access"
   },
   "setPasswordModal": {
     "title": "Set password"
+  },
+  "setPinModal": {
+    "title": "Set PIN",
+    "description": "Set a PIN to encrypt your seed phrase locally. This adds an extra layer of security."
   },
   "confirmLogoutModal": {
     "title": "Log out and clear browsing data",
@@ -307,6 +320,10 @@
   "disablePasswordModal": {
     "title": "Disable password",
     "description": "Please enter the current password"
+  },
+  "disablePinModal": {
+    "title": "Disable PIN",
+    "description": "Please enter the current PIN"
   },
   "demoCard": {
     "title": "Demo version",
@@ -385,7 +402,7 @@
   },
   "secretPhraseModal": {
     "title": "Show secret phrase",
-    "warning": "Never share your secret phrase with anyone,<br/> store it securely!",
+    "warning": "Double check the URL to be <url>{{url}}</url>. <br/><br/>Never share your secret phrase with anyone, store it securely!",
     "description": "If someone has your secret phrase they will have full control of your wallet.",
     "copy": "Copy secret phrase"
   },

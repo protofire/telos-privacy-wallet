@@ -66,6 +66,8 @@
     "showSecretPhrase": "Mostrar frase secreta",
     "setPassword": "Definir senha",
     "disablePassword": "Desativar senha",
+    "setPin": "Definir PIN",
+    "disablePin": "Desativar PIN",
     "generateQRCode": "Gerar código QR do endereço",
     "generateAddress": "Gerar endereço de recebimento",
     "getPaymentLink": "Obter link de pagamento",
@@ -85,6 +87,8 @@
     "titleOffline": "Crie sua Conta Privada",
     "portfolio": "Meu portfólio",
     "latestTransactions": "Últimas transações",
+    "privateAccount": "Conta Privada",
+    "publicAccount": "Conta Pública",
     "description": "Gere uma conta privada segura e desbloqueie transferências com preservação de privacidade."
   },
   "portfolio": {
@@ -261,14 +265,14 @@
       "title": "Restaurar com Frase Secreta",
       "description": "Digite sua frase secreta salva para restaurar uma conta existente"
     },
-    "createPassword": {
+    "createPin": {
       "title": "Proteja sua conta",
-      "description": "Defina uma senha para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
+      "description": "Defina um PIN para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
     },
     "createWithSecret": {
       "title": "Salve sua Frase Secreta",
       "description": "Anote ou copie estas palavras na ordem correta e guarde-as em um local seguro",
-      "warning": "Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
+      "warning": "Verifique se a URL é <url>{{url}}</url>.<br/><br/>Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
       "copy": "Copiar frase secreta"
     },
     "confirmSecret": {
@@ -284,19 +288,33 @@
       "description": "Acessando sua conta zkAccount com sua carteira conectada."
     }
   },
-  "password": {
-    "placeholder1": "Senha com 6+ caracteres",
-    "placeholder2": "Verificar senha",
-    "rule1": "Por favor, insira 6 ou mais caracteres",
-    "rule2": "As senhas devem coincidir"
+
+  "pin": {
+
+
+    "helper": "Use as setas para navegar ou cole o código",
+    "error": "PIN inválido, tente novamente",
+    "error.length": "O PIN deve ter exatamente 4 dígitos",
+    "error.digits": "Use apenas dígitos",
+    "error.match": "Os PINs devem coincidir",
+    "error.invalid": "PIN incorreto. Tente novamente"
   },
   "enterPasswordModal": {
     "title": "Digite a senha",
-    "description": "$t(accountSetupModal.createPassword.description)",
+    "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "Esqueceu a senha? Clique aqui para recuperar o acesso"
+  },
+  "enterPinModal": {
+    "title": "Desbloquear zkAccount",
+    "description": "Digite seu PIN para desbloquear sua zkAccount",
+    "lostPin": "Esqueceu o PIN? Clique aqui para recuperar o acesso"
   },
   "setPasswordModal": {
     "title": "Definir senha"
+  },
+  "setPinModal": {
+    "title": "Definir PIN",
+    "description": "Defina um PIN para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
   },
   "confirmLogoutModal": {
     "title": "Sair e limpar os dados de navegação",
@@ -305,6 +323,10 @@
   "disablePasswordModal": {
     "title": "Desativar senha",
     "description": "Por favor, digite a senha atual"
+  },
+  "disablePinModal": {
+    "title": "Desativar PIN",
+    "description": "Por favor, digite o PIN atual"
   },
   "demoCard": {
     "title": "Versão de demonstração",
@@ -383,7 +405,7 @@
   },
   "secretPhraseModal": {
     "title": "Mostrar frase secreta",
-    "warning": "Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
+    "warning": "Verifique se a URL é <url>{{url}}</url>.<br/><br/>Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
     "description": "Se alguém tiver sua frase secreta, ela terá controle total sobre sua carteira.",
     "copy": "Copiar frase secreta"
   },

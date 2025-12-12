@@ -4,36 +4,41 @@ import { useTranslation } from 'react-i18next';
 
 import Modal from 'components/Modal';
 import Button from 'components/Button';
-import Input from 'components/Input';
+import PinInput from 'components/PinInput';
 
 import { ModalContext, ZkAccountContext } from 'contexts';
+import usePinValidation from 'hooks/usePinValidation';
 
 export default () => {
   const { t } = useTranslation();
   const { isDisablePasswordModalOpen, closeDisablePasswordModal } = useContext(ModalContext);
   const { removePassword } = useContext(ZkAccountContext);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [pin, setPin] = useState('');
+  const { validate, errorKey, setErrorKey, resetValidation } = usePinValidation();
 
   const handlePasswordChange = useCallback(e => {
-    setError(null);
-    setPassword(e.target.value);
-  }, []);
+    setErrorKey(null);
+    setPin(e);
+  }, [setErrorKey]);
 
   const closeModal = useCallback(() => {
     closeDisablePasswordModal();
-    setPassword('');
-    setError(null);
-  }, [closeDisablePasswordModal]);
+    setPin('');
+    resetValidation();
+  }, [closeDisablePasswordModal, resetValidation]);
 
   const confirm = useCallback(() => {
+    if (!validate({ pin })) {
+      return;
+    }
     try {
-      removePassword(password);
+      removePassword(pin);
       closeModal();
     } catch (error) {
-      setError(error);
+      setErrorKey('pin.error.invalid');
+      setPin('');
     }
-  }, [password, removePassword, closeModal]);
+  }, [closeModal, pin, removePassword, setErrorKey, validate]);
 
   const handleKeyPress = useCallback(event => {
     if(event.key === 'Enter'){
@@ -45,19 +50,18 @@ export default () => {
     <Modal
       isOpen={isDisablePasswordModalOpen}
       onClose={closeModal}
-      title={t('disablePasswordModal.title')}
+      title={t('disablePinModal.title')}
     >
       <Container onKeyPress={handleKeyPress}>
         <Description>
-          {t('disablePasswordModal.description')}
+          {t('disablePinModal.description')}
         </Description>
-        <Input
+        <PinInput
           autoFocus
-          type="password"
-          placeholder={t('common.password')}
-          value={password}
+          value={pin}
           onChange={handlePasswordChange}
-          error={!!error}
+          error={!!errorKey}
+          helperText={errorKey ? t(errorKey) : t('pin.helper')}
         />
         <Button onClick={confirm}>{t('buttonText.confirm')}</Button>
       </Container>
