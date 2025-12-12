@@ -93,7 +93,6 @@ const Content = ({
 
   const hasAddresses = Object.keys(shieldedAddresses).length > 0;
 
-  const hasAddresses = Object.keys(shieldedAddresses).length > 0;
 
   return (
     <Container>

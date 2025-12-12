@@ -278,18 +278,6 @@ const Title = styled.span`
   gap: 8px;
 `;
 
-const SelectorInline = styled.span`
-  display: inline-flex;
-  align-items: center;
-`;
-
-const Note = styled.p`
-  font-size: 14px;
-  color: ${props => props.theme.card.note.color};
-  margin: 0 4px 16px;
-`;
-
-
 // const MessageContainer = styled(Row)`
 //   justify-content: center;
 //   flex-wrap: wrap;
