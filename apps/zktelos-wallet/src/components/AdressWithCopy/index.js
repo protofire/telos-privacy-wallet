@@ -7,8 +7,11 @@ import Tooltip from 'components/Tooltip';
 
 import { CopyIcon, CheckIcon } from 'lucide-react';
 
+import { shortAddress } from 'utils';
+
 export default ({
   children,
+  formatType = '0x',
   prefixIcon,
   onPrefixClick,
   $noBorder,
@@ -54,7 +57,7 @@ export default ({
         </PrefixIconWrapper>
       )}
       <Address>
-        {children}
+        {formatType === '0x' ? shortAddress(children, 25) : children}
       </Address>
       <CopyToClipboard text={children} onCopy={onCopy}>
         <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>

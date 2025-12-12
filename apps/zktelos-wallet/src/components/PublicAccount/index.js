@@ -14,7 +14,6 @@ import { sortRowsByAsset } from 'components/PortfolioTable/formatters';
 import { CONNECTORS_ICONS, TOKENS_ICONS, NETWORKS } from 'constants';
 import { TokenBalanceContext, PoolContext, WalletContext, ModalContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
-import { shortAddress } from 'utils';
 
 export default () => {
   const { t } = useTranslation();
@@ -29,7 +28,6 @@ export default () => {
   const nativeSymbol = NETWORKS[activeChainId]?.nativeSymbol || 'ETH';
   const nativePrice = priceMap?.get(nativeSymbol) || null;
   const isLoading = isLoadingBalance || isLoadingPrices;
-  const wrapDisabled = !nativeBalance || nativeBalance.isZero();
 
   const getRefreshIcon = () => {
     return <RenewIcon width={18} height={18} />;
@@ -117,7 +115,7 @@ export default () => {
     }
 
     return sortRowsByAsset(rows);
-  }, [balances, priceMap, nativeBalance, nativePrice, nativeSymbol, t, setCurrentPool, goToDeposit, openWrapModal, wrapDisabled, availablePools]);
+  }, [balances, priceMap, nativeBalance, nativePrice, nativeSymbol, t, setCurrentPool, goToDeposit, openWrapModal, availablePools]);
 
   if (!account) {
     return <ConnectWalletWrapper>
@@ -138,6 +136,7 @@ export default () => {
           <AddressWithCopy
             prefixIcon={getRefreshIcon()}
             onPrefixClick={handleChangeWallet}
+            formatType="0x"
             $noBorder
             $fontSize="14px"
             $height="auto"
@@ -146,7 +145,7 @@ export default () => {
             $padding="0"
             $background="transparent"
           >
-            {shortAddress(account, 25)}
+            {account}
           </AddressWithCopy>
         </HeaderContent>
       </HeaderContainer>
