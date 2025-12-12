@@ -17,6 +17,7 @@
     "wallet": "钱包",
     "viewInExplorer": "在浏览器中打开",
     "settings": "设定",
+    "theme": "默认主题",
     "password": "密码",
     "language": "语言",
     "sender": "发送人",
@@ -65,6 +66,8 @@
     "showSecretPhrase": "显示助记词",
     "setPassword": "设置密码",
     "disablePassword": "停用密码",
+    "setPin": "设置PIN",
+    "disablePin": "停用PIN",
     "generateQRCode": "生成二维码地址",
     "generateAddress": "生成收款地址",
     "getPaymentLink": "生成付款链接",
@@ -84,6 +87,8 @@
     "titleOffline": "创建您的私密账户",
     "portfolio": "我的投资组合",
     "latestTransactions": "最新交易",
+    "privateAccount": "私密账户",
+    "publicAccount": "公共账户",
     "description": "生成安全的私密账户并开启隐私保护转账。"
   },
   "portfolio": {
@@ -260,10 +265,14 @@
       "title": "使用助记词恢复",
       "description": "输入您保存的助记词以恢复现有账户"
     },
+    "createPin": {
+      "title": "保护您的账户",
+      "description": "设置PIN以在本地加密您的助记词。这增加了一层额外的安全性。"
+    },
     "createWithSecret": {
       "title": "保存您的助记词",
       "description": "请按正确的顺序抄写或复制助记词，并妥善保存",
-      "warning": "请勿与任何人分享您的助记词，<br/>请妥善保存！",
+      "warning": "请确认URL为 <url>{{url}}</url>。<br/><br/>请勿与任何人分享您的助记词，<br/>请妥善保存！",
       "copy": "复制助记词"
     },
     "confirmSecret": {
@@ -279,19 +288,31 @@
       "description": "使用已连接的钱包登入您的zk账户。"
     }
   },
-  "password": {
-    "placeholder1": "密码需6位或以上字符",
-    "placeholder2": "确认密码",
-    "rule1": "请输入6位或以上字符",
-    "rule2": "两次输入的密码需匹配"
+  "pin": {
+    "helper": "可用方向键导航或粘贴代码",
+    "success": "PIN 已通过",
+    "error": "PIN 无效，请重试",
+    "error.length": "PIN 需正好4位数字",
+    "error.digits": "仅支持数字",
+    "error.match": "两次 PIN 必须一致",
+    "error.invalid": "PIN 不正确，请重试"
   },
   "enterPasswordModal": {
     "title": "输入密码",
-    "description": "$t(accountSetupModal.createPassword.description)",
+    "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "忘记密码？点击此处恢复"
+  },
+  "enterPinModal": {
+    "title": "解锁zk账户",
+    "description": "输入您的PIN以解锁您的zk账户",
+    "lostPin": "忘记PIN？点击此处恢复"
   },
   "setPasswordModal": {
     "title": "设置密码"
+  },
+  "setPinModal": {
+    "title": "设置PIN",
+    "description": "设置PIN以在本地加密您的助记词。这增加了一层额外的安全性。"
   },
   "confirmLogoutModal": {
     "title": "登出并清除浏览记录",
@@ -300,6 +321,10 @@
   "disablePasswordModal": {
     "title": "停用密码",
     "description": "请输入现用密码"
+  },
+  "disablePinModal": {
+    "title": "停用PIN",
+    "description": "请输入现用PIN"
   },
   "demoCard": {
     "title": "测试版",
@@ -378,7 +403,7 @@
   },
   "secretPhraseModal": {
     "title": "显示助记词",
-    "warning": "请勿与任何人分享您的助记词，<br/>请妥善保管！",
+    "warning": "请确认URL为 <url>{{url}}</url>。<br/><br/>请勿与任何人分享您的助记词，<br/>请妥善保存！",
     "description": "若他人掌握您的助记词，他们将完全掌握您钱包的控制权。",
     "copy": "复制助记词"
   },

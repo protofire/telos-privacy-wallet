@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Tooltip from 'components/Tooltip';
 import QRCodeReader from 'components/QRCodeReader';
 
-import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
+import { InfoIcon as InfoIconDefault } from 'lucide-react';
 import { ReactComponent as QrCodeIconDefault } from 'assets/qr-code.svg';
 
 import useAutosizeTextArea from './hooks/useAutosizeTextArea';
@@ -18,7 +18,7 @@ export default ({ value, onChange, hint, placeholder, qrCode }) => {
   }, [onChange])
 
   const handleKeyPress = event => {
-    if(event.key === 'Enter' || event.key === ' '){
+    if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
     }
   };
@@ -81,6 +81,7 @@ const TextArea = styled.textarea`
   outline: none;
   color: ${props => props.theme.text.color.primary};
   font-size: 16px;
+  background: transparent;
   line-height: 20px;
   font-weight: 400;
   max-height: 40px;
@@ -101,11 +102,14 @@ const InfoIcon = styled(InfoIconDefault)`
   top: 50%;
   transform: translateY(-50%);
   cursor: default;
+  
+  color: ${props => props.theme.icon.color.default};
+
   &:hover {
-    & > path {
-      fill: ${props => props.theme.color.purple};
-    }
+    color: ${props => props.theme.icon.color.hover};
   }
+  width: 14px;
+  height: 14px;
 `;
 
 const QrCodeIcon = styled(QrCodeIconDefault)`

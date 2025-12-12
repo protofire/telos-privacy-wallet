@@ -6,17 +6,20 @@ import Button from 'components/Button';
 
 
 import { OnboardingTutorialContext } from 'contexts';
+import ThemeContext from 'contexts/ThemeContext';
 import welcomeImage from 'assets/telos-wallet-logo.svg';
+import welcomeImageDark from 'assets/telos-wallet-logo-dark.svg';
 
 export default () => {
   const { t } = useTranslation();
+  const { theme } = useContext(ThemeContext);
   const { startTour, completeTour } = useContext(OnboardingTutorialContext);
 
   return (
     <WelcomeCard>
       <Container>
         <Title>{t('welcome.title')}</Title>
-        <img src={welcomeImage} alt="Welcome" />
+        <img src={theme === 'dark' ? welcomeImageDark : welcomeImage} alt="Welcome" />
         <Description>
           <Text>
             <Trans i18nKey="welcome.content.paragraph1" />
@@ -26,7 +29,7 @@ export default () => {
           </Text>
           <Text>{t('welcome.content.paragraph3')}</Text>
         </Description>
-        <ButtonContainer>
+        <ButtonContainer $theme={theme}>
           <Button onClick={completeTour}>{t('welcome.skipTour')}</Button>
           <Button onClick={startTour}>{t('welcome.startTour')}</Button>
         </ButtonContainer>
@@ -84,12 +87,13 @@ const ButtonContainer = styled.div`
   }
 
   button:first-child:hover {
-    background: ${props => props.theme.color.telosGradientSoft};
+    background: ${props => props.theme.button.background};
     color: ${props => props.theme.color.black} !important;
   }
   
   button:last-child:hover {
-    background: ${props => props.theme.color.telosGradient};
+    background: ${props => props.$theme === 'dark' ? props.theme.background : props.theme.color.telosGradient};
+    color: ${props => props.theme.text.color.primary} !important;
   }
 `;
 
@@ -100,7 +104,7 @@ const WelcomeCard = styled.div`
   width: 675px;
   max-width: 100%;
   box-sizing: border-box;
-  background-color: ${props => props.theme.color.white};
+  background-color: ${props => props.theme.modal.background};
   border-radius: 8px;
   border: 2px solid ${props => props.theme.color.black};
   & > * {

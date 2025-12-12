@@ -2,22 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
-import { ReactComponent as MenuDepositIcon } from 'assets/menu_deposit.svg';
-import { ReactComponent as MenuWithdrawIcon } from 'assets/menu_withdraw.svg';
-import { ReactComponent as MenuTransferIcon } from 'assets/menu_transfer.svg';
-import { ReactComponent as MenuTransactionsIcon } from 'assets/menu_transactions.svg';
-import { ReactComponent as MenuHomeIcon } from 'assets/menu_home.svg';
+
+import { HomeIcon, MoveDownLeftIcon, MoveUpRightIcon, ArrowRightLeftIcon, ListCheckIcon, Settings } from 'lucide-react';
 
 export default ({ tabs, activeTab, onTabClick, showBadge }) => {
   const { t } = useTranslation();
 
   const getTabIcon = (tabName) => {
     const iconMap = {
-      'Home': MenuHomeIcon,
-      'Deposit': MenuDepositIcon,
-      'Withdraw': MenuWithdrawIcon,
-      'Transfer': MenuTransferIcon,
-      'History': MenuTransactionsIcon,
+      'Home': HomeIcon,
+      'Deposit': MoveDownLeftIcon,
+      'Withdraw': MoveUpRightIcon,
+      'Transfer': ArrowRightLeftIcon,
+      'History': ListCheckIcon,
+      'Settings': Settings,
     };
     return iconMap[tabName];
   };
@@ -35,7 +33,7 @@ export default ({ tabs, activeTab, onTabClick, showBadge }) => {
             data-ga-id={`tab-${tab.name.toLowerCase()}`}
             data-tour={tab.dataTour}
           >
-            <IconWrapper><TabIcon width={14} height={14} /></IconWrapper>
+            <TabIcon size={16} />
             <MenuText>{t(tab.i18nKey)}</MenuText>
           </MenuItem>
         );
@@ -60,12 +58,11 @@ const MenuContainer = styled.div`
   }
 
   @media only screen and (max-width: 560px) {
-    width: 240px;
+    width: auto;
+    max-width: 100%;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding-left: 30px;
-    padding-right: 30px;
   }
 `;
 
@@ -76,15 +73,19 @@ const MenuItem = styled.div`
   gap: 12px;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${props => props.active ? props.theme.color.telosGradientSoft : 'transparent'};
-  border: ${props => props.active ? `1px solid rgb(149 126 223 / 40%)` : 'none'};
+  background: ${props => props.active ? props.theme.button.background : 'transparent'};
+  border: ${props => props.active ? `1px solid ${props.theme.button.primary.border.color}` : 'none'};
   color: ${props => props.theme.text.color[props.active ? 'primary' : 'secondary']};
   font-weight: normal;
   cursor: pointer;
   transition: all 0.2s ease;
+
+  svg {
+    color: ${props => props.theme.icon.color.default};
+  }
   
   &:hover {
-    background: ${props => props.active ? props.theme.color.telosGradientSoft : 'rgba(0, 0, 0, 0.02)'};
+    background: ${props => props.active ? props.theme.button.background : 'rgba(0, 0, 0, 0.02)'};
     color: ${props => props.theme.text.color.primary};
   }
 
@@ -97,7 +98,6 @@ const MenuItem = styled.div`
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: #E53E3E;
   }
 `;
 
@@ -108,10 +108,4 @@ const MenuText = styled.span`
   @media only screen and (max-width: 560px) {
     display: none;
   }
-`;
-
-const IconWrapper = styled.div`
-  width: 16px;
-  height: 16px;
-  transition: all 0.2s ease;
 `;

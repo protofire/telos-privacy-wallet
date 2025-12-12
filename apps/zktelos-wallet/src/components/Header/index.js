@@ -7,20 +7,16 @@ import ButtonDefault from 'components/Button';
 import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import ZkAccountDropdown from 'components/ZkAccountDropdown';
 import NetworkDropdown from 'components/NetworkDropdown';
-import MoreDropdown from 'components/MoreDropdown';
 import SpinnerDefault from 'components/Spinner';
 // import Skeleton from 'components/Skeleton';
 // import BalanceDisplay from 'components/BalanceDisplay';
 
-import { ReactComponent as StyledEyeIcon } from 'assets/eye.svg';
-import { ReactComponent as StyledEyeClosedIcon } from 'assets/eye-off.svg';
+import { EyeIcon, EyeOffIcon, RefreshCcwIcon, ChevronDownIcon, MoonIcon, SunIcon } from 'lucide-react';
 
 import { BalanceVisibilityContext } from 'contexts';
+import ThemeContext from 'contexts/ThemeContext';
 
 import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
-import { ReactComponent as RefreshIcon } from 'assets/refresh.svg';
-import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
-import { ReactComponent as DotsIcon } from 'assets/dots.svg';
 
 // import { formatNumber } from 'utils';
 import { NETWORKS } from 'constants';
@@ -58,6 +54,7 @@ export default ({ empty }) => {
   } = useContext(ZkAccountContext);
   const { openAccessAccountModal } = useContext(ModalContext);
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const { currentPool } = useContext(PoolContext);
 
   const refresh = useCallback(e => {
@@ -161,24 +158,19 @@ export default ({ empty }) => {
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton> */}
           {/* {!isMobile && walletDropdown} */}
-          {(account || zkAccount) && <IconWrapper onClick={toggleVisibility}>
-            {isVisible ? <StyledEyeIcon width={24} height={24} /> : <StyledEyeClosedIcon width={24} height={24} />}
-          </IconWrapper>}
+
           {!isMobile && zkAccountDropdown}
-          {(zkAccount && !isMobile) && (
+          <RefreshButtonContainer onClick={toggleTheme} >
+            {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+          </RefreshButtonContainer>
+          <RefreshButtonContainer onClick={toggleVisibility} >
+            {(account || zkAccount) && isVisible ? <EyeIcon /> : <EyeOffIcon />}
+          </RefreshButtonContainer>
+          {zkAccount && (
             <RefreshButtonContainer onClick={refresh}>
-              {(isLoadingBalance || isLoadingState) ? (
-                <Spinner size={18} />
-              ) : (
-                <RefreshIcon />
-              )}
+              {(isLoadingBalance || isLoadingState) ? <Spinner size={18} /> : <RefreshCcwIcon />}
             </RefreshButtonContainer>
           )}
-          <MoreDropdown>
-            <DropdownButton data-ga-id="extra-menu-header">
-              <DotsIcon />
-            </DropdownButton>
-          </MoreDropdown>
         </AccountSection>
       </Row>
       {isMobile && (
@@ -207,7 +199,7 @@ const OnlyMobile = styled.div`
   right: 0;
   height: 50px;
   padding: 0 7px;
-  background: #fff;
+  background: ${props => props.theme.modal.background};
   z-index: 1;
   display: flex;
   align-items: center;
@@ -266,7 +258,7 @@ const DropdownButton = styled(Row)`
   }
 `;
 
-const DropdownIcon = styled(DropdownIconDefault)`
+const DropdownIcon = styled(ChevronDownIcon)`
   width: 16px !important;
   height: 16px;
   margin-left: 7px;
@@ -354,6 +346,17 @@ const RefreshButtonContainer = styled(Row)`
     height: 30px;
     border-radius: 16px;
   }
+
+  svg {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    color: ${props => props.theme.icon.color.default};
+  }
+
+  &:hover svg {
+    color: ${props => props.theme.icon.color.hover};
+  }
 `;
 
 const Button = styled(ButtonDefault)`
@@ -380,19 +383,4 @@ const NetworkLabel = styled.span`
   margin-left: 8px;
   font-size: 14px;
   color: ${props => props.theme.text.color.primary};
-`;
-
-const IconWrapper = styled.div`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  transition: opacity 0.2s ease;
-  width: 24px;
-  height: 24px;
-
-  &:hover {
-    opacity: 0.7;
-  }
 `;

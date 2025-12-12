@@ -6,7 +6,7 @@ import { useTranslation, Trans } from 'react-i18next';
 
 import ButtonDefault from 'components/Button';
 import Modal from 'components/Modal';
-import Link from 'components/Link';
+// import Link from 'components/Link';
 import Spinner from 'components/Spinner';
 import Tooltip from 'components/Tooltip';
 

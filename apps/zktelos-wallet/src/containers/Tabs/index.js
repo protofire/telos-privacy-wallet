@@ -12,6 +12,7 @@ const tabs = [
   { name: 'Withdraw', path: '/withdraw', i18nKey: 'withdraw.title', dataTour: 'withdraw-tab' },
   { name: 'Transfer', path: '/transfer', i18nKey: 'transfer.title', dataTour: 'transfer-tab' },
   { name: 'History', path: '/history', i18nKey: 'history.title', badge: true, dataTour: 'history-tab' },
+  { name: 'Settings', path: '/settings', i18nKey: 'common.settings', dataTour: 'settings-tab' },
 ]
 
 export default () => {

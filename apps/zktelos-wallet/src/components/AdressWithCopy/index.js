@@ -5,11 +5,13 @@ import { useTranslation } from 'react-i18next';
 
 import Tooltip from 'components/Tooltip';
 
-import { ReactComponent as CopyIcon } from 'assets/copy.svg';
-import { ReactComponent as CheckIcon } from 'assets/check.svg';
+import { CopyIcon, CheckIcon } from 'lucide-react';
+
+import { shortAddress } from 'utils';
 
 export default ({
   children,
+  formatType = '0x',
   prefixIcon,
   onPrefixClick,
   $noBorder,
@@ -55,34 +57,30 @@ export default ({
         </PrefixIconWrapper>
       )}
       <Address>
-        {children}
+        {formatType === '0x' ? shortAddress(children, 25) : children}
       </Address>
       <CopyToClipboard text={children} onCopy={onCopy}>
         <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>
-          {isCopied ? <CheckIcon /> : <CopyWrapper><CopyIcon /></CopyWrapper>}
+          {isCopied ? <CheckIcon /> : <CopyIcon />}
         </Tooltip>
       </CopyToClipboard>
     </PrivateAddressContainer>
   );
 }
 
-const CopyWrapper = styled.div`
-  cursor: pointer;
-  &:hover {
-    path {
-      fill: ${props => props.theme.color.purple};
-    }
-  }`;
+
 
 const PrefixIconWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-right: 8px;
   cursor: ${props => props.$clickable ? 'pointer' : 'default'};
-
+  path {
+    fill: ${props => props.theme.icon.color.default};
+  }
   &:hover {
     path {
-      fill: ${props => props.theme.color.purple};
+      fill: ${props => props.theme.icon.color.hover};
     }
   }
 `;
@@ -103,6 +101,17 @@ const PrivateAddressContainer = styled.div`
   padding: ${props => props.$padding || '0 24px'};
   outline: none;
   max-width: ${props => props.$maxWidth || '100%'};
+  
+  svg {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    color: ${props => props.theme.icon.color.default};
+
+    &:hover {
+      color: ${props => props.theme.icon.color.hover};
+    }
+  }
   
   &::placeholder {
     color: ${props => props.theme.text.color.secondary};

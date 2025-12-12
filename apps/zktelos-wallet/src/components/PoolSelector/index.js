@@ -5,7 +5,7 @@ import Dropdown from 'components/Dropdown';
 import OptionButton from 'components/OptionButton';
 
 import { TOKENS_ICONS } from 'constants';
-import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
+import { ChevronDownIcon } from 'lucide-react';
 
 const PoolSelector = ({ options = [], selectedAlias, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +50,7 @@ const PoolSelector = ({ options = [], selectedAlias, onSelect }) => {
       <Selected>
         <TokenIcon src={TOKENS_ICONS[selected.icon || selected.tokenSymbol]} />
         {selected.label || selected.tokenSymbol}
-        <DropdownIcon />
+        <ChevronDownIcon />
       </Selected>
     </Dropdown>
   );
@@ -81,10 +81,14 @@ const Selected = styled.div`
   cursor: pointer;
   position: relative;
   font-weight: ${props => props.theme.text.weight.bold};
-`;
 
-const DropdownIcon = styled(DropdownIconDefault)`
-  margin-left: 6px;
+  svg {
+    color: ${props => props.theme.icon.color.default};
+
+    &:hover {
+      color: ${props => props.theme.icon.color.hover};
+    }
+  }
 `;
 
 const OptionButtonStyled = styled(OptionButton)`

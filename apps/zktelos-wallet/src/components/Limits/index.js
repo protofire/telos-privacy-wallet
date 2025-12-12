@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Tooltip from 'components/Tooltip';
 import Skeleton from 'components/Skeleton';
 
-import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
+import { InfoIcon as InfoIconDefault } from 'lucide-react';
 
 import { formatNumber } from 'utils';
 
@@ -51,7 +51,7 @@ export default ({ limits, loading, currentPool }) => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  background: rgba(255, 250, 238, 0.6);
+  background: ${props => props.theme.dropdown.background};
   border: 2px solid #FBEED0;
   border-radius: 16px;
   margin-top: 20px;
@@ -92,9 +92,10 @@ const Value = styled.span`
 
 const InfoIcon = styled(InfoIconDefault)`
   margin-left: 5px;
+  width: 14px;
+  height: 14px;
+  color: ${props => props.theme.icon.color.default};
   &:hover {
-    & > path {
-      fill: ${props => props.theme.color.purple};
-    }
+    color: ${props => props.theme.icon.color.hover};
   }
 `;

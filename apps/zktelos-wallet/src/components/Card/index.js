@@ -9,7 +9,7 @@ export default ({ title, icon, note, children, style, titleStyle }) => {
     <Card style={style} $isMobile={isMobile}>
       {(title || icon) && (
         <Header>
-          {icon && <Icon src={icon} />}
+          {icon && <IconWrapper>{icon}</IconWrapper>}
           {title && <Title style={titleStyle}>{title}</Title>}
         </Header>
       )}
@@ -42,10 +42,14 @@ const Header = styled.div`
   margin-bottom: 12px;
 `;
 
-const Icon = styled.img`
+const IconWrapper = styled.div`
+  margin-right: 8px;
   width: 24px;
   height: 24px;
-  margin-right: 8px;
+
+  svg {
+    stroke: ${props => props.theme.icon.color.default};
+  }
 `;
 
 const Title = styled.span`

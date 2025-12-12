@@ -10,9 +10,9 @@ export default ({ onClick, children, disabled, loading }) => {
   );
 }
 const CreatePrivateAccountButton = styled(Button)`
-  background: ${props => props.theme.color.telosGradientSoft};
+  background: ${props => props.theme.button.background};
   color: rgb(149 126 223 / 90%);
-  border: 1px solid rgb(149 126 223 / 40%);
+  border: 1px solid ${props => props.theme.button.primary.border.color};
   padding: 16px;
   border-radius: 8px;
   font-size: 16px;

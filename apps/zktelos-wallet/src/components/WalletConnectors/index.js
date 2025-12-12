@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 
 import { WalletContext } from 'contexts';
@@ -6,23 +6,21 @@ import { WalletContext } from 'contexts';
 import { CONNECTORS_ICONS } from 'constants';
 
 export default ({ callback, gaIdPrefix = '', descriptions = {} }) => {
-  const evmWallet = useContext(WalletContext);
+  const { connectors, disconnect, connect } = useContext(WalletContext);
 
-  const connectors = useMemo(() => {
-    return evmWallet.connectors;
-  }, [evmWallet]);
 
   const connectWallet = useCallback(async connector => {
-    if (connector.id === evmWallet.connector?.id) {
-      await evmWallet.disconnect();
+    if (connector.id === connector?.id) {
+      await disconnect();
     }
     try {
-      await evmWallet.connect({ connector });
+      const connectorChainId = connector.chains[0].id;
+      await connect({ connector, chainId: connectorChainId });
       callback?.(connector);
     } catch (error) {
       console.error('Error connecting wallet:', error);
     }
-  }, [callback, evmWallet]);
+  }, [callback, disconnect, connect]);
 
   const hasDescriptions = Object.keys(descriptions).length > 0;
 

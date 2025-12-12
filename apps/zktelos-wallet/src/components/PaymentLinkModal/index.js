@@ -5,7 +5,7 @@ import { useTranslation, Trans } from 'react-i18next';
 
 import Modal from 'components/Modal';
 import Tooltip from 'components/Tooltip';
-import Link from 'components/Link';
+// import Link from 'components/Link';
 
 import { ReactComponent as CopyIconDefault } from 'assets/copy.svg';
 import { ReactComponent as CheckIcon } from 'assets/check.svg';
