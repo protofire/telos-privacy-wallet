@@ -270,7 +270,7 @@
     "createWithSecret": {
       "title": "保存您的助记词",
       "description": "请按正确的顺序抄写或复制助记词，并妥善保存",
-      "warning": "请勿与任何人分享您的助记词，<br/>请妥善保存！",
+      "warning": "请确认URL为 <url>{{url}}</url>。<br/><br/>请勿与任何人分享您的助记词，<br/>请妥善保存！",
       "copy": "复制助记词"
     },
     "confirmSecret": {
@@ -408,7 +408,7 @@
   },
   "secretPhraseModal": {
     "title": "显示助记词",
-    "warning": "请勿与任何人分享您的助记词，<br/>请妥善保管！",
+    "warning": "请确认URL为 <url>{{url}}</url>。<br/><br/>请勿与任何人分享您的助记词，<br/>请妥善保存！",
     "description": "若他人掌握您的助记词，他们将完全掌握您钱包的控制权。",
     "copy": "复制助记词"
   },

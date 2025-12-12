@@ -272,7 +272,7 @@
     "createWithSecret": {
       "title": "Save Your Seed Phrase",
       "description": "Write down or copy these words in the right order and save them somewhere safe",
-      "warning": "Never share your secret phrase with anyone,<br/> store it securely!",
+      "warning": "Double check the URL to be <url>{{url}}</url>. <br/>Never share your secret phrase with anyone,<br/> store it securely!",
       "copy": "Copy secret phrase"
     },
     "confirmSecret": {
@@ -410,7 +410,7 @@
   },
   "secretPhraseModal": {
     "title": "Show secret phrase",
-    "warning": "Never share your secret phrase with anyone,<br/> store it securely!",
+    "warning": "Double check the URL to be <url>{{url}}</url>. <br/><br/>Never share your secret phrase with anyone, store it securely!",
     "description": "If someone has your secret phrase they will have full control of your wallet.",
     "copy": "Copy secret phrase"
   },

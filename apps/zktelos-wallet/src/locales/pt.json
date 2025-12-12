@@ -270,7 +270,7 @@
     "createWithSecret": {
       "title": "Salve sua Frase Secreta",
       "description": "Anote ou copie estas palavras na ordem correta e guarde-as em um local seguro",
-      "warning": "Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
+      "warning": "Verifique se a URL é <url>{{url}}</url>.<br/><br/>Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
       "copy": "Copiar frase secreta"
     },
     "confirmSecret": {
@@ -408,7 +408,7 @@
   },
   "secretPhraseModal": {
     "title": "Mostrar frase secreta",
-    "warning": "Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
+    "warning": "Verifique se a URL é <url>{{url}}</url>.<br/><br/>Nunca compartilhe sua frase secreta com ninguém,<br/> guarde-a com segurança!",
     "description": "Se alguém tiver sua frase secreta, ela terá controle total sobre sua carteira.",
     "copy": "Copiar frase secreta"
   },
