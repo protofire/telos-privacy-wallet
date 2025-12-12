@@ -48,7 +48,8 @@ jobs:
           echo "REACT_APP_CONFIG=dev" > apps/zktelos-wallet/.env
           echo "REACT_APP_BUILD_TARGET=electron" >> apps/zktelos-wallet/.env
           echo "REACT_APP_WALLETCONNECT_PROJECT_ID=${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}" >> apps/zktelos-wallet/.env
-          echo "REACT_APP_LOCK_TIMEOUT=100000" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_LOCK_TIMEOUT=300000" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_BASE_URL=https://privacy.telos.protofire.io" >> apps/zktelos-wallet/.env
 
       - name: Build Electron app
         env:
@@ -106,7 +107,8 @@ jobs:
           REACT_APP_CONFIG=dev
           REACT_APP_BUILD_TARGET=electron
           REACT_APP_WALLETCONNECT_PROJECT_ID=${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}
-          REACT_APP_LOCK_TIMEOUT=100000
+          REACT_APP_LOCK_TIMEOUT=300000
+          REACT_APP_BASE_URL=https://privacy.telos.protofire.io
           "@ | Out-File -FilePath apps/zktelos-wallet/.env -Encoding utf8
 
       - name: Build Electron app
@@ -164,8 +166,8 @@ jobs:
           echo "REACT_APP_CONFIG=dev" > apps/zktelos-wallet/.env
           echo "REACT_APP_BUILD_TARGET=electron" >> apps/zktelos-wallet/.env
           echo "REACT_APP_WALLETCONNECT_PROJECT_ID=${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}" >> apps/zktelos-wallet/.env
-          echo "REACT_APP_LOCK_TIMEOUT=100000" >> apps/zktelos-wallet/.env
-
+          echo "REACT_APP_LOCK_TIMEOUT=300000" >> apps/zktelos-wallet/.env
+          echo "REACT_APP_BASE_URL=https://privacy.telos.protofire.io" >> apps/zktelos-wallet/.env
       - name: Build Electron app
         env:
           CI: false

@@ -44,6 +44,9 @@ jobs:
           REACT_APP_CONFIG: "dev"
           REACT_APP_BUILD_TARGET: "web"
           REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}
+          REACT_APP_LOCK_TIMEOUT: 300000
+          REACT_APP_BASE_URL: "https://privacy.telos.protofire.io"
+          
         run: yarn build
 
       - name: Configure AWS credentials
