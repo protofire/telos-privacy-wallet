@@ -114,9 +114,3 @@ const Value = styled(BalanceDisplay)`
   line-height: 1.2;
 `;
 
-const Separator = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: ${props => props.theme.color.grey || '#E5E5E5'};
-  margin-top: 8px;
-`;
