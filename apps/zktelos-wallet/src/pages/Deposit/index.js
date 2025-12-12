@@ -305,6 +305,33 @@ const Note = styled.p`
 //   font-weight: ${props => props.theme.text.weight.bold};
 // `;
 
+const SelectorInline = styled.span`
+  display: inline-flex;
+  align-items: center;
+`;
+
+const Note = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.card.note.color};
+  margin: 0 4px 16px;
+`;
+
+
+// const MessageContainer = styled(Row)`
+//   justify-content: center;
+//   flex-wrap: wrap;
+//   background: #FBEED0;
+//   border-radius: 10px;
+//   padding: 7px 10px;
+//   font-size: 14px;
+//   font-weight: ${props => props.theme.text.weight.bold};
+//   color: ${props => props.theme.text.color.secondary};
+// `;
+
+// const Link = styled(DefaultLink)`
+//   font-weight: ${props => props.theme.text.weight.bold};
+// `;
+
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;

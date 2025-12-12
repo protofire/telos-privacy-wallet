@@ -93,6 +93,8 @@ const Content = ({
 
   const hasAddresses = Object.keys(shieldedAddresses).length > 0;
 
+  const hasAddresses = Object.keys(shieldedAddresses).length > 0;
+
   return (
     <Container>
       <Title style={{ marginBottom: 20 }}>{t('common.zkAccount')}</Title>
