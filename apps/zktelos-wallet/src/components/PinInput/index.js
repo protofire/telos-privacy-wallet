@@ -146,6 +146,10 @@ const CellInput = styled.input`
   text-align: center;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  
+  -webkit-text-security: disc;
+  -moz-text-security: disc;
+  text-security: disc;
 
   &:focus {
     border-color: ${({ theme }) => theme.text.color.blue || theme.text.color.link || '#4d7cff'};
