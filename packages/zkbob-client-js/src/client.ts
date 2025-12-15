@@ -1,4 +1,4 @@
-import {Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx} from "libzkbob-rs-wasm-web";
+import {Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx, IExtraItem} from "libzkbob-rs-wasm-web";
 import {Chains, Pools, Parameters, ClientConfig, AccountConfig, accountId, ProverMode, DepositType, ZkAddressPrefix} from "./config";
 import {truncateHexPrefix, toTwosComplementHex, bigintToArrayLe, isDesktop} from "./utils";
 import {SyncStat, ZkBobState, ZERO_OPTIMISTIC_STATE} from "./state";
@@ -1144,7 +1144,12 @@ export class ZkBobClient extends ZkBobProvider {
         prover: this.network().addressToBytes(onePart.fee.proverAddress),
         proxy_fee: onePart.fee.proxyPart.toString(),
         prover_fee: onePart.fee.proverPart.toString(),
-        data: [],
+        data: [{
+          leaf_index: 0,
+          pad_length: 0,
+          need_encrypt: false,
+          data: new Uint8Array([0, 1, 2, 3, 4, 5])
+        }],
       };
       const oneTxData = await state.createTransferOptimistic(oneTx, optimisticState);
 

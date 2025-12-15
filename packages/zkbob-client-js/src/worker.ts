@@ -126,7 +126,7 @@ const obj = {
   // accountId is a unique string depends on network, poolId and sk
   // The local db will be named with accountId
   async createAccount(accountId: string, sk: Uint8Array, poolId: number, isObsolete: boolean): Promise<void> {
-    console.debug('Web worker: createAccount');
+    console.debug('Web worker: createAccount. is obsolete?', isObsolete);
     try {
       const state = await wasm.UserState.init(accountId);
       zpAccounts[accountId] = new wasm.UserAccount(sk, poolId, isObsolete, state);
