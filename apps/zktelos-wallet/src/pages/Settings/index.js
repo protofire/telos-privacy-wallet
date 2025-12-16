@@ -38,65 +38,56 @@ const Settings = () => {
   const { hasPassword } = getSeed ? getSeed() : { hasPassword: false };
 
   return (
-    <Container>
-      <CardContainer>
-        <Card title={t('common.settings')} icon={<SettingsIcon />}>
+    <CardContainer>
+      <Card title={t('common.settings')} icon={<SettingsIcon />}>
+        <Section>
+          <SectionTitle>{t('common.language')}</SectionTitle>
+          <ButtonGroup>
+            {languages.map(lang => (
+              <OptionButton
+                key={lang.code}
+                active={currentLang === lang.code}
+                onClick={() => changeLanguage(lang.code)}
+              >
+                {lang.label}
+              </OptionButton>
+            ))}
+          </ButtonGroup>
+        </Section>
+        <Section>
+          <SectionTitle>{t('common.theme')}</SectionTitle>
+          <ButtonGroup>
+            {themes.map(item => (
+              <OptionButton
+                key={item.code}
+                active={themePreference === item.code}
+                onClick={() => setThemePreference(item.code)}
+              >
+                {item.label}
+              </OptionButton>
+            ))}
+          </ButtonGroup>
+        </Section>
+        {zkAccount && (
           <Section>
-            <SectionTitle>{t('common.language')}</SectionTitle>
+            <SectionTitle>{t('common.zkAccount')}</SectionTitle>
             <ButtonGroup>
-              {languages.map(lang => (
-                <OptionButton
-                  key={lang.code}
-                  active={currentLang === lang.code}
-                  onClick={() => changeLanguage(lang.code)}
-                >
-                  {lang.label}
-                </OptionButton>
-              ))}
+              <OptionButton onClick={openSeedPhraseModal}>
+                {t('buttonText.showSecretPhrase')}
+              </OptionButton>
+              <OptionButton onClick={hasPassword ? openDisablePasswordModal : openChangePasswordModal}>
+                {hasPassword ? t('buttonText.disablePin') : t('buttonText.setPin')}
+              </OptionButton>
             </ButtonGroup>
           </Section>
-          <Section>
-            <SectionTitle>{t('common.theme')}</SectionTitle>
-            <ButtonGroup>
-              {themes.map(item => (
-                <OptionButton
-                  key={item.code}
-                  active={themePreference === item.code}
-                  onClick={() => setThemePreference(item.code)}
-                >
-                  {item.label}
-                </OptionButton>
-              ))}
-            </ButtonGroup>
-          </Section>
-          {zkAccount && (
-            <Section>
-              <SectionTitle>{t('common.zkAccount')}</SectionTitle>
-              <ButtonGroup>
-                <OptionButton onClick={openSeedPhraseModal}>
-                  {t('buttonText.showSecretPhrase')}
-                </OptionButton>
-                <OptionButton onClick={hasPassword ? openDisablePasswordModal : openChangePasswordModal}>
-                  {hasPassword ? t('buttonText.disablePin') : t('buttonText.setPin')}
-                </OptionButton>
-              </ButtonGroup>
-            </Section>
-          )}
-        </Card>
-      </CardContainer>
-    </Container>
+        )}
+      </Card>
+    </CardContainer>
   );
 };
 
 export default Settings;
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-`;
 
 const CardContainer = styled.div`
   display: flex;

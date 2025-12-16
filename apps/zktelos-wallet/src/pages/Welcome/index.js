@@ -101,7 +101,7 @@ const WelcomeCard = styled.div`
   display: flex;
   flex-direction: column;
   padding: 16px 12px 12px;
-  width: 675px;
+  width: 540;
   max-width: 100%;
   box-sizing: border-box;
   background-color: ${props => props.theme.modal.background};

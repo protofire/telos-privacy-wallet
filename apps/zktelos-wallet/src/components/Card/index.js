@@ -24,7 +24,7 @@ const Card = styled.div`
   flex-direction: column;
   border-radius: 24px;
   padding: 16px;
-  width: ${props => props.$isMobile ? 'fill-available' : '480px'};
+  width: ${props => props.$isMobile ? 'fill-available' : '540px'};
   max-width: 100%;
   box-sizing: border-box;
   & > * {

@@ -52,9 +52,10 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   width: fill-available;
-  max-width: 100%;
+  max-width: 90%;
   padding: 0 12px;
   margin-top: 25px;
+  margin-bottom: 25px;
   box-sizing: border-box;
 `;
 
