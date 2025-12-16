@@ -29,7 +29,13 @@
     "shieldedBalance": "Saldo protegido: ",
     "generatingAddress": "Gerando endereço...",
     "accessPrivateAccount": "Conectar carteira",
-    "createPrivateAccount": "Criar Conta Privada"
+    "createPrivateAccount": "Criar Conta Privada",
+    "emptyState": {
+      "title": "Sem fundos ainda",
+      "description": "Faça seu primeiro depósito para começar a usar o zkTelos.",
+      "fundEvm": "Financie sua conta EVM para começar a usar o zkTelos.",
+      "buy": "Comprar TLOS"
+    }
   },
   "buttonText": {
     "connectWallet": "Conectar carteira",
