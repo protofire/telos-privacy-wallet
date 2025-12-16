@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { ethers } from 'ethers';
 
 import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
+import Link from 'components/Link';
 import Button from 'components/Button';
 import AddressWithCopy from 'components/AdressWithCopy';
 import OptionButtonDefault from 'components/OptionButton';
@@ -117,6 +118,10 @@ export default () => {
     return sortRowsByAsset(rows);
   }, [balances, priceMap, nativeBalance, nativePrice, nativeSymbol, t, setCurrentPool, goToDeposit, openWrapModal, availablePools]);
 
+  const hasAnyBalance = useMemo(() => {
+    return tableRows.some(row => row.balance && row.balance.gt(0));
+  }, [tableRows]);
+
   if (!account) {
     return <ConnectWalletWrapper>
       <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>;
@@ -149,7 +154,18 @@ export default () => {
           </AddressWithCopy>
         </HeaderContent>
       </HeaderContainer>
-      <PortfolioTable rows={tableRows} isLoading={isLoading} />
+      {hasAnyBalance ?
+        (
+          <PortfolioTable rows={tableRows} isLoading={isLoading} />
+        ) : (
+          <EmptyState>
+            <EmptyStateTitle>{t('common.emptyState.title')}</EmptyStateTitle>
+            <EmptyStateDescription>{t('common.emptyState.fundEvm')}</EmptyStateDescription>
+            < Link type="link" href="https://www.telos.net/buy" target="_blank" noreferrer small>
+              {t('common.emptyState.buy')}
+            </Link>
+          </EmptyState>
+        )}
     </Container>
   );
 };
@@ -213,4 +229,24 @@ const OptionButton = styled(OptionButtonDefault)`
   height: auto;
   font-size: 14px;
   width: auto;
+`;
+
+const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${props => props.theme.modal.background};
+  padding: 8px;
+  gap: 8px;
+`;
+
+const EmptyStateTitle = styled.span`
+  font-size: 16px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.primary};
+`;
+
+const EmptyStateDescription = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
 `;

@@ -14,6 +14,7 @@ import { ZkAvatar, ZkName } from 'components/ZkAccountIdentifier';
 import AddressWithCopy from 'components/AdressWithCopy';
 import PortfolioTable from 'components/PortfolioTable';
 import { sortRowsByAsset } from 'components/PortfolioTable/formatters';
+import Button from 'components/Button';
 
 export default () => {
   const { t } = useTranslation();
@@ -178,8 +179,16 @@ export default () => {
         </HeaderContent>
       </HeaderContainer>
 
-      {hasAnyBalance && (
+      {hasAnyBalance ? (
         <PortfolioTable rows={tableRows} isLoading={isLoading} />
+      ) : (
+        <EmptyState>
+          <EmptyStateTitle>{t('common.emptyState.title')}</EmptyStateTitle>
+          <EmptyStateDescription>{t('common.emptyState.description')}</EmptyStateDescription>
+          <Button onClick={() => history.push('/deposit')} small>
+            {t('buttonText.deposit')}
+          </Button>
+        </EmptyState>
       )}
     </Container>
   );
@@ -248,4 +257,24 @@ const ShieldedAddress = styled.span`
   font-size: 13px;
   color: ${props => props.theme.color.black};
   line-height: 16px;
+`;
+
+const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${props => props.theme.modal.background};
+  padding: 8px;
+  gap: 8px;
+`;
+
+const EmptyStateTitle = styled.span`
+  font-size: 16px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.primary};
+`;
+
+const EmptyStateDescription = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
 `;

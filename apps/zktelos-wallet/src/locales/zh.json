@@ -29,7 +29,13 @@
     "shieldedBalance": "隐私余额: ",
     "generatingAddress": "生成隐私地址...",
     "accessPrivateAccount": "连接钱包",
-    "createPrivateAccount": "创建私密账户"
+    "createPrivateAccount": "创建私密账户",
+    "emptyState": {
+      "title": "暂无资金",
+      "description": "进行第一笔存款以开始使用zkTelos。",
+      "fundEvm": "为您的EVM账户充值以开始使用zkTelos。",
+      "buy": "购买TLOS"
+    }
   },
   "buttonText": {
     "connectWallet": "连接钱包",

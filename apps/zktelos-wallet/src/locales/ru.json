@@ -29,7 +29,13 @@
     "shieldedBalance": "Защищенный баланс: ",
     "generatingAddress": "Генерация адреса...",
     "accessPrivateAccount": "Подключить кошелек",
-    "createPrivateAccount": "Создать Приватный Аккаунт"
+    "createPrivateAccount": "Создать Приватный Аккаунт",
+    "emptyState": {
+      "title": "Пока нет средств",
+      "description": "Сделайте первый депозит, чтобы начать использовать zkTelos.",
+      "fundEvm": "Пополните ваш EVM аккаунт, чтобы начать использовать zkTelos.",
+      "buy": "Купить TLOS"
+    }
   },
   "buttonText": {
     "connectWallet": "Подключить кошелек",
