@@ -8,7 +8,7 @@ export default props => {
   switch (props.type) {
     case 'link':
       return <TransparentButton {...otherProps} />;
-    case 'pripary':
+    case 'primary':
     default:
       return (
         <Button {...otherProps} >
