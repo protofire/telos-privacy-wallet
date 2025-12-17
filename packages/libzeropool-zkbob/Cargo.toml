@@ -1,5 +1,5 @@
 [package]
-name = "libzeropool-zkbob"
+name = "libzeropool"
 version = "1.4.0"
 authors = ["Igor Gulamov <igor.gulamov@gmail.com>"]
 homepage = "https://github.com/zkbob/libzeropool"

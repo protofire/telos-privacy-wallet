@@ -1,26 +1,26 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, {useContext, useEffect, useState, useMemo} from 'react';
 import styled from 'styled-components';
-import { useTranslation, Trans } from 'react-i18next';
+import {useTranslation, Trans} from 'react-i18next';
 
 import Card from 'components/Card';
 import Spinner from 'components/Spinner';
 import Pagination from 'components/Pagination';
 import HistoryItem from 'components/HistoryItem';
-import { actions, getSign } from 'components/HistoryItem';
+import {actions, getSign} from 'components/HistoryItem';
 import Button from 'components/Button';
 import AccountSetUpButton from 'containers/AccountSetUpButton';
 
-import { ZkAccountContext, PoolContext } from 'contexts';
-import { useWindowDimensions } from 'hooks';
+import {ZkAccountContext, PoolContext} from 'contexts';
+import {useWindowDimensions} from 'hooks';
 
 export default () => {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const {
     histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
   } = useContext(ZkAccountContext);
-  const { availablePools } = useContext(PoolContext);
-  const { width } = useWindowDimensions();
+  const {availablePools} = useContext(PoolContext);
+  const {width} = useWindowDimensions();
   const isMobile = width <= 500;
 
   const pageSize = 5;
@@ -29,6 +29,7 @@ export default () => {
   const isLoading = isLoadingZkAccount || isLoadingHistory;
   const title = t('history.title');
 
+  console.log('RAFAEL', histories)
   const items = useMemo(() => {
     if (!histories) return [];
 
@@ -86,7 +87,7 @@ export default () => {
       return result;
     }).join('\n');
 
-    const blob = new Blob([headers.join(',') + '\n' + csvContent], { type: 'text/csv' });
+    const blob = new Blob([headers.join(',') + '\n' + csvContent], {type: 'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -96,7 +97,7 @@ export default () => {
   }
   return (
     <ContentContainer>
-      <Card title={!isHistoryEmpty ? title : null} titleStyle={{ marginBottom: 22 }}>
+      <Card title={!isHistoryEmpty ? title : null} titleStyle={{marginBottom: 22}}>
         {((isLoading && isHistoryEmpty) || isHistoryEmpty || !zkAccount) && (
           <Title>{title}</Title>
         )}
@@ -138,15 +139,15 @@ export default () => {
 
 const Title = styled.span`
   font-size: 16px;
-  color: ${({ theme }) => theme.text.color.primary};
-  font-weight: ${({ theme }) => theme.text.weight.bold};
+  color: ${({theme}) => theme.text.color.primary};
+  font-weight: ${({theme}) => theme.text.weight.bold};
   text-align: center;
 `;
 
 const Description = styled.span`
   font-size: 14px;
   line-height: 22px;
-  color: ${({ theme }) => theme.text.color.secondary};
+  color: ${({theme}) => theme.text.color.secondary};
   text-align: center;
 `;
 

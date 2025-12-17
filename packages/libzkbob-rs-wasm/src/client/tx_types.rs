@@ -1,13 +1,7 @@
 use crate::{Fr, IDepositData, IDepositPermittableData, ITransferData, IWithdrawData};
-use libzkbob_rs::client::{TokenAmount, TxOperator, TxOutput, TxType as NativeTxType};
+use libzkbob_rs::client::{ExtraItem, TokenAmount, TxOperator, TxOutput, TxType as NativeTxType};
 use serde::Deserialize;
 use wasm_bindgen::prelude::*;
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ExtraItem {
-    pub to: String,    // whom to share this data with
-    pub data: Vec<u8>, // the data
-}
 
 #[allow(clippy::manual_non_exhaustive)]
 #[wasm_bindgen]
