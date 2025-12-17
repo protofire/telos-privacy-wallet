@@ -1,24 +1,33 @@
 mod evm_verifier;
 
+use core::panic;
 use libzeropool_zkbob::{
-    POOL_PARAMS,
+    circuit::delegated_deposit::{
+        check_delegated_deposit_batch, CDelegatedDepositBatchPub, CDelegatedDepositBatchSec,
+    },
     circuit::tree::{tree_update, CTreePub, CTreeSec},
     circuit::tx::{c_transfer, CTransferPub, CTransferSec},
-    circuit::delegated_deposit::{check_delegated_deposit_batch, CDelegatedDepositBatchPub, CDelegatedDepositBatchSec},
     clap::Clap,
+    POOL_PARAMS,
 };
-use core::panic;
 use std::{fs::File, io::Write};
 
-use fawkes_crypto::engines::bn256::Fr;
-use fawkes_crypto::backend::bellman_groth16::engines::Bn256;
-use fawkes_crypto::ff_uint::Num;
-use fawkes_crypto::backend::bellman_groth16::{verifier::{VK, verify}, prover::{Proof, prove}, setup::setup, Parameters};
-use evm_verifier::generate_sol_data;
-use fawkes_crypto::circuit::cs::CS;
-use fawkes_crypto::rand::rngs::OsRng;
-use libzeropool_zkbob::helpers::sample_data::{State, random_sample_tree_update, random_sample_delegated_deposit};
 use convert_case::{Case, Casing};
+use evm_verifier::generate_sol_data;
+use fawkes_crypto::backend::bellman_groth16::engines::Bn256;
+use fawkes_crypto::backend::bellman_groth16::{
+    prover::{prove, Proof},
+    setup::setup,
+    verifier::{verify, VK},
+    Parameters,
+};
+use fawkes_crypto::circuit::cs::CS;
+use fawkes_crypto::engines::bn256::Fr;
+use fawkes_crypto::ff_uint::Num;
+use fawkes_crypto::rand::rngs::OsRng;
+use libzeropool_zkbob::helpers::sample_data::{
+    random_sample_delegated_deposit, random_sample_tree_update, State,
+};
 
 #[derive(Clap)]
 struct Opts {
@@ -115,31 +124,34 @@ struct GenerateTestDataOpts {
     circuit: String,
     /// Input object JSON file
     #[clap(short = "o", long = "object")]
-    object: Option<String>
+    object: Option<String>,
 }
 
-fn tree_circuit<C:CS<Fr=Fr>>(public: CTreePub<C>, secret: CTreeSec<C>) {
+fn tree_circuit<C: CS<Fr = Fr>>(public: CTreePub<C>, secret: CTreeSec<C>) {
     tree_update(&public, &secret, &*POOL_PARAMS);
 }
 
-fn tx_circuit<C:CS<Fr=Fr>>(public: CTransferPub<C>, secret: CTransferSec<C>) {
+fn tx_circuit<C: CS<Fr = Fr>>(public: CTransferPub<C>, secret: CTransferSec<C>) {
     c_transfer(&public, &secret, &*POOL_PARAMS);
 }
 
-fn delegated_deposit_circuit<C:CS<Fr=Fr>>(public: CDelegatedDepositBatchPub<C>, secret: CDelegatedDepositBatchSec<C>) {
+fn delegated_deposit_circuit<C: CS<Fr = Fr>>(
+    public: CDelegatedDepositBatchPub<C>,
+    secret: CDelegatedDepositBatchSec<C>,
+) {
     check_delegated_deposit_batch(&public, &secret, &*POOL_PARAMS);
 }
 
-fn cli_setup(o:SetupOpts) {
+fn cli_setup(o: SetupOpts) {
     let params_path = o.params.unwrap_or(format!("{}_params.bin", o.circuit));
-    let vk_path = o.vk.unwrap_or(format!("{}_verification_key.json", o.circuit));
-    
+    let vk_path =
+        o.vk.unwrap_or(format!("{}_verification_key.json", o.circuit));
 
     let params = match o.circuit.as_str() {
         "tree_update" => setup::<Bn256, _, _, _>(tree_circuit),
         "transfer" => setup::<Bn256, _, _, _>(tx_circuit),
         "delegated_deposit" => setup::<Bn256, _, _, _>(delegated_deposit_circuit),
-        _ => panic!("Wrong cicruit parameter")
+        _ => panic!("Wrong cicruit parameter"),
     };
 
     let vk = params.get_vk();
@@ -154,34 +166,39 @@ fn cli_setup(o:SetupOpts) {
 fn cli_generate_verifier(o: GenerateVerifierOpts) {
     let circuit = o.circuit.clone();
     let vk_path = o.vk.unwrap_or(format!("{}_verification_key.json", circuit));
-    let contract_name = o.contract_name.unwrap_or(format!("{}_verifier", circuit).to_case(Case::Pascal));
+    let contract_name = o
+        .contract_name
+        .unwrap_or(format!("{}_verifier", circuit).to_case(Case::Pascal));
     let solidity_path = o.solidity.unwrap_or(format!("{}_verifier.sol", circuit));
 
-
     let vk_str = std::fs::read_to_string(vk_path).unwrap();
-    let vk :VK<Bn256> = serde_json::from_str(&vk_str).unwrap();
+    let vk: VK<Bn256> = serde_json::from_str(&vk_str).unwrap();
     let sol_str = generate_sol_data(&vk, contract_name);
-    File::create(solidity_path).unwrap().write(&sol_str.into_bytes()).unwrap();
+    File::create(solidity_path)
+        .unwrap()
+        .write(&sol_str.into_bytes())
+        .unwrap();
     println!("solidity verifier generated")
 }
 
-fn cli_verify(o:VerifyOpts) {
+fn cli_verify(o: VerifyOpts) {
     let proof_path = o.proof.unwrap_or(format!("{}_proof.json", o.circuit));
-    let vk_path = o.vk.unwrap_or(format!("{}_verification_key.json", o.circuit));
+    let vk_path =
+        o.vk.unwrap_or(format!("{}_verification_key.json", o.circuit));
     let inputs_path = o.inputs.unwrap_or(format!("{}_inputs.json", o.circuit));
 
     let vk_str = std::fs::read_to_string(vk_path).unwrap();
     let proof_str = std::fs::read_to_string(proof_path).unwrap();
     let public_inputs_str = std::fs::read_to_string(inputs_path).unwrap();
 
-    let vk:VK<Bn256> = serde_json::from_str(&vk_str).unwrap();
-    let proof:Proof<Bn256> = serde_json::from_str(&proof_str).unwrap();
-    let public_inputs:Vec<Num<Fr>> = serde_json::from_str(&public_inputs_str).unwrap();
+    let vk: VK<Bn256> = serde_json::from_str(&vk_str).unwrap();
+    let proof: Proof<Bn256> = serde_json::from_str(&proof_str).unwrap();
+    let public_inputs: Vec<Num<Fr>> = serde_json::from_str(&public_inputs_str).unwrap();
 
     println!("Verify result is {}.", verify(&vk, &proof, &public_inputs))
 }
 
-fn cli_generate_test_data(o:GenerateTestDataOpts) {
+fn cli_generate_test_data(o: GenerateTestDataOpts) {
     let object_path = o.object.unwrap_or(format!("{}_object.json", o.circuit));
     let mut rng = OsRng::default();
     let data_str = match o.circuit.as_str() {
@@ -189,25 +206,23 @@ fn cli_generate_test_data(o:GenerateTestDataOpts) {
             let state = State::random_sample_state(&mut rng, &*POOL_PARAMS);
             let data = state.random_sample_transfer(&mut rng, &*POOL_PARAMS);
             serde_json::to_string_pretty(&data).unwrap()
-            
-        },
+        }
         "tree_update" => {
             let data = random_sample_tree_update(&mut rng, &*POOL_PARAMS);
             serde_json::to_string_pretty(&data).unwrap()
-        },
+        }
         "delegated_deposit" => {
             let data = random_sample_delegated_deposit(&mut rng, &*POOL_PARAMS);
             serde_json::to_string_pretty(&data).unwrap()
-        },
-        _ => panic!("Wrong cicruit parameter")
+        }
+        _ => panic!("Wrong cicruit parameter"),
     };
     std::fs::write(object_path, &data_str.into_bytes()).unwrap();
 
     println!("Test data generated")
-
 }
 
-fn cli_prove(o:ProveOpts) {
+fn cli_prove(o: ProveOpts) {
     let params_path = o.params.unwrap_or(format!("{}_params.bin", o.circuit));
     let object_path = o.object.unwrap_or(format!("{}_object.json", o.circuit));
     let proof_path = o.proof.unwrap_or(format!("{}_proof.json", o.circuit));
@@ -223,28 +238,26 @@ fn cli_prove(o:ProveOpts) {
         "transfer" => {
             let (public, secret) = serde_json::from_str(&object_str).unwrap();
             prove(&params, &public, &secret, tx_circuit)
-        },
+        }
         "tree_update" => {
             let (public, secret) = serde_json::from_str(&object_str).unwrap();
             prove(&params, &public, &secret, tree_circuit)
-        },
+        }
         "delegated_deposit" => {
             let (public, secret) = serde_json::from_str(&object_str).unwrap();
-            prove(&params, &public, &secret, delegated_deposit_circuit)  
-        },
-        _ => panic!("Wrong cicruit parameter")
+            prove(&params, &public, &secret, delegated_deposit_circuit)
+        }
+        _ => panic!("Wrong cicruit parameter"),
     };
-
 
     let proof_str = serde_json::to_string_pretty(&snark_proof).unwrap();
     let inputs_str = serde_json::to_string_pretty(&inputs).unwrap();
 
     std::fs::write(proof_path, &proof_str.into_bytes()).unwrap();
     std::fs::write(inputs_path, &inputs_str.into_bytes()).unwrap();
-    
+
     println!("Proved")
 }
-
 
 pub fn main() {
     let opts: Opts = Opts::parse();
@@ -253,6 +266,6 @@ pub fn main() {
         SubCommand::Verify(o) => cli_verify(o),
         SubCommand::Setup(o) => cli_setup(o),
         SubCommand::GenerateVerifier(o) => cli_generate_verifier(o),
-        SubCommand::GenerateTestData(o) => cli_generate_test_data(o)
-    }    
+        SubCommand::GenerateTestData(o) => cli_generate_test_data(o),
+    }
 }

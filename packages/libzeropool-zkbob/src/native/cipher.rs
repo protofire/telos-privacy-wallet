@@ -1,25 +1,31 @@
 use crate::{
+    constants::{self, ACCOUNT_HEAPLESS_SIZE, NOTE_HEAPLESS_SIZE, SHARED_SECRETS_HEAPLESS_SIZE},
     fawkes_crypto::{
-        ff_uint::{Num, seedbox::{SeedboxChaCha20, SeedBox, SeedBoxGen}},
-        borsh::{BorshSerialize, BorshDeserialize},
-        native::ecc::{EdwardsPoint},
-
+        borsh::{BorshDeserialize, BorshSerialize},
+        ff_uint::{
+            seedbox::{SeedBox, SeedBoxGen, SeedboxChaCha20},
+            Num,
+        },
+        native::ecc::EdwardsPoint,
     },
     native::{
         account::Account,
-        note::Note,
+        key::{derive_key_a, derive_key_p_d},
+        note::{ExtraData, Note},
         params::PoolParams,
-        key::{derive_key_a, derive_key_p_d}
     },
-    constants::{self, SHARED_SECRETS_HEAPLESS_SIZE, ACCOUNT_HEAPLESS_SIZE, NOTE_HEAPLESS_SIZE}
 };
 
-use super::symmetric::{encrypt_chacha_constant_nonce, keccak256, decrypt_chacha_constant_nonce, Buffer, encrypt_xchacha, decrypt_xchacha};
+use super::symmetric::{
+    decrypt_chacha_constant_nonce, decrypt_xchacha, encrypt_chacha_constant_nonce, encrypt_xchacha,
+    keccak256, Buffer,
+};
 
 #[derive(Debug)]
 pub struct UnsupportedEncryption;
 
 /// The memo message encryption scheme
+#[derive(Copy, Clone)]
 pub enum MessageEncryptionType {
     /// The original memo message encryption
     ECDH,
@@ -53,36 +59,41 @@ pub fn encrypt<P: PoolParams>(
     kappa: &[u8],
     account: Account<P::Fr>,
     note: &[Note<P::Fr>],
-    params:&P
+    params: &P,
 ) -> Vec<u8> {
     let nozero_notes_num = note.len();
-    let nozero_items_num = nozero_notes_num+1;
+    let nozero_items_num = nozero_notes_num + 1;
 
     let mut sb = SeedboxChaCha20::new_with_salt(entropy);
 
     let account_data = {
-        let mut account_key = [0u8;constants::U256_SIZE];
+        let mut account_key = [0u8; constants::U256_SIZE];
         sb.fill_bytes(&mut account_key);
-        let account_ciphertext = encrypt_chacha_constant_nonce(&account_key, &account.try_to_vec().unwrap());
+        let account_ciphertext =
+            encrypt_chacha_constant_nonce(&account_key, &account.try_to_vec().unwrap());
         (account_key, account_ciphertext)
     };
 
-
-    let notes_data = note.iter().map(|e|{
-        let a:Num<P::Fs> = sb.gen();
-        let p_d = EdwardsPoint::subgroup_decompress(e.p_d, params.jubjub()).unwrap();
-        let ecdh =  p_d.mul(a, params.jubjub());
-        let key = keccak256(&ecdh.x.try_to_vec().unwrap());
-        let ciphertext = encrypt_chacha_constant_nonce(&key, &e.try_to_vec().unwrap());
-        let a_pub = derive_key_p_d(e.d.to_num(), a, params); 
-        (a_pub.x, key, ciphertext)
-
-    }).collect::<Vec<_>>();
+    let notes_data = note
+        .iter()
+        .map(|e| {
+            let a: Num<P::Fs> = sb.gen();
+            let p_d = EdwardsPoint::subgroup_decompress(e.p_d, params.jubjub()).unwrap();
+            let ecdh = p_d.mul(a, params.jubjub());
+            let key = keccak256(&ecdh.x.try_to_vec().unwrap());
+            let ciphertext = encrypt_chacha_constant_nonce(&key, &e.try_to_vec().unwrap());
+            let a_pub = derive_key_p_d(e.d.to_num(), a, params);
+            (a_pub.x, key, ciphertext)
+        })
+        .collect::<Vec<_>>();
 
     let shared_secret_data = {
         let mut nonce = [0; constants::XCHACHA20_POLY1305_NONCE_SIZE];
         sb.fill_bytes(&mut nonce);
-        let text:Vec<u8> = core::iter::once(&account_data.0[..]).chain(notes_data.iter().map(|e| &e.1[..])).collect::<Vec<_>>().concat();
+        let text: Vec<u8> = core::iter::once(&account_data.0[..])
+            .chain(notes_data.iter().map(|e| &e.1[..]))
+            .collect::<Vec<_>>()
+            .concat();
         let ciphertext = encrypt_xchacha(kappa, &nonce, &text);
         (nonce, ciphertext)
     };
@@ -90,7 +101,9 @@ pub fn encrypt<P: PoolParams>(
     let mut res = vec![];
 
     (nozero_items_num as u16).serialize(&mut res).unwrap();
-    (MessageEncryptionType::Symmetric.to_u16()).serialize(&mut res).unwrap();
+    (MessageEncryptionType::Symmetric.to_u16())
+        .serialize(&mut res)
+        .unwrap();
     account.hash(params).serialize(&mut res).unwrap();
 
     for e in note.iter() {
@@ -101,7 +114,7 @@ pub fn encrypt<P: PoolParams>(
 
     res.extend(&account_data.1);
 
-    notes_data.iter().for_each(|nd|{
+    notes_data.iter().for_each(|nd| {
         nd.0.serialize(&mut res).unwrap();
         res.extend(&nd.2);
     });
@@ -109,7 +122,7 @@ pub fn encrypt<P: PoolParams>(
     res
 }
 
-fn buf_take<'a>(memo: &mut &'a[u8], size:usize) -> Option<&'a[u8]> {
+fn buf_take<'a>(memo: &mut &'a [u8], size: usize) -> Option<&'a [u8]> {
     if memo.len() < size {
         None
     } else {
@@ -128,48 +141,75 @@ pub fn parse_memo_header(memo: &mut &[u8]) -> Option<(usize, MessageEncryptionTy
     Some((nozero_items_num, enc_type))
 }
 
-pub fn decrypt_out<P: PoolParams>(eta: Num<P::Fr>, kappa: &[u8; 32], mut memo: &[u8], params: &P)->Option<(Account<P::Fr>, Vec<Note<P::Fr>>)> {
-    let num_size = constants::num_size_bits::<P::Fr>()/8;
-    let account_size = constants::account_size_bits::<P::Fr>()/8;
-    let note_size = constants::note_size_bits::<P::Fr>()/8;
+pub fn decrypt_out<P: PoolParams>(
+    eta: Num<P::Fr>,
+    kappa: &[u8; 32],
+    mut memo: &[u8],
+    params: &P,
+) -> Option<(Account<P::Fr>, Vec<Note<P::Fr>>)> {
+    let num_size = constants::num_size_bits::<P::Fr>() / 8;
+    let account_size = constants::account_size_bits::<P::Fr>() / 8;
+    let note_size = constants::note_size_bits::<P::Fr>() / 8;
 
     let (nozero_items_num, enc_type) = parse_memo_header(&mut memo)?;
 
     let nozero_notes_num = nozero_items_num - 1;
-    let shared_secret_ciphertext_size = nozero_items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
+    let shared_secret_ciphertext_size =
+        nozero_items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
 
     let account_hash = Num::deserialize(&mut memo).ok()?;
     let note_hashes = buf_take(&mut memo, nozero_notes_num * num_size)?;
 
-    let shared_secret_text = decrypt_shared_secrets::<P, SHARED_SECRETS_HEAPLESS_SIZE>(enc_type, eta, kappa, &mut memo, shared_secret_ciphertext_size, params)?;
+    let shared_secret_text = decrypt_shared_secrets::<P, SHARED_SECRETS_HEAPLESS_SIZE>(
+        enc_type,
+        eta,
+        kappa,
+        &mut memo,
+        shared_secret_ciphertext_size,
+        params,
+    )?;
 
     let mut shared_secret_text_ptr = shared_secret_text.as_slice();
 
-    let account_key= <[u8;constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr).ok()?;
-    let note_key = (0..nozero_notes_num).map(|_| <[u8;constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr)).collect::<Result<Vec<_>,_>>().ok()?;
+    let account_key =
+        <[u8; constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr).ok()?;
+    let note_key = (0..nozero_notes_num)
+        .map(|_| <[u8; constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr))
+        .collect::<Result<Vec<_>, _>>()
+        .ok()?;
 
-    let account_ciphertext = buf_take(&mut memo, account_size+constants::POLY_1305_TAG_SIZE)?;
+    let account_ciphertext = buf_take(&mut memo, account_size + constants::POLY_1305_TAG_SIZE)?;
     let account = decrypt_account(&account_key, account_ciphertext, account_hash, params)?;
 
-    let note = (0..nozero_notes_num).map(|i| {
-        buf_take(&mut memo, num_size)?;
-        let note_hash = {
-            let note_hash = &mut &note_hashes[i * num_size..(i + 1) * num_size];
-            Num::deserialize(note_hash).ok()?
-        };
+    let note = (0..nozero_notes_num)
+        .map(|i| {
+            buf_take(&mut memo, num_size)?;
+            let note_hash = {
+                let note_hash = &mut &note_hashes[i * num_size..(i + 1) * num_size];
+                Num::deserialize(note_hash).ok()?
+            };
 
-        let ciphertext = buf_take(&mut memo, note_size+constants::POLY_1305_TAG_SIZE)?;
+            let ciphertext = buf_take(&mut memo, note_size + constants::POLY_1305_TAG_SIZE)?;
 
-        decrypt_note(&note_key[i], ciphertext, note_hash, params)
-    }).collect::<Option<Vec<_>>>()?;
-    
+            decrypt_note(&note_key[i], ciphertext, note_hash, params)
+        })
+        .collect::<Option<Vec<_>>>()?;
+
     Some((account, note))
 }
 
-fn decrypt_shared_secrets<P: PoolParams, const N: usize>(enc_type: MessageEncryptionType, eta: Num<P::Fr>, kappa: &[u8; 32], buf: &mut &[u8], size: usize, params: &P) -> Option<Buffer<u8, N>> {
+fn decrypt_shared_secrets<P: PoolParams, const N: usize>(
+    enc_type: MessageEncryptionType,
+    eta: Num<P::Fr>,
+    kappa: &[u8; 32],
+    buf: &mut &[u8],
+    size: usize,
+    params: &P,
+) -> Option<Buffer<u8, N>> {
     match enc_type {
         MessageEncryptionType::ECDH => {
-            let a_p = EdwardsPoint::subgroup_decompress(Num::deserialize(buf).ok()?, params.jubjub())?;
+            let a_p =
+                EdwardsPoint::subgroup_decompress(Num::deserialize(buf).ok()?, params.jubjub())?;
             let ecdh = a_p.mul(eta.to_other_reduced(), params.jubjub());
             let key = {
                 let mut x: [u8; 32] = [0; 32];
@@ -178,35 +218,44 @@ fn decrypt_shared_secrets<P: PoolParams, const N: usize>(enc_type: MessageEncryp
             };
             let ciphertext = buf_take(buf, size)?;
             Some(decrypt_chacha_constant_nonce::<N>(&key, ciphertext)?)
-        },
+        }
         MessageEncryptionType::Symmetric => {
             let nonce = &buf_take(buf, constants::XCHACHA20_POLY1305_NONCE_SIZE)?;
             let ciphertext = buf_take(buf, size)?;
             Some(decrypt_xchacha::<N>(kappa, nonce, ciphertext)?)
-        },
-        MessageEncryptionType::Plain => None
+        }
+        MessageEncryptionType::Plain => None,
     }
 }
 
-fn shared_secrets_size(enc_type: MessageEncryptionType, num_size: usize, items_num: usize) -> Option<usize> {
-    let shared_secret_ciphertext_size = items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
+fn shared_secrets_size(
+    enc_type: MessageEncryptionType,
+    num_size: usize,
+    items_num: usize,
+) -> Option<usize> {
+    let shared_secret_ciphertext_size =
+        items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
     match enc_type {
         MessageEncryptionType::ECDH => {
             let ecdh_size = num_size;
             Some(ecdh_size + shared_secret_ciphertext_size)
-        },
+        }
         MessageEncryptionType::Symmetric => {
             let nonce_size = constants::XCHACHA20_POLY1305_NONCE_SIZE;
             Some(nonce_size + shared_secret_ciphertext_size)
-        },
-        MessageEncryptionType::Plain => None
+        }
+        MessageEncryptionType::Plain => None,
     }
 }
 
-fn _decrypt_in<P: PoolParams>(eta:Num<P::Fr>, mut memo:&[u8], params:&P)->Option<Vec<Option<Note<P::Fr>>>> {
-    let num_size = constants::num_size_bits::<P::Fr>()/8;
-    let account_size = constants::account_size_bits::<P::Fr>()/8;
-    let note_size = constants::note_size_bits::<P::Fr>()/8;
+fn _decrypt_in<P: PoolParams>(
+    eta: Num<P::Fr>,
+    mut memo: &[u8],
+    params: &P,
+) -> Option<Vec<Option<Note<P::Fr>>>> {
+    let num_size = constants::num_size_bits::<P::Fr>() / 8;
+    let account_size = constants::account_size_bits::<P::Fr>() / 8;
+    let note_size = constants::note_size_bits::<P::Fr>() / 8;
 
     let (nozero_items_num, enc_type) = parse_memo_header(&mut memo)?;
 
@@ -217,33 +266,41 @@ fn _decrypt_in<P: PoolParams>(eta:Num<P::Fr>, mut memo:&[u8], params:&P)->Option
 
     let shared_secrets_size = shared_secrets_size(enc_type, num_size, nozero_items_num)?;
     buf_take(&mut memo, shared_secrets_size)?;
-    buf_take(&mut memo, account_size+constants::POLY_1305_TAG_SIZE)?;
+    buf_take(&mut memo, account_size + constants::POLY_1305_TAG_SIZE)?;
 
+    let note = (0..nozero_notes_num)
+        .map(|i| {
+            let a_pub = EdwardsPoint::subgroup_decompress(
+                Num::deserialize(&mut memo).ok()?,
+                params.jubjub(),
+            )?;
+            let ecdh = a_pub.mul(eta.to_other_reduced(), params.jubjub());
 
-    let note = (0..nozero_notes_num).map(|i| {
-        let a_pub = EdwardsPoint::subgroup_decompress(Num::deserialize(&mut memo).ok()?, params.jubjub())?;
-        let ecdh = a_pub.mul(eta.to_other_reduced(), params.jubjub());
-        
-        let key = {
-            let mut x: [u8; 32] = [0; 32];
-            ecdh.x.serialize(&mut &mut x[..]).unwrap();
-            keccak256(&x)
-        };
+            let key = {
+                let mut x: [u8; 32] = [0; 32];
+                ecdh.x.serialize(&mut &mut x[..]).unwrap();
+                keccak256(&x)
+            };
 
-        let note_hash = {
-            let note_hash = &mut &note_hashes[i * num_size..(i + 1) * num_size];
-            Num::deserialize(note_hash).ok()?
-        };
-        
-        let ciphertext = buf_take(&mut memo, note_size+constants::POLY_1305_TAG_SIZE)?;
+            let note_hash = {
+                let note_hash = &mut &note_hashes[i * num_size..(i + 1) * num_size];
+                Num::deserialize(note_hash).ok()?
+            };
 
-        decrypt_note(&key, ciphertext, note_hash, params)
-    }).collect::<Vec<Option<_>>>();
+            let ciphertext = buf_take(&mut memo, note_size + constants::POLY_1305_TAG_SIZE)?;
+
+            decrypt_note(&key, ciphertext, note_hash, params)
+        })
+        .collect::<Vec<Option<_>>>();
 
     Some(note)
 }
 
-pub fn decrypt_in<P: PoolParams>(eta:Num<P::Fr>, memo:&[u8], params:&P)->Vec<Option<Note<P::Fr>>> {
+pub fn decrypt_in<P: PoolParams>(
+    eta: Num<P::Fr>,
+    memo: &[u8],
+    params: &P,
+) -> Vec<Option<Note<P::Fr>>> {
     if let Some(res) = _decrypt_in(eta, memo, params) {
         res
     } else {
@@ -251,39 +308,133 @@ pub fn decrypt_in<P: PoolParams>(eta:Num<P::Fr>, memo:&[u8], params:&P)->Vec<Opt
     }
 }
 
-/// get encrypted memo chunks with associated decryption keys (chunk: account or note)
-/// returns vector of tupple (index, chunk, key)
-/// indexes are zero-based and enumerated within current memo
-pub fn symcipher_decryption_keys<P: PoolParams>(eta: Num<P::Fr>, kappa: &[u8; 32], mut memo:&[u8], params:&P) -> Option<Vec<(u64, Vec<u8>, Vec<u8>)>> {
-    let num_size = constants::num_size_bits::<P::Fr>()/8;
-    let account_size = constants::account_size_bits::<P::Fr>()/8;
-    let note_size = constants::note_size_bits::<P::Fr>()/8;
+fn symcipher_decryption_keys_user_data<P: PoolParams>(
+    eta: Num<P::Fr>,
+    kappa: &[u8; 32],
+    enc_type: MessageEncryptionType,
+    mut memo: &[u8], //assumed this is the end of the memo only with the user data
+    params: &P,
+) -> Option<Vec<(u64, Vec<u8>, Vec<u8>)>> {
+    let num_size = constants::num_size_bits::<P::Fr>() / 8;
+    let nozero_items_num = u16::deserialize(&mut memo).ok()? as usize;
+    if nozero_items_num == 0 {
+        return None;
+    }
 
-    let (nozero_items_num, enc_type) = parse_memo_header(&mut memo)?;
-
-    let nozero_notes_num = nozero_items_num - 1;
-    let shared_secret_ciphertext_size = nozero_items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
-
-    let account_hash = Num::deserialize(&mut memo).ok()?;
-    let note_hashes = buf_take(&mut memo, nozero_notes_num * num_size)?;
-
-    let shared_secret_text = decrypt_shared_secrets::<P, SHARED_SECRETS_HEAPLESS_SIZE>(enc_type, eta, kappa, &mut memo, shared_secret_ciphertext_size, params);
+    let shared_secret_ciphertext_size =
+        nozero_items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
+    let shared_secret_text = decrypt_shared_secrets::<P, SHARED_SECRETS_HEAPLESS_SIZE>(
+        enc_type,
+        eta,
+        kappa,
+        &mut memo,
+        shared_secret_ciphertext_size,
+        params,
+    );
 
     if let Some(shared_secret_text) = shared_secret_text {
         // here is a our transaction, we can restore account and all notes
         let mut shared_secret_text_ptr = shared_secret_text.as_slice();
 
-        let account_key= <[u8;constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr).ok()?;
-        let note_key = (0..nozero_notes_num).map(|_| <[u8;constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr)).collect::<Result<Vec<_>,_>>().ok()?;
+        let _ = <[u8; constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr).ok()?;
+        let data_keys = (0..nozero_items_num)
+            .map(|_| <[u8; constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr))
+            .collect::<Result<Vec<_>, _>>()
+            .ok()?;
 
-        let account_ciphertext = buf_take(&mut memo, account_size+constants::POLY_1305_TAG_SIZE)?;
+        let result = (0..nozero_items_num)
+            .filter_map(|i| {
+                //rand encription key
+                buf_take(&mut memo, num_size)?;
+                //ciphertext size
+                let cipher_data_size = u32::deserialize(&mut memo).ok()? as usize;
+                // ciphertext
+                let ciphertext = buf_take(&mut memo, cipher_data_size)?;
+
+                match decrypt_user_data_no_validate(&data_keys[i], ciphertext, params) {
+                    Some(_) => Some((i as u64, ciphertext.to_vec(), data_keys[i].to_vec())),
+                    _ => None,
+                }
+            })
+            .collect::<Vec<_>>();
+
+        Some(result)
+    } else {
+        let user_data = (0..nozero_items_num)
+            .filter_map(|i| {
+                let a_pub = EdwardsPoint::subgroup_decompress(
+                    Num::deserialize(&mut memo).ok()?,
+                    params.jubjub(),
+                )?;
+                let ecdh = a_pub.mul(eta.to_other_reduced(), params.jubjub());
+
+                let key = {
+                    let mut x: [u8; 32] = [0; 32];
+                    ecdh.x.serialize(&mut &mut x[..]).unwrap();
+                    keccak256(&x)
+                };
+
+                //ciphertext size
+                let cipher_data_size = u16::deserialize(&mut memo).ok()? as usize;
+                // ciphertext
+                let ciphertext = buf_take(&mut memo, cipher_data_size)?;
+                match decrypt_user_data_no_validate(&key, ciphertext, params) {
+                    Some(_) => Some((i as u64, ciphertext.to_vec(), key.to_vec())),
+                    _ => None,
+                }
+            })
+            .collect();
+
+        Some(user_data)
+    }
+}
+
+fn symcipher_account_notes<P: PoolParams>(
+    eta: Num<P::Fr>,
+    kappa: &[u8; 32],
+    mut memo: &[u8],
+    params: &P,
+) -> Option<(MessageEncryptionType, Vec<(u64, Vec<u8>, Vec<u8>)>)> {
+    let num_size = constants::num_size_bits::<P::Fr>() / 8;
+    let account_size = constants::account_size_bits::<P::Fr>() / 8;
+    let note_size = constants::note_size_bits::<P::Fr>() / 8;
+
+    let (nozero_items_num, enc_type) = parse_memo_header(&mut memo)?;
+
+    let nozero_notes_num = nozero_items_num - 1;
+    let shared_secret_ciphertext_size =
+        nozero_items_num * constants::U256_SIZE + constants::POLY_1305_TAG_SIZE;
+
+    let account_hash = Num::deserialize(&mut memo).ok()?;
+    let note_hashes = buf_take(&mut memo, nozero_notes_num * num_size)?;
+
+    let shared_secret_text = decrypt_shared_secrets::<P, SHARED_SECRETS_HEAPLESS_SIZE>(
+        enc_type,
+        eta,
+        kappa,
+        &mut memo,
+        shared_secret_ciphertext_size,
+        params,
+    );
+
+    if let Some(shared_secret_text) = shared_secret_text {
+        // here is a our transaction, we can restore account and all notes
+        let mut shared_secret_text_ptr = shared_secret_text.as_slice();
+
+        let account_key =
+            <[u8; constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr).ok()?;
+        let note_key = (0..nozero_notes_num)
+            .map(|_| <[u8; constants::U256_SIZE]>::deserialize(&mut shared_secret_text_ptr))
+            .collect::<Result<Vec<_>, _>>()
+            .ok()?;
+
+        let account_ciphertext = buf_take(&mut memo, account_size + constants::POLY_1305_TAG_SIZE)?;
         let _ = decrypt_account(&account_key, account_ciphertext, account_hash, params)?;
 
         let account_tuple = (0 as u64, account_ciphertext.to_vec(), account_key.to_vec());
         let result = Some(account_tuple)
             .into_iter()
-            .chain(
-                (0..nozero_notes_num).filter_map(|i| {
+            .chain((0..nozero_notes_num).filter_map(|i| {
                 buf_take(&mut memo, num_size)?;
 
                 let note_hash = {
@@ -291,105 +442,220 @@ pub fn symcipher_decryption_keys<P: PoolParams>(eta: Num<P::Fr>, kappa: &[u8; 32
                     Num::deserialize(note_hash).ok()?
                 };
 
-                let ciphertext = buf_take(&mut memo, note_size+constants::POLY_1305_TAG_SIZE)?;
+                let ciphertext = buf_take(&mut memo, note_size + constants::POLY_1305_TAG_SIZE)?;
                 match decrypt_note(&note_key[i], ciphertext, note_hash, params) {
                     Some(_) => Some((i as u64 + 1, ciphertext.to_vec(), note_key[i].to_vec())),
                     _ => None,
                 }
-            })
-        ).collect::<Vec<_>>();
-        
-        Some(result)
+            }))
+            .collect::<Vec<_>>();
+
+        Some((enc_type, result))
     } else {
         // search for incoming notes
-        buf_take(&mut memo, account_size+constants::POLY_1305_TAG_SIZE)?;   // skip account
-        let notes = (0..nozero_notes_num).filter_map(|i| {
-            let a_pub = EdwardsPoint::subgroup_decompress(Num::deserialize(&mut memo).ok()?, params.jubjub())?;
-            let ecdh = a_pub.mul(eta.to_other_reduced(), params.jubjub());
-            
-            let key = {
-                let mut x: [u8; 32] = [0; 32];
-                ecdh.x.serialize(&mut &mut x[..]).unwrap();
-                keccak256(&x)
-            };
-    
-            let note_hash = {
-                let note_hash = &mut &note_hashes[i * num_size..(i + 1) * num_size];
-                Num::deserialize(note_hash).ok()?
-            };
+        buf_take(&mut memo, account_size + constants::POLY_1305_TAG_SIZE)?; // skip account
+        let notes = (0..nozero_notes_num)
+            .filter_map(|i| {
+                let a_pub = EdwardsPoint::subgroup_decompress(
+                    Num::deserialize(&mut memo).ok()?,
+                    params.jubjub(),
+                )?;
+                let ecdh = a_pub.mul(eta.to_other_reduced(), params.jubjub());
 
-            let ciphertext = buf_take(&mut memo, note_size+constants::POLY_1305_TAG_SIZE)?;
-            match decrypt_note(&key, ciphertext, note_hash, params) {
-                Some(_) => Some((i as u64 + 1, ciphertext.to_vec(), key.to_vec())),
-                _ => None,
-            }
-        })
-        .collect();
+                let key = {
+                    let mut x: [u8; 32] = [0; 32];
+                    ecdh.x.serialize(&mut &mut x[..]).unwrap();
+                    keccak256(&x)
+                };
 
-        Some(notes)
+                let note_hash = {
+                    let note_hash = &mut &note_hashes[i * num_size..(i + 1) * num_size];
+                    Num::deserialize(note_hash).ok()?
+                };
+
+                let ciphertext = buf_take(&mut memo, note_size + constants::POLY_1305_TAG_SIZE)?;
+                match decrypt_note(&key, ciphertext, note_hash, params) {
+                    Some(_) => Some((i as u64 + 1, ciphertext.to_vec(), key.to_vec())),
+                    _ => None,
+                }
+            })
+            .collect();
+
+        Some((enc_type, notes))
     }
 }
 
-pub fn decrypt_account<P: PoolParams>(symkey: &[u8], ciphertext: &[u8], hash: Num<P::Fr>, params: &P) -> Option<Account<P::Fr>> {
+/// get encrypted memo chunks with associated decryption keys (chunk: account or note)
+/// returns vector of tupple (index, chunk, key)
+/// indexes are zero-based and enumerated within current memo
+pub fn symcipher_decryption_keys<P: PoolParams>(
+    eta: Num<P::Fr>,
+    kappa: &[u8; 32],
+    mut memo: &[u8],
+    params: &P,
+) -> Option<Vec<(u64, Vec<u8>, Vec<u8>)>> {
+    let (enc_type, mut res) = symcipher_account_notes(eta, kappa, &mut memo, params)?;
+    let mut res2 = symcipher_decryption_keys_user_data(eta, kappa, enc_type, &mut memo, params)?;
+
+    res.append(&mut res2);
+
+    return Some(res);
+}
+
+pub fn decrypt_account<P: PoolParams>(
+    symkey: &[u8],
+    ciphertext: &[u8],
+    hash: Num<P::Fr>,
+    params: &P,
+) -> Option<Account<P::Fr>> {
     match decrypt_account_no_validate(symkey, ciphertext, params) {
         Some(acc) if acc.hash(params) == hash => Some(acc),
         _ => None,
     }
 }
 
-pub fn decrypt_account_no_validate<P: PoolParams>(symkey: &[u8], ciphertext: &[u8], _: &P) -> Option<Account<P::Fr>> {
+pub fn decrypt_account_no_validate<P: PoolParams>(
+    symkey: &[u8],
+    ciphertext: &[u8],
+    _: &P,
+) -> Option<Account<P::Fr>> {
     let plain = decrypt_chacha_constant_nonce::<ACCOUNT_HEAPLESS_SIZE>(&symkey, ciphertext)?;
     Account::try_from_slice(plain.as_slice()).ok()
 }
 
-pub fn decrypt_note<P: PoolParams>(symkey: &[u8], ciphertext: &[u8], hash: Num<P::Fr>, params: &P) -> Option<Note<P::Fr>> {
+pub fn decrypt_note<P: PoolParams>(
+    symkey: &[u8],
+    ciphertext: &[u8],
+    hash: Num<P::Fr>,
+    params: &P,
+) -> Option<Note<P::Fr>> {
     match decrypt_note_no_validate(symkey, ciphertext, params) {
         Some(note) if note.hash(params) == hash => Some(note),
         _ => None,
     }
 }
 
-pub fn decrypt_note_no_validate<P: PoolParams>(symkey: &[u8], ciphertext: &[u8], _: &P) -> Option<Note<P::Fr>> {
+pub fn decrypt_note_no_validate<P: PoolParams>(
+    symkey: &[u8],
+    ciphertext: &[u8],
+    _: &P,
+) -> Option<Note<P::Fr>> {
     let plain = decrypt_chacha_constant_nonce::<NOTE_HEAPLESS_SIZE>(&symkey, ciphertext)?;
     Note::try_from_slice(plain.as_slice()).ok()
 }
 
-/// Deprecated but still in use on the old pools
-pub fn _encrypt_old<P: PoolParams>(
-    entropy: &[u8],
-    eta:Num<P::Fr>,
-    account: Account<P::Fr>,
-    note: &[Note<P::Fr>],
-    params:&P
-) -> Vec<u8> {
-    let nozero_notes_num = note.len();
-    let nozero_items_num = nozero_notes_num+1;
+pub fn decrypt_user_data_no_validate<P: PoolParams>(
+    symkey: &[u8],
+    ciphertext: &[u8],
+    _: &P,
+) -> Option<ExtraData<P::Fr>> {
+    let plain = decrypt_chacha_constant_nonce::<NOTE_HEAPLESS_SIZE>(&symkey, ciphertext)?;
+    let res = ExtraData::try_from_slice(plain.as_slice()).ok();
 
+    return res;
+}
+
+/// Deprecated but still in use on the old pools
+pub fn _encrypt_old_user_data<P: PoolParams>(
+    entropy: &[u8],
+    eta: Num<P::Fr>,
+    user_data: &[ExtraData<P::Fr>],
+    params: &P,
+) -> Vec<u8> {
+    let nozero_items_num = user_data.len() + 1;
     let mut sb = SeedboxChaCha20::new_with_salt(entropy);
 
-    let account_data = {
-        let mut account_key = [0u8;constants::U256_SIZE];
+    let account_key = {
+        let mut account_key = [0u8; constants::U256_SIZE];
         sb.fill_bytes(&mut account_key);
-        let account_ciphertext = encrypt_chacha_constant_nonce(&account_key, &account.try_to_vec().unwrap());
-        (account_key, account_ciphertext)
+        account_key
     };
-    
-    let notes_data = note.iter().map(|e|{
-        let a:Num<P::Fs> = sb.gen();
-        let p_d = EdwardsPoint::subgroup_decompress(e.p_d, params.jubjub()).unwrap();
-        let ecdh =  p_d.mul(a, params.jubjub());
-        let key = keccak256(&ecdh.x.try_to_vec().unwrap());
-        let ciphertext = encrypt_chacha_constant_nonce(&key, &e.try_to_vec().unwrap());
-        let a_pub = derive_key_p_d(e.d.to_num(), a, params); 
-        (a_pub.x, key, ciphertext)
-        
-    }).collect::<Vec<_>>();
+
+    let user_data_arr = user_data
+        .iter()
+        .map(|e| {
+            let a: Num<P::Fs> = sb.gen();
+            let p_d = EdwardsPoint::subgroup_decompress(e.p_d, params.jubjub()).unwrap();
+            let ecdh = p_d.mul(a, params.jubjub());
+            let key = keccak256(&ecdh.x.try_to_vec().unwrap());
+            let ciphertext = encrypt_chacha_constant_nonce(&key, &e.try_to_vec().unwrap());
+            let a_pub = derive_key_p_d(e.d.to_num(), a, params);
+            let ciphertext_size = ciphertext.len();
+
+            (a_pub.x, key, ciphertext_size as u32, ciphertext)
+        })
+        .collect::<Vec<_>>();
 
     let shared_secret_data = {
         let a_p_pub = derive_key_a(sb.gen(), params);
         let ecdh = a_p_pub.mul(eta.to_other_reduced(), params.jubjub());
         let key = keccak256(&ecdh.x.try_to_vec().unwrap());
-        let text:Vec<u8> = core::iter::once(&account_data.0[..]).chain(notes_data.iter().map(|e| &e.1[..])).collect::<Vec<_>>().concat();
+        let text: Vec<u8> = core::iter::once(&account_key[..])
+            .chain(user_data_arr.iter().map(|e| &e.1[..]))
+            .collect::<Vec<_>>()
+            .concat();
+        let ciphertext = encrypt_chacha_constant_nonce(&key, &text);
+        (a_p_pub.x, ciphertext)
+    };
+
+    let mut res = vec![];
+
+    (nozero_items_num as u32).serialize(&mut res).unwrap();
+
+    shared_secret_data.0.serialize(&mut res).unwrap();
+    res.extend(&shared_secret_data.1);
+
+    user_data_arr.iter().for_each(|nd| {
+        nd.0.serialize(&mut res).unwrap();
+        nd.2.serialize(&mut res).unwrap();
+        res.extend(&nd.3);
+    });
+
+    res
+}
+
+/// Deprecated but still in use on the old pools
+pub fn _encrypt_old<P: PoolParams>(
+    entropy: &[u8],
+    eta: Num<P::Fr>,
+    account: Account<P::Fr>,
+    note: &[Note<P::Fr>],
+    params: &P,
+) -> Vec<u8> {
+    let nozero_notes_num = note.len();
+    let nozero_items_num = nozero_notes_num + 1;
+
+    let mut sb = SeedboxChaCha20::new_with_salt(entropy);
+
+    let account_data = {
+        let mut account_key = [0u8; constants::U256_SIZE];
+        sb.fill_bytes(&mut account_key);
+        let account_ciphertext =
+            encrypt_chacha_constant_nonce(&account_key, &account.try_to_vec().unwrap());
+        (account_key, account_ciphertext)
+    };
+
+    let notes_data = note
+        .iter()
+        .map(|e| {
+            let a: Num<P::Fs> = sb.gen();
+            let p_d = EdwardsPoint::subgroup_decompress(e.p_d, params.jubjub()).unwrap();
+            let ecdh = p_d.mul(a, params.jubjub());
+            let key = keccak256(&ecdh.x.try_to_vec().unwrap());
+            let ciphertext = encrypt_chacha_constant_nonce(&key, &e.try_to_vec().unwrap());
+            let a_pub = derive_key_p_d(e.d.to_num(), a, params);
+            (a_pub.x, key, ciphertext)
+        })
+        .collect::<Vec<_>>();
+
+    let shared_secret_data = {
+        let a_p_pub = derive_key_a(sb.gen(), params);
+        let ecdh = a_p_pub.mul(eta.to_other_reduced(), params.jubjub());
+        let key = keccak256(&ecdh.x.try_to_vec().unwrap());
+        let text: Vec<u8> = core::iter::once(&account_data.0[..])
+            .chain(notes_data.iter().map(|e| &e.1[..]))
+            .collect::<Vec<_>>()
+            .concat();
         let ciphertext = encrypt_chacha_constant_nonce(&key, &text);
         (a_p_pub.x, ciphertext)
     };
@@ -407,7 +673,7 @@ pub fn _encrypt_old<P: PoolParams>(
 
     res.extend(&account_data.1);
 
-    notes_data.iter().for_each(|nd|{
+    notes_data.iter().for_each(|nd| {
         nd.0.serialize(&mut res).unwrap();
         res.extend(&nd.2);
     });
@@ -420,17 +686,22 @@ mod tests {
     use test_case::test_case;
 
     use crate::constants::XCHACHA20_POLY1305_NONCE_SIZE;
-    use crate::native::cipher::{symcipher_decryption_keys, decrypt_account, decrypt_note, encrypt};
-    use crate::native::note::Note;
-    use crate::native::symmetric::{encrypt_chacha_constant_nonce, decrypt_chacha_constant_nonce, encrypt_xchacha, decrypt_xchacha};
-    use crate::{POOL_PARAMS, native::boundednum::BoundedNum};
     use crate::native::account::Account;
+    use crate::native::cipher::{
+        _encrypt_old_user_data, decrypt_account, decrypt_note, encrypt, symcipher_decryption_keys,
+    };
+    use crate::native::key::{derive_key_a, derive_key_eta, derive_key_kappa, derive_key_p_d};
+    use crate::native::note::{ExtraData, Note};
+    use crate::native::symmetric::{
+        decrypt_chacha_constant_nonce, decrypt_xchacha, encrypt_chacha_constant_nonce,
+        encrypt_xchacha,
+    };
+    use crate::{native::boundednum::BoundedNum, POOL_PARAMS};
     use fawkes_crypto::ff_uint::Num;
-    use fawkes_crypto::{rand::Rng, engines::bn256::Fr};
     use fawkes_crypto::rand::rngs::OsRng;
-    use crate::native::key::{derive_key_a, derive_key_eta, derive_key_p_d, derive_key_kappa};
+    use fawkes_crypto::{engines::bn256::Fr, rand::Rng};
 
-    use super::{_encrypt_old, decrypt_out, decrypt_in, MessageEncryptionType};
+    use super::{_encrypt_old, decrypt_in, decrypt_out, MessageEncryptionType};
 
     #[test_case(0)]
     #[test_case(1)]
@@ -441,7 +712,7 @@ mod tests {
         let mut rng = OsRng::default();
 
         let key: [u8; 32] = rng.gen();
-        let plaintext: Vec<u8> = (0..buf_len).map(|_| { rng.gen() }).collect();
+        let plaintext: Vec<u8> = (0..buf_len).map(|_| rng.gen()).collect();
         let ciphertext = encrypt_chacha_constant_nonce(&key, &plaintext.as_slice());
         let decrypted = decrypt_chacha_constant_nonce::<0>(&key, &ciphertext.as_slice()).unwrap();
 
@@ -459,7 +730,7 @@ mod tests {
 
         let key: [u8; 32] = rng.gen();
         let nonce: [u8; XCHACHA20_POLY1305_NONCE_SIZE] = rng.gen();
-        let plaintext: Vec<u8> = (0..buf_len).map(|_| { rng.gen() }).collect();
+        let plaintext: Vec<u8> = (0..buf_len).map(|_| rng.gen()).collect();
         let ciphertext = encrypt_xchacha(&key, &nonce, &plaintext.as_slice());
         let decrypted = decrypt_xchacha::<0>(&key, &nonce, &ciphertext.as_slice()).unwrap();
 
@@ -485,7 +756,11 @@ mod tests {
     #[test_case(20, 0.5, MessageEncryptionType::Symmetric)]
     #[test_case(30, 0.7, MessageEncryptionType::Symmetric)]
     #[test_case(42, 0.5, MessageEncryptionType::Symmetric)]
-    fn test_decrypt_in_out(notes_count: u32, note_probability: f64, enc_type: MessageEncryptionType) {
+    fn test_decrypt_in_out(
+        notes_count: u32,
+        note_probability: f64,
+        enc_type: MessageEncryptionType,
+    ) {
         let params = &POOL_PARAMS.clone();
         let mut rng = OsRng::default();
 
@@ -506,46 +781,53 @@ mod tests {
 
         // output notes
         let mut dst_notes_num: usize = 0;
-        let notes: Vec<Note<Fr>> = (0..notes_count as u64).map(|_| {
-            let mut a_note = Note::sample(&mut rng, params);
-            a_note.b = BoundedNum::new(Num::from(500000000 as u64));
-            if rng.gen_bool(note_probability) {
-                // a few notes to the receiver
-                a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta2, params).x;
-                dst_notes_num += 1;
-            } else {
-                // other notes are loopback
-                a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta1, params).x;
-            }
-            a_note
-        }).collect();
+        let notes: Vec<Note<Fr>> = (0..notes_count as u64)
+            .map(|_| {
+                let mut a_note = Note::sample(&mut rng, params);
+                a_note.b = BoundedNum::new(Num::from(500000000 as u64));
+                if rng.gen_bool(note_probability) {
+                    // a few notes to the receiver
+                    a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta2, params).x;
+                    dst_notes_num += 1;
+                } else {
+                    // other notes are loopback
+                    a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta1, params).x;
+                }
+                a_note
+            })
+            .collect();
 
         // encrypt account and notes with the sender key
         let entropy: [u8; 32] = rng.gen();
         let mut encrypted = match enc_type {
-            MessageEncryptionType::ECDH => _encrypt_old(&entropy, eta1, account, notes.as_slice(), params),
-            MessageEncryptionType::Symmetric => encrypt(&entropy, &kappa1, account, notes.as_slice(), params),
-            MessageEncryptionType::Plain => unreachable!()
-        };  
+            MessageEncryptionType::ECDH => {
+                _encrypt_old(&entropy, eta1, account, notes.as_slice(), params)
+            }
+            MessageEncryptionType::Symmetric => {
+                encrypt(&entropy, &kappa1, account, notes.as_slice(), params)
+            }
+            MessageEncryptionType::Plain => unreachable!(),
+        };
 
         // let's decrypt the memo from the receiver side and check the result
         let decrypted_in = decrypt_in(eta2, encrypted.as_mut_slice(), params);
         assert_eq!(decrypted_in.len(), notes.len());
         let in_notes: Vec<_> = decrypted_in
-                .into_iter()
-                .enumerate()
-                .filter_map(|(i, note)| {
-                    match note {
-                        Some(note) => { //if note.p_d == key::derive_key_p_d(note.d.to_num(), *eta, params).x => {
-                            assert_eq!(&note, notes.get(i).unwrap());
-                            Some(note)
-                        }
-                        _ => None,
+            .into_iter()
+            .enumerate()
+            .filter_map(|(i, note)| {
+                match note {
+                    Some(note) => {
+                        //if note.p_d == key::derive_key_p_d(note.d.to_num(), *eta, params).x => {
+                        assert_eq!(&note, notes.get(i).unwrap());
+                        Some(note)
                     }
-                })
-                .collect();
+                    _ => None,
+                }
+            })
+            .collect();
         assert_eq!(in_notes.len(), dst_notes_num);
-        
+
         // decrypt the memo from the sender side and check the result
         let decrypted_out = decrypt_out(eta1, &kappa1, encrypted.as_mut_slice(), params);
         let decrypted_acc = decrypted_out.as_ref().unwrap().0;
@@ -587,7 +869,7 @@ mod tests {
         let kappa2 = derive_key_kappa(eta2);
         // third-party
         let eta3 = derive_key_eta(derive_key_a(rng.gen(), params).x, params);
-        let kappa3 =  derive_key_kappa(eta3);
+        let kappa3 = derive_key_kappa(eta3);
 
         // output account
         let mut account: Account<Fr> = Account::sample(&mut rng, params);
@@ -598,57 +880,107 @@ mod tests {
 
         // output notes
         let mut dst_notes_num: usize = 0;
-        let notes: Vec<Note<Fr>> = (0..notes_count as u64).map(|_| {
-            let mut a_note = Note::sample(&mut rng, params);
-            a_note.b = BoundedNum::new(Num::from(500000000 as u64));
-            if rng.gen_bool(note_probability) {
-                // a few notes to the receiver
-                a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta2, params).x;
-                dst_notes_num += 1;
-            } else {
-                // other notes are loopback
-                a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta1, params).x;
-            }
-            a_note
-        }).collect();
+        let notes: Vec<Note<Fr>> = (0..notes_count as u64)
+            .map(|_| {
+                let mut a_note = Note::sample(&mut rng, params);
+                a_note.b = BoundedNum::new(Num::from(500000000 as u64));
+                if rng.gen_bool(note_probability) {
+                    // a few notes to the receiver
+                    a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta2, params).x;
+                    dst_notes_num += 1;
+                } else {
+                    // other notes are loopback
+                    a_note.p_d = derive_key_p_d(a_note.d.to_num(), eta1, params).x;
+                }
+                a_note
+            })
+            .collect();
+
+        // output messages
+        let mut dst_messages_num: usize = 0;
+        let messages: Vec<ExtraData<Fr>> = (0..notes_count as u64)
+            .map(|_| {
+                let mut data = ExtraData::sample(&mut rng, params, vec![1, 2, 3, 4, 5]);
+                if rng.gen_bool(note_probability) {
+                    // a few messages to the receiver
+                    data.p_d = derive_key_p_d(data.d.to_num(), eta2, params).x;
+                    dst_messages_num += 1;
+                } else {
+                    // other messages are loopback
+                    data.p_d = derive_key_p_d(data.d.to_num(), eta1, params).x;
+                }
+                data
+            })
+            .collect();
 
         // encrypt account and notes with the sender key
         let entropy: [u8; 32] = rng.gen();
-        let encrypted = match enc_type {
-            MessageEncryptionType::ECDH => _encrypt_old(&entropy, eta1, account, notes.as_slice(), params),
-            MessageEncryptionType::Symmetric => encrypt(&entropy, &kappa1, account, notes.as_slice(), params),
-            MessageEncryptionType::Plain => unreachable!()
-        };  
+        let mut encrypted = match enc_type {
+            MessageEncryptionType::ECDH => {
+                _encrypt_old(&entropy, eta1, account, notes.as_slice(), params)
+            }
+            MessageEncryptionType::Symmetric => {
+                encrypt(&entropy, &kappa1, account, notes.as_slice(), params)
+            }
+            MessageEncryptionType::Plain => unreachable!(),
+        };
+
+        // always ECDH encryption
+        let encrypted_extra_data =
+            _encrypt_old_user_data(&entropy, eta1, messages.as_slice(), params);
+
+        encrypted.extend(encrypted_extra_data);
 
         // trying to restore chunks and associated decryption keys from the sender side
-        let sender_restored = symcipher_decryption_keys(eta1, &kappa1, encrypted.as_slice(), params).unwrap();
+        let sender_restored =
+            symcipher_decryption_keys(eta1, &kappa1, encrypted.as_slice(), params).unwrap();
         assert!(sender_restored.len() == notes.len() + 1);
         sender_restored.iter().for_each(|(index, chunk, key)| {
             if *index == 0 {
                 // decrypt account
-                let decrypt_acc = decrypt_account(key.as_slice(), chunk.as_slice(), account.hash(params), params).unwrap();
+                let decrypt_acc = decrypt_account(
+                    key.as_slice(),
+                    chunk.as_slice(),
+                    account.hash(params),
+                    params,
+                )
+                .unwrap();
                 assert_eq!(decrypt_acc, account);
             } else {
                 // decrypt note
                 let orig_note = notes.get((index - 1) as usize).unwrap();
-                let decrypt_note = decrypt_note(key.as_slice(), chunk.as_slice(), orig_note.hash(params), params).unwrap();
+                let decrypt_note = decrypt_note(
+                    key.as_slice(),
+                    chunk.as_slice(),
+                    orig_note.hash(params),
+                    params,
+                )
+                .unwrap();
                 assert_eq!(decrypt_note, *orig_note);
             }
         });
 
         // trying to restore chunks and associated decryption keys from the receiver side
-        let receiver_restored = symcipher_decryption_keys(eta2, &kappa2, encrypted.as_slice(), params).unwrap();
+        let receiver_restored =
+            symcipher_decryption_keys(eta2, &kappa2, encrypted.as_slice(), params).unwrap();
         assert!(receiver_restored.len() == dst_notes_num);
         receiver_restored.iter().for_each(|(index, chunk, key)| {
             assert_ne!(*index, 0); // account shouldn't be decrypted on receiver side
-            // decrypt note
+                                   // decrypt note
             let orig_note = notes.get((index - 1) as usize).unwrap();
-            let decrypt_note = decrypt_note(key.as_slice(), chunk.as_slice(), orig_note.hash(params), params).unwrap();
+            let decrypt_note = decrypt_note(
+                key.as_slice(),
+                chunk.as_slice(),
+                orig_note.hash(params),
+                params,
+            )
+            .unwrap();
             assert_eq!(decrypt_note, *orig_note);
         });
 
         // trying to restore memo from the third-party actor
-        let thirdparty_restored = symcipher_decryption_keys(eta3, &kappa3, encrypted.as_slice(), params).unwrap();
+        let thirdparty_restored =
+            symcipher_decryption_keys(eta3, &kappa3, encrypted.as_slice(), params).unwrap();
         assert_eq!(thirdparty_restored.len(), 0);
     }
 }
