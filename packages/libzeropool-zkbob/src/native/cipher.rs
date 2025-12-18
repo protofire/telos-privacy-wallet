@@ -146,7 +146,7 @@ pub fn decrypt_out<P: PoolParams>(
     kappa: &[u8; 32],
     mut memo: &[u8],
     params: &P,
-) -> Option<(Account<P::Fr>, Vec<Note<P::Fr>>)> {
+) -> Option<(Account<P::Fr>, Vec<Note<P::Fr>>, Vec<ExtraData<P::Fr>>)> {
     let num_size = constants::num_size_bits::<P::Fr>() / 8;
     let account_size = constants::account_size_bits::<P::Fr>() / 8;
     let note_size = constants::note_size_bits::<P::Fr>() / 8;
@@ -195,7 +195,16 @@ pub fn decrypt_out<P: PoolParams>(
         })
         .collect::<Option<Vec<_>>>()?;
 
-    Some((account, note))
+    let extra_data_ciphers =
+        symcipher_decryption_keys_user_data(eta, kappa, enc_type, memo, params).unwrap_or(vec![]);
+    let extra_data: Vec<ExtraData<_>> = extra_data_ciphers
+        .iter()
+        .filter_map(|cipher| {
+            decrypt_user_data_no_validate(cipher.2.as_slice(), cipher.1.as_slice(), params)
+        })
+        .collect();
+
+    Some((account, note, extra_data))
 }
 
 fn decrypt_shared_secrets<P: PoolParams, const N: usize>(
@@ -253,7 +262,7 @@ fn _decrypt_in<P: PoolParams>(
     eta: Num<P::Fr>,
     mut memo: &[u8],
     params: &P,
-) -> Option<Vec<Option<Note<P::Fr>>>> {
+) -> Option<(Vec<Option<Note<P::Fr>>>, Vec<Option<ExtraData<P::Fr>>>)> {
     let num_size = constants::num_size_bits::<P::Fr>() / 8;
     let account_size = constants::account_size_bits::<P::Fr>() / 8;
     let note_size = constants::note_size_bits::<P::Fr>() / 8;
@@ -294,18 +303,44 @@ fn _decrypt_in<P: PoolParams>(
         })
         .collect::<Vec<Option<_>>>();
 
-    Some(note)
+    let extra_items_num = u32::deserialize(&mut memo).ok()? as usize;
+
+    buf_take(&mut memo, shared_secrets_size)?;
+    let extra_data = (0..extra_items_num)
+        .map(|_| {
+            let a_pub = EdwardsPoint::subgroup_decompress(
+                Num::deserialize(&mut memo).ok()?,
+                params.jubjub(),
+            )?;
+            let ecdh = a_pub.mul(eta.to_other_reduced(), params.jubjub());
+
+            let key = {
+                let mut x: [u8; 32] = [0; 32];
+                ecdh.x.serialize(&mut &mut x[..]).unwrap();
+                keccak256(&x)
+            };
+
+            //ciphertext size
+            let cipher_data_size = u16::deserialize(&mut memo).ok()? as usize;
+            // ciphertext
+            let ciphertext = buf_take(&mut memo, cipher_data_size)?;
+            println!("CIPHERTEXT {:#?}", ciphertext);
+            decrypt_user_data_no_validate(&key, ciphertext, params)
+        })
+        .collect();
+
+    Some((note, extra_data))
 }
 
 pub fn decrypt_in<P: PoolParams>(
     eta: Num<P::Fr>,
     memo: &[u8],
     params: &P,
-) -> Vec<Option<Note<P::Fr>>> {
+) -> (Vec<Option<Note<P::Fr>>>, Vec<Option<ExtraData<P::Fr>>>) {
     if let Some(res) = _decrypt_in(eta, memo, params) {
         res
     } else {
-        vec![]
+        (vec![], vec![])
     }
 }
 
@@ -499,17 +534,17 @@ pub fn symcipher_decryption_keys<P: PoolParams>(
 ) -> Option<Vec<(u64, Vec<u8>, Vec<u8>)>> {
     let (enc_type, new_memo, mut res) = symcipher_account_notes(eta, kappa, &mut memo, params)?;
 
-    if let MessageEncryptionType::ECDH = enc_type {
-        let res_0_indexed =
-            symcipher_decryption_keys_user_data(eta, kappa, enc_type, new_memo.as_slice(), params)
-                .unwrap_or(vec![]);
-        let mut res_2: Vec<(u64, Vec<u8>, Vec<u8>)> = res_0_indexed
-            .iter()
-            .map(|cur| (cur.0 + res.len() as u64, cur.1.clone(), cur.2.clone()))
-            .collect();
+    //if let MessageEncryptionType::ECDH = enc_type {
+    //let res_0_indexed =
+    //symcipher_decryption_keys_user_data(eta, kappa, enc_type, new_memo.as_slice(), params)
+    //.unwrap_or(vec![]);
+    //let mut res_2: Vec<(u64, Vec<u8>, Vec<u8>)> = res_0_indexed
+    //.iter()
+    //.map(|cur| (cur.0 + res.len() as u64, cur.1.clone(), cur.2.clone()))
+    //.collect();
 
-        res.append(&mut res_2);
-    }
+    //res.append(&mut res_2);
+    //}
 
     return Some(res);
 }
@@ -750,6 +785,7 @@ mod tests {
         assert_eq!(plaintext.as_slice(), decrypted.as_slice());
     }
 
+    // REMOVED symetric case since we use only v1 calldata for contracts
     #[test_case(0, 0.0, MessageEncryptionType::ECDH)]
     #[test_case(1, 0.0, MessageEncryptionType::ECDH)]
     #[test_case(1, 1.0, MessageEncryptionType::ECDH)]
@@ -759,15 +795,15 @@ mod tests {
     #[test_case(20, 0.5, MessageEncryptionType::ECDH)]
     #[test_case(30, 0.7, MessageEncryptionType::ECDH)]
     #[test_case(42, 0.5, MessageEncryptionType::ECDH)]
-    #[test_case(0, 0.0, MessageEncryptionType::Symmetric)]
-    #[test_case(1, 0.0, MessageEncryptionType::Symmetric)]
-    #[test_case(1, 1.0, MessageEncryptionType::Symmetric)]
-    #[test_case(5, 0.8, MessageEncryptionType::Symmetric)]
-    #[test_case(15, 0.0, MessageEncryptionType::Symmetric)]
-    #[test_case(15, 1.0, MessageEncryptionType::Symmetric)]
-    #[test_case(20, 0.5, MessageEncryptionType::Symmetric)]
-    #[test_case(30, 0.7, MessageEncryptionType::Symmetric)]
-    #[test_case(42, 0.5, MessageEncryptionType::Symmetric)]
+    //#[test_case(0, 0.0, MessageEncryptionType::Symmetric)]
+    //#[test_case(1, 0.0, MessageEncryptionType::Symmetric)]
+    //#[test_case(1, 1.0, MessageEncryptionType::Symmetric)]
+    //#[test_case(5, 0.8, MessageEncryptionType::Symmetric)]
+    //#[test_case(15, 0.0, MessageEncryptionType::Symmetric)]
+    //#[test_case(15, 1.0, MessageEncryptionType::Symmetric)]
+    //#[test_case(20, 0.5, MessageEncryptionType::Symmetric)]
+    //#[test_case(30, 0.7, MessageEncryptionType::Symmetric)]
+    //#[test_case(42, 0.5, MessageEncryptionType::Symmetric)]
     fn test_decrypt_in_out(
         notes_count: u32,
         note_probability: f64,
@@ -809,11 +845,35 @@ mod tests {
             })
             .collect();
 
+        // output messages
+        let mut dst_messages_num: usize = 0;
+        let messages: Vec<ExtraData<Fr>> = (0..notes_count as u64)
+            .map(|_| {
+                let mut data = ExtraData::sample(&mut rng, params, vec![1, 2, 3, 4, 5]);
+                if rng.gen_bool(note_probability) {
+                    // a few messages to the receiver
+                    data.p_d = derive_key_p_d(data.d.to_num(), eta2, params).x;
+                    dst_messages_num += 1;
+                } else {
+                    // other messages are loopback
+                    data.p_d = derive_key_p_d(data.d.to_num(), eta1, params).x;
+                }
+                data
+            })
+            .collect();
+
         // encrypt account and notes with the sender key
         let entropy: [u8; 32] = rng.gen();
         let mut encrypted = match enc_type {
             MessageEncryptionType::ECDH => {
-                _encrypt_old(&entropy, eta1, account, notes.as_slice(), params)
+                let mut cipher = _encrypt_old(&entropy, eta1, account, notes.as_slice(), params);
+                cipher.extend(_encrypt_old_user_data(
+                    &entropy,
+                    eta1,
+                    messages.as_slice(),
+                    params,
+                ));
+                cipher
             }
             MessageEncryptionType::Symmetric => {
                 encrypt(&entropy, &kappa1, account, notes.as_slice(), params)
@@ -822,9 +882,11 @@ mod tests {
         };
 
         // let's decrypt the memo from the receiver side and check the result
-        let decrypted_in = decrypt_in(eta2, encrypted.as_mut_slice(), params);
-        assert_eq!(decrypted_in.len(), notes.len());
-        let in_notes: Vec<_> = decrypted_in
+        let (decrypted_in_notes, decrypted_in_data) =
+            decrypt_in(eta2, encrypted.as_mut_slice(), params);
+        assert_eq!(decrypted_in_notes.len(), notes.len());
+
+        let in_notes: Vec<_> = decrypted_in_notes
             .into_iter()
             .enumerate()
             .filter_map(|(i, note)| {
@@ -840,15 +902,37 @@ mod tests {
             .collect();
         assert_eq!(in_notes.len(), dst_notes_num);
 
+        let in_messages: Vec<_> = decrypted_in_data
+            .into_iter()
+            .enumerate()
+            .filter_map(|(i, data)| match data {
+                Some(data) => {
+                    assert_eq!(&data, messages.get(i).unwrap());
+                    Some(data)
+                }
+                _ => None,
+            })
+            .collect();
+        assert_eq!(in_messages.len(), dst_messages_num);
+
         // decrypt the memo from the sender side and check the result
         let decrypted_out = decrypt_out(eta1, &kappa1, encrypted.as_mut_slice(), params);
         let decrypted_acc = decrypted_out.as_ref().unwrap().0;
         let decrypted_notes = &decrypted_out.as_ref().unwrap().1;
+        let decrypted_messages = &decrypted_out.as_ref().unwrap().2;
+
         assert_eq!(decrypted_acc, account);
         assert_eq!(decrypted_notes.len(), notes.len());
+        assert_eq!(decrypted_messages.len(), messages.len());
         (0..notes.len()).for_each(|i: usize| {
             let src = notes.get(i).unwrap();
             let recovered = decrypted_notes.get(i).unwrap();
+            assert_eq!(src, recovered);
+        });
+
+        (0..messages.len()).for_each(|i: usize| {
+            let src = messages.get(i).unwrap();
+            let recovered = decrypted_messages.get(i).unwrap();
             assert_eq!(src, recovered);
         });
     }
@@ -947,10 +1031,8 @@ mod tests {
         // trying to restore chunks and associated decryption keys from the sender side
         let sender_restored =
             symcipher_decryption_keys(eta1, &kappa1, encrypted.as_slice(), params).unwrap();
-        assert!(sender_restored.len() == notes.len() + messages.len() + 1);
-        println!("HOW MANY {}", sender_restored.len());
+        assert!(sender_restored.len() == notes.len() + 1);
         sender_restored.iter().for_each(|(index, chunk, key)| {
-            println!("RAFAEL {}", index);
             if *index == 0 {
                 // decrypt account
                 let decrypt_acc = decrypt_account(
@@ -973,7 +1055,6 @@ mod tests {
                 .unwrap();
                 assert_eq!(decrypt_note, *orig_note);
             }
-            println!("RAFAEL END");
         });
 
         // trying to restore chunks and associated decryption keys from the receiver side

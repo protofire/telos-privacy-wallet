@@ -14,6 +14,15 @@ pub struct ExtraData<Fr: PrimeField> {
     pub data: Vec<u8>,
 }
 
+impl<Fr: PrimeField> Eq for ExtraData<Fr> {}
+
+impl<Fr: PrimeField> PartialEq for ExtraData<Fr> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.d.eq(&other.d) && self.p_d.eq(&other.p_d) && self.data.eq(&other.data)
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(bound(serialize = "", deserialize = ""))]
 pub struct Note<Fr: PrimeField> {
@@ -42,4 +51,3 @@ impl<Fr: PrimeField> PartialEq for Note<Fr> {
         self.d.eq(&other.d) && self.p_d.eq(&other.p_d) && self.b.eq(&other.b) && self.t.eq(&other.t)
     }
 }
-
