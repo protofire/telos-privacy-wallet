@@ -264,7 +264,7 @@ export const ZkAccountContextProvider = ({ children }) => {
 
   const updateLimits = useCallback(async (poolAlias = currentPool.alias) => {
     const client = zkClients[poolAlias];
-    if (!client) return;
+    if (!zkAccount || !client) return;
     setIsLoadingLimits(true);
     let limits = defaultLimits;
     try {
@@ -300,7 +300,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     }
     setLimitsByPool(prev => ({ ...prev, [poolAlias]: limits }));
     setIsLoadingLimits(false);
-  }, [zkClients, account, fromShieldedAmount, currentPool.alias]);
+  }, [zkAccount, zkClients, account, fromShieldedAmount, currentPool.alias]);
 
   const calcMaxTransferable = useCallback(async (type, relayerFee, amountToConvert = ethers.constants.Zero) => {
     let max = ethers.constants.Zero;
@@ -666,18 +666,19 @@ export const ZkAccountContextProvider = ({ children }) => {
   }, [updateSupportId]);
 
   const removeZkAccountMnemonic = useCallback(async () => {
-    if (zkAccount) {
-      // Clean state and logout from all zkClients
-      const cleanupPromises = Object.values(zkClients).map(async (client) => {
-        if (client) {
-          await client.cleanState();
-          await client.logout();
-        }
-      });
-      await Promise.all(cleanupPromises);
-    }
+    const clientsToLogout = zkAccount ? Object.values(zkClients).filter(Boolean) : [];
+
     window.localStorage.removeItem('seed');
     clearState();
+
+    for (const client of clientsToLogout) {
+      try {
+        await client.cleanState();
+        await client.logout();
+      } catch (error) {
+        console.warn('Error during client cleanup:', error);
+      }
+    }
   }, [zkAccount, zkClients, clearState]);
 
   const lockAccount = useCallback(() => {
@@ -694,8 +695,9 @@ export const ZkAccountContextProvider = ({ children }) => {
   }, [openPasswordModal, clearState, closeAllModals, updateSupportId]);
 
   useEffect(() => {
+    if (!zkAccount) return;
     updatePoolData();
-  }, [updatePoolData, currentPool]);
+  }, [updatePoolData, currentPool, zkAccount]);
 
   // Load data for all pools when zkAccount is set (after login)
   useEffect(() => {
@@ -717,10 +719,12 @@ export const ZkAccountContextProvider = ({ children }) => {
   // Note: updatePoolData and loadMinTxAmount are intentionally omitted to only trigger on login/logout
 
   useEffect(() => {
+    if (!zkAccount) return;
     loadMinTxAmount();
-  }, [loadMinTxAmount, currentPool]);
+  }, [loadMinTxAmount, currentPool, zkAccount]);
 
   useEffect(() => {
+    if (!zkAccount) return;
     if (isPending || isPendingIncoming || giftCardTxHash || pendingDirectDeposits.length > 0) {
       if (giftCardTxHash) {
         const tx = history.find(item => item.txHash === giftCardTxHash);
@@ -742,7 +746,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       return () => clearInterval(intervalId);
     }
   }, [
-    isPending, isPendingIncoming, updatePoolData, updateTokenBalance,
+    zkAccount, isPending, isPendingIncoming, updatePoolData, updateTokenBalance,
     giftCardTxHash, history, pendingDirectDeposits,
   ]);
 

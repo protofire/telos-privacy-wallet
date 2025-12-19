@@ -6,7 +6,6 @@ import { ethers } from 'ethers';
 
 import { RefreshCcwIcon } from 'lucide-react';
 import Link from 'components/Link';
-import Button from 'components/Button';
 import AddressWithCopy from 'components/AdressWithCopy';
 import OptionButtonDefault from 'components/OptionButton';
 import PortfolioTable from 'components/PortfolioTable';
@@ -34,8 +33,12 @@ export default () => {
     openWalletModal();
   }
 
-  const handleLogout = () => {
-    disconnect();
+  const handleLogout = async () => {
+    try {
+      await disconnect();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   }
 
   const goToDeposit = useCallback((tokenSymbol) => {
@@ -118,11 +121,6 @@ export default () => {
     return tableRows.some(row => row.balance && row.balance.gt(0));
   }, [tableRows]);
 
-  if (!account) {
-    return <ConnectWalletWrapper>
-      <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>;
-  }
-
   return (
     <Container>
       <HeaderContainer>
@@ -178,14 +176,7 @@ const WalletConnectorIcon = styled.img`
   height: 46px;
 `;
 
-const ConnectWalletWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  gap: 16px;
-`;
+
 
 
 const HeaderContainer = styled.div`

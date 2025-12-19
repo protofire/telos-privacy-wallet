@@ -70,9 +70,10 @@ const Content = ({
   //   }
   // }, [initializeGiftCard, close]);
 
-  const handleOptionClick = useCallback(actions => {
+  const handleOptionClick = useCallback(async ([logout, disconnect]) => {
     close();
-    actions.forEach(action => action());
+    await disconnect();
+    await logout();
   }, [close]);
 
   // if (showQRCode) {

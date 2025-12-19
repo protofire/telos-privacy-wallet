@@ -23,7 +23,7 @@ const config = {
         chainId: 40,
         poolAddress: '0xB5340818eE78D6221f631495346E2e55DA5BcA58',
         tokenAddress: '0xD102cE6A4dB07D247fcc28F366A623Df0938CA9E',
-        relayerUrls: ['https://d27792kvwtl6y7.cloudfront.net/'],
+        relayerUrls: ['https://dsw2020napxes.cloudfront.net/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: '',
         tokenSymbol: 'TLOS',
@@ -33,6 +33,20 @@ const config = {
         addressPrefix: '',
         parameters: 'prod',
         isNative: true,
+      },
+      'tlos_usdce': {
+        chainId: 40,
+        poolAddress: '0xe47A4F0099cA16d61C678Dc75911F91e11deDAa3',
+        tokenAddress: '0xF1815bd50389c46847f0Bda824eC8da914045D14',
+        relayerUrls: ['https://d39zrx7k37xhn.cloudfront.net/'],
+        delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
+        coldStorageConfigPath: '',
+        tokenSymbol: 'USDC.e',
+        tokenDecimals: 6,
+        feeDecimals: 2,
+        depositScheme: 'approve',
+        addressPrefix: '',
+        parameters: 'prod',
       }
     },
     chains: {
@@ -42,11 +56,11 @@ const config = {
     },
     "snarkParamsSet": {
       "prod": isElectron() ? {
-        transferParamsUrl: assetURL('assets/transfer_params.bin'),
-        transferVkUrl: assetURL('assets/transfer_verification_key.json'),
+        transferParamsUrl: assetURL('assets/transfer_params_prod.bin'),
+        transferVkUrl: assetURL('assets/transfer_verification_key_prod.json'),
       } : {
-        transferParamsUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_params.bin',
-        transferVkUrl: 'https://telos-privacy-params.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
+        transferParamsUrl: 'https://telos-privacy-params-prod.s3.us-east-2.amazonaws.com/transfer_params.bin',
+        transferVkUrl: 'https://telos-privacy-params-prod.s3.us-east-2.amazonaws.com/transfer_verification_key.json',
       }
     }
   },
@@ -57,7 +71,7 @@ const config = {
         chainId: 41,
         poolAddress: '0x88BFa2463b43c3F25524aA16C1843fb3C18f25a3',
         tokenAddress: '0x28d1BCc58E6Cd0270F45b63e4FFd13b3fF5E98af',
-        relayerUrls: ['https://d3stlx22yc25rg.cloudfront.net/'],
+        relayerUrls: ['https://dj52jwsv8mae.cloudfront.net/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: '',
         tokenSymbol: 'PUSD',
@@ -71,7 +85,7 @@ const config = {
         chainId: 41,
         poolAddress: '0x468585bfAeb2D2d84DD5b27750dD55CF65F3347f',
         tokenAddress: '0xaE85Bf723A9e74d6c663dd226996AC1b8d075AA9',
-        relayerUrls: ['https://d27792kvwtl6y7.cloudfront.net/'],
+        relayerUrls: ['https://d3fpdfo0byy8s8.cloudfront.net/'],
         delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
         coldStorageConfigPath: '',
         tokenSymbol: 'TLOS',

@@ -9,8 +9,9 @@ import PublicAccount from 'components/PublicAccount';
 import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
 import Skeleton from 'components/Skeleton';
+import Button from 'components/Button';
 
-import { ZkAccountContext, PoolContext, WalletContext } from 'contexts';
+import { ZkAccountContext, PoolContext, WalletContext, ModalContext } from 'contexts';
 
 import { ShieldCheckIcon, GlobeIcon } from 'lucide-react';
 
@@ -20,6 +21,7 @@ export default () => {
   const location = useLocation();
   const { availablePools } = useContext(PoolContext);
   const { address: account } = useContext(WalletContext);
+  const { openWalletModal } = useContext(ModalContext);
   const {
     histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
@@ -81,15 +83,20 @@ export default () => {
         </Card>
       </CardsContainer>
 
-      {account && (<CardsContainer>
+      {zkAccount && <CardsContainer>
         <Card
           title={t('home.publicAccount')}
           icon={<GlobeIcon />}
           titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
         >
-          <PublicAccount />
+          {account && <PublicAccount />}
+          {!account &&
+            <ConnectWalletWrapper>
+              <Button onClick={openWalletModal} style={{ padding: '8px' }}>{t('buttonText.connectWallet')}</Button></ConnectWalletWrapper>
+          }
         </Card>
-      </CardsContainer>)}
+      </CardsContainer>
+      }
 
       {zkAccount && (<CardsContainer>
         <Card>
@@ -154,3 +161,11 @@ const ContentContainer = styled.div`
   }
 `;
 
+const ConnectWalletWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 16px;
+`;

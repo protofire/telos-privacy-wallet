@@ -555,8 +555,8 @@ export class ZkBobClient extends ZkBobProvider {
     // Only handle naked addresses (no prefix support)
     if (NAKED_ADDR_REGEX.test(address)) {
       const poolId = await this.poolId();
-      if (poolId === 1 || poolId === 2) {
-        // Telos testnet pools
+      // TODO: All our pools are between 40001 and 40002
+      if (poolId === 40001 || poolId === 40002) {
         format = ShieldedAddressFormat.PoolSpecific;
       } else {
         format = ShieldedAddressFormat.Generic; // Fallback for other pools
@@ -593,8 +593,10 @@ export class ZkBobClient extends ZkBobProvider {
         // For pool-specific addresses, verify poolId matches current pool
         try {
           const components = await this.zpState().parseAddress(address);
+
           if (components.format === "pool") {
             const currentPoolId = await this.poolId();
+
             // Verify poolId matches
             if (components.pool_id !== currentPoolId.toString()) {
               return false; // Address belongs to different pool

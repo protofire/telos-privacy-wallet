@@ -39,6 +39,7 @@ const telos = {
     symbol: 'TLOS',
   },
   rpcUrls: {
+    public: { http: ['https://rpc.telos.net'] },
     default: { http: ['https://rpc.telos.net'] },
   },
   blockExplorers: {
