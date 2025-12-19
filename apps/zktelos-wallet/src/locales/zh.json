@@ -271,9 +271,9 @@
       "title": "使用助记词恢复",
       "description": "输入您保存的助记词以恢复现有账户"
     },
-    "createPin": {
+    "createPassword": {
       "title": "保护您的账户",
-      "description": "设置PIN以在本地加密您的助记词。这增加了一层额外的安全性。"
+      "description": "设置密码以在本地加密您的助记词。这增加了一层额外的安全性。"
     },
     "createWithSecret": {
       "title": "保存您的助记词",
@@ -294,43 +294,31 @@
       "description": "使用已连接的钱包登入您的zk账户。"
     }
   },
-  "pin": {
-    "helper": "可用方向键导航或粘贴代码",
-    "success": "PIN 已通过",
-    "error": "PIN 无效，请重试",
-    "error.length": "PIN 需正好4位数字",
-    "error.digits": "仅支持数字",
-    "error.match": "两次 PIN 必须一致",
-    "error.invalid": "PIN 不正确，请重试"
+  "password": {
+    "placeholder1": "密码 6+ 字符",
+    "placeholder2": "验证密码",
+    "rule1": "请输入 6 或更多字符",
+    "rule2": "至少一个大写字母",
+    "rule3": "至少一个小写字母",
+    "rule4": "至少一个数字",
+    "rule5": "至少一个特殊字符",
+    "rule6": "密码必须匹配"
   },
   "enterPasswordModal": {
     "title": "输入密码",
     "description": "$t(accountSetupModal.createPin.description)",
     "lostPassword": "忘记密码？点击此处恢复"
   },
-  "enterPinModal": {
-    "title": "解锁zk账户",
-    "description": "输入您的PIN以解锁您的zk账户",
-    "lostPin": "忘记PIN？点击此处恢复"
-  },
   "setPasswordModal": {
     "title": "设置密码"
-  },
-  "setPinModal": {
-    "title": "设置PIN",
-    "description": "设置PIN以在本地加密您的助记词。这增加了一层额外的安全性。"
   },
   "confirmLogoutModal": {
     "title": "登出并清除浏览记录",
     "description": "登出后，您的zk账户信息将从缓存中移除，您将无法使用密码再次访问，请使用助记词和新密码以恢复账户和显示余额。"
   },
-  "disablePasswordModal": {
+    "disablePasswordModal": {
     "title": "停用密码",
     "description": "请输入现用密码"
-  },
-  "disablePinModal": {
-    "title": "停用PIN",
-    "description": "请输入现用PIN"
   },
   "demoCard": {
     "title": "测试版",

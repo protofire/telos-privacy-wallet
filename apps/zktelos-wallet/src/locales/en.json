@@ -271,9 +271,9 @@
       "title": "Restore with Seedphrase",
       "description": "Input your saved secret phrase to restore an existing account"
     },
-    "createPin": {
+    "createPassword": {
       "title": "Protect your account",
-      "description": "Set a PIN to encrypt your seed phrase locally. This adds an extra layer of security."
+      "description": "Set a password to encrypt your seed phrase locally. This adds an extra layer of security."
     },
     "createWithSecret": {
       "title": "Save Your Seed Phrase",
@@ -294,30 +294,23 @@
       "description": "Accessing your zkAccount with your connected wallet."
     }
   },
-  "pin": {
-    "helper": "You can use arrow keys to navigate or paste the code",
-    "error": "Invalid PIN, try again",
-    "error.length": "PIN must be exactly 4 digits",
-    "error.digits": "Use digits only",
-    "error.match": "PINs must match",
-    "error.invalid": "Incorrect PIN. Try again"
+  "password": {
+    "placeholder1": "Password 6+ characters",
+    "placeholder2": "Verify password",
+    "rule1": "Please enter 6 or more characters",
+    "rule2": "At least one uppercase letter",
+    "rule3": "At least one lowercase letter",
+    "rule4": "At least one digit",
+    "rule5": "At least one special character",
+    "rule6": "Password should match"
   },
   "enterPasswordModal": {
     "title": "Enter password",
-    "description": "$t(accountSetupModal.createPin.description)",
+    "description": "$t(accountSetupModal.createPassword.description)",
     "lostPassword": "Lost password? Click here to restore access"
-  },
-  "enterPinModal": {
-    "title": "Unlock zkAccount",
-    "description": "Enter your PIN to unlock your zkAccount",
-    "lostPin": "Lost PIN? Click here to restore access"
   },
   "setPasswordModal": {
     "title": "Set password"
-  },
-  "setPinModal": {
-    "title": "Set PIN",
-    "description": "Set a PIN to encrypt your seed phrase locally. This adds an extra layer of security."
   },
   "confirmLogoutModal": {
     "title": "Log out and clear browsing data",
@@ -326,10 +319,6 @@
   "disablePasswordModal": {
     "title": "Disable password",
     "description": "Please enter the current password"
-  },
-  "disablePinModal": {
-    "title": "Disable PIN",
-    "description": "Please enter the current PIN"
   },
   "demoCard": {
     "title": "Demo version",

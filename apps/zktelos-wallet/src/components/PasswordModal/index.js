@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import Button from 'components/Button';
 import Modal from 'components/Modal';
-import PinInput from 'components/PinInput';
+import Input from 'components/Input';
 
 export default ({
-  isOpen, confirm, reset, pin, isLoading,
-  onPinChange, errorKey, successMessage, isAccountSetUpModalOpen
+  isOpen, confirm, reset, password, isLoading,
+  onPasswordChange, error, isAccountSetUpModalOpen
 }) => {
   const { t } = useTranslation();
   const handleKeyPress = useCallback(event => {
@@ -17,31 +17,29 @@ export default ({
     }
   }, [confirm]);
 
-  const helper = successMessage || (errorKey ? t(errorKey) : t('pin.helper'));
 
   return (
     <Modal
       isOpen={isOpen}
-      title={t('enterPinModal.title')}
+      title={t('enterPasswordModal.title')}
       containerStyle={{ visibility: isAccountSetUpModalOpen ? 'hidden' : 'visible' }}
     >
       <Container onKeyPress={handleKeyPress}>
         <Description>
-          {t('enterPinModal.description')}
+          {t('enterPasswordModal.description')}
         </Description>
-        <PinInput
+        <Input
           autoFocus
-          value={pin}
-          onChange={onPinChange}
-          error={!!errorKey}
-          success={!!successMessage}
-          helperText={helper}
-          disabled={isLoading}
+          type="password"
+          placeholder={t('common.password')}
+          value={password}
+          onChange={onPasswordChange}
+          error={!!error}
         />
         <Button onClick={confirm} disabled={isLoading}>
           {isLoading ? t('buttonText.signingIn') : t('buttonText.signIn')}
         </Button>
-        <Button type="link" onClick={reset}>{t('enterPinModal.lostPin')}</Button>
+        <Button type="link" onClick={reset}>{t('enterPasswordModal.lostPassword')}</Button>
       </Container>
     </Modal>
   );

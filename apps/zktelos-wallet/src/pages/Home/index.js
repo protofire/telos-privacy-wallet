@@ -10,7 +10,7 @@ import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
 import Skeleton from 'components/Skeleton';
 
-import { ZkAccountContext, PoolContext } from 'contexts';
+import { ZkAccountContext, PoolContext, WalletContext } from 'contexts';
 
 import { ShieldCheckIcon, GlobeIcon } from 'lucide-react';
 
@@ -19,6 +19,7 @@ export default () => {
   const history = useHistory();
   const location = useLocation();
   const { availablePools } = useContext(PoolContext);
+  const { address: account } = useContext(WalletContext);
   const {
     histories, zkAccount, pendingDirectDepositsByPool,
     isLoadingZkAccount, isLoadingHistory,
@@ -80,7 +81,7 @@ export default () => {
         </Card>
       </CardsContainer>
 
-      {zkAccount && (<CardsContainer>
+      {account && (<CardsContainer>
         <Card
           title={t('home.publicAccount')}
           icon={<GlobeIcon />}

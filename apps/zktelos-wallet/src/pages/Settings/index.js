@@ -12,11 +12,9 @@ const Settings = () => {
   const { t } = useTranslation();
   const { themePreference, setThemePreference } = useContext(ThemeContext);
   const { changeLanguage } = useContext(LanguageContext);
-  const { zkAccount, getSeed } = useContext(ZkAccountContext);
+  const { zkAccount } = useContext(ZkAccountContext);
   const {
     openSeedPhraseModal,
-    openChangePasswordModal,
-    openDisablePasswordModal
   } = useContext(ModalContext);
 
   const { i18n } = useTranslation();
@@ -35,7 +33,6 @@ const Settings = () => {
     { code: 'system', label: 'System' },
   ];
 
-  const { hasPassword } = getSeed ? getSeed() : { hasPassword: false };
 
   return (
     <CardContainer>
@@ -75,9 +72,9 @@ const Settings = () => {
               <OptionButton onClick={openSeedPhraseModal}>
                 {t('buttonText.showSecretPhrase')}
               </OptionButton>
-              <OptionButton onClick={hasPassword ? openDisablePasswordModal : openChangePasswordModal}>
+              {/* <OptionButton onClick={hasPassword ? openDisablePasswordModal : openChangePasswordModal}>
                 {hasPassword ? t('buttonText.disablePin') : t('buttonText.setPin')}
-              </OptionButton>
+              </OptionButton> */}
             </ButtonGroup>
           </Section>
         )}
