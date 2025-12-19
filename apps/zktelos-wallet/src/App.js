@@ -51,7 +51,7 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background: ${props => props.theme.background}; /* Cambiado de background-image a background */
+    background: ${props => props.theme.background}; 
   }
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
