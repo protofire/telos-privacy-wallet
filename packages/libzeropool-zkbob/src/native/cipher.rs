@@ -306,7 +306,7 @@ fn _decrypt_in<P: PoolParams>(
     let extra_items_num = u32::deserialize(&mut memo).ok()? as usize;
 
     buf_take(&mut memo, shared_secrets_size)?;
-    let extra_data = (0..extra_items_num)
+    let extra_data = (0..extra_items_num - 1)
         .map(|_| {
             let a_pub = EdwardsPoint::subgroup_decompress(
                 Num::deserialize(&mut memo).ok()?,
@@ -321,10 +321,9 @@ fn _decrypt_in<P: PoolParams>(
             };
 
             //ciphertext size
-            let cipher_data_size = u16::deserialize(&mut memo).ok()? as usize;
+            let cipher_data_size = u32::deserialize(&mut memo).ok()? as usize;
             // ciphertext
             let ciphertext = buf_take(&mut memo, cipher_data_size)?;
-            println!("CIPHERTEXT {:#?}", ciphertext);
             decrypt_user_data_no_validate(&key, ciphertext, params)
         })
         .collect();
@@ -413,7 +412,7 @@ fn symcipher_decryption_keys_user_data<P: PoolParams>(
                 };
 
                 //ciphertext size
-                let cipher_data_size = u16::deserialize(&mut memo).ok()? as usize;
+                let cipher_data_size = u32::deserialize(&mut memo).ok()? as usize;
                 // ciphertext
                 let ciphertext = buf_take(&mut memo, cipher_data_size)?;
                 match decrypt_user_data_no_validate(&key, ciphertext, params) {
@@ -937,13 +936,13 @@ mod tests {
         });
     }
 
-    //#[test_case(0, 0.0, MessageEncryptionType::ECDH)]
-    //#[test_case(1, 0.0, MessageEncryptionType::ECDH)]
-    //#[test_case(1, 1.0, MessageEncryptionType::ECDH)]
-    //#[test_case(3, 0.5, MessageEncryptionType::ECDH)]
-    //#[test_case(10, 0.5, MessageEncryptionType::ECDH)]
-    //#[test_case(15, 0.0, MessageEncryptionType::ECDH)]
-    //#[test_case(30, 1.0, MessageEncryptionType::ECDH)]
+    #[test_case(0, 0.0, MessageEncryptionType::ECDH)]
+    #[test_case(1, 0.0, MessageEncryptionType::ECDH)]
+    #[test_case(1, 1.0, MessageEncryptionType::ECDH)]
+    #[test_case(3, 0.5, MessageEncryptionType::ECDH)]
+    #[test_case(10, 0.5, MessageEncryptionType::ECDH)]
+    #[test_case(15, 0.0, MessageEncryptionType::ECDH)]
+    #[test_case(30, 1.0, MessageEncryptionType::ECDH)]
     #[test_case(42, 0.5, MessageEncryptionType::ECDH)]
     //#[test_case(0, 0.0, MessageEncryptionType::Symmetric)]
     //#[test_case(1, 0.0, MessageEncryptionType::Symmetric)]
