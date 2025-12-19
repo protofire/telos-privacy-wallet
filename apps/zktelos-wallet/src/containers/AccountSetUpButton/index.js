@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 
 import { ModalContext, ZkAccountContext } from 'contexts';
 
-import CreatePrivateAccountButton from 'components/CreatePrivateAccount';
+import Button from 'components/Button';
 
 export default () => {
   const { t } = useTranslation();
   const { openCreateAccountModal } = useContext(ModalContext);
   const { isLoadingZkAccount } = useContext(ZkAccountContext);
   return (
-    <CreatePrivateAccountButton
+    <Button
       loading={isLoadingZkAccount}
       contrast
       disabled={isLoadingZkAccount}
@@ -18,6 +18,6 @@ export default () => {
       data-ga-id="zkaccount-get-started"
     >
       {isLoadingZkAccount ? t('buttonText.loading') : t('buttonText.getStarted')}
-    </CreatePrivateAccountButton>
+    </Button>
   );
 }

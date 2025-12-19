@@ -4,7 +4,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
+import { RefreshCcwIcon } from 'lucide-react';
 import Link from 'components/Link';
 import Button from 'components/Button';
 import AddressWithCopy from 'components/AdressWithCopy';
@@ -29,10 +29,6 @@ export default () => {
   const nativeSymbol = NETWORKS[activeChainId]?.nativeSymbol || 'ETH';
   const nativePrice = priceMap?.get(nativeSymbol) || null;
   const isLoading = isLoadingBalance || isLoadingPrices;
-
-  const getRefreshIcon = () => {
-    return <RenewIcon width={18} height={18} />;
-  }
 
   const handleChangeWallet = () => {
     openWalletModal();
@@ -139,7 +135,7 @@ export default () => {
             </OptionButton>
           </HeaderTitle>
           <AddressWithCopy
-            prefixIcon={getRefreshIcon()}
+            prefixIcon={<RefreshCcwIcon width={16} height={16} />}
             onPrefixClick={handleChangeWallet}
             formatType="0x"
             $noBorder
@@ -191,9 +187,6 @@ const ConnectWalletWrapper = styled.div`
   gap: 16px;
 `;
 
-const RenewIcon = styled(RenewSVGIcon)`
-  cursor: pointer;
-`;
 
 const HeaderContainer = styled.div`
   display: flex;
