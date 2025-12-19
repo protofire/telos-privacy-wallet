@@ -271,9 +271,9 @@
       "title": "Restaurar com Frase Secreta",
       "description": "Digite sua frase secreta salva para restaurar uma conta existente"
     },
-    "createPin": {
+    "createPassword": {
       "title": "Proteja sua conta",
-      "description": "Defina um PIN para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
+      "description": "Defina uma senha para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
     },
     "createWithSecret": {
       "title": "Salve sua Frase Secreta",
@@ -295,32 +295,23 @@
     }
   },
 
-  "pin": {
-
-
-    "helper": "Use as setas para navegar ou cole o código",
-    "error": "PIN inválido, tente novamente",
-    "error.length": "O PIN deve ter exatamente 4 dígitos",
-    "error.digits": "Use apenas dígitos",
-    "error.match": "Os PINs devem coincidir",
-    "error.invalid": "PIN incorreto. Tente novamente"
+  "password": {
+    "placeholder1": "Senha 6+ caracteres",
+    "placeholder2": "Verificar senha",
+    "rule1": "Por favor, insira 6 ou mais caracteres",
+    "rule2": "Pelo menos uma letra maiúscula",
+    "rule3": "Pelo menos uma letra minúscula",
+    "rule4": "Pelo menos um dígito",
+    "rule5": "Pelo menos um caractere especial",
+    "rule6": "A senha deve coincidir"
   },
   "enterPasswordModal": {
     "title": "Digite a senha",
-    "description": "$t(accountSetupModal.createPin.description)",
+    "description": "$t(accountSetupModal.createPassword.description)",
     "lostPassword": "Esqueceu a senha? Clique aqui para recuperar o acesso"
-  },
-  "enterPinModal": {
-    "title": "Desbloquear zkAccount",
-    "description": "Digite seu PIN para desbloquear sua zkAccount",
-    "lostPin": "Esqueceu o PIN? Clique aqui para recuperar o acesso"
   },
   "setPasswordModal": {
     "title": "Definir senha"
-  },
-  "setPinModal": {
-    "title": "Definir PIN",
-    "description": "Defina um PIN para criptografar sua frase secreta localmente. Isso adiciona uma camada extra de segurança."
   },
   "confirmLogoutModal": {
     "title": "Sair e limpar os dados de navegação",

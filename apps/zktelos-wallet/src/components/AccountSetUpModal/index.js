@@ -166,10 +166,10 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
     closeModal();
   }, [newMnemonic, isNewAccount, saveZkAccountMnemonic, closeModal]);
 
-  const handlePasswordSkip = useCallback(() => {
-    saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
-    closeModal();
-  }, [newMnemonic, isNewAccount, saveZkAccountMnemonic, closeModal]);
+  // const handlePasswordSkip = useCallback(() => {
+  //   saveZkAccountMnemonic(newMnemonic, null, isNewAccount);
+  //   closeModal();
+  // }, [newMnemonic, isNewAccount, saveZkAccountMnemonic, closeModal]);
 
   let title = null;
   let component = null;
@@ -203,11 +203,10 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       prevStep = STEP.CREATE_INSTANT;
       break;
     case STEP.SUGGEST_PASSWORD:
-      title = t('accountSetupModal.createPin.title'); // Ensure this key exists or add it
+      title = t('accountSetupModal.createPassword.title');
       component = (
         <Password
           confirmPassword={handlePasswordSet}
-          onSkip={handlePasswordSkip}
         />
       );
       prevStep = null;

@@ -5,7 +5,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import Modal from 'components/Modal';
 import Button from 'components/Button';
 import CopyTextButton from 'components/CopyTextButton';
-import PinInput from 'components/PinInput';
+import Input from 'components/Input';
 import SeedPhrase from 'components/SeedPhrase';
 
 const getUrl = () => {
@@ -20,7 +20,7 @@ const getUrl = () => {
 
 export default ({
   isOpen, onClose, mnemonic,
-  confirm, pin, onPinChange,
+  confirm, password, onPasswordChange,
   onKeyPress, error,
 }) => {
   const { t } = useTranslation();
@@ -58,12 +58,13 @@ export default ({
           </>
         ) : (
           <>
-            <PinInput
+            <Input
               autoFocus
-              value={pin}
-              onChange={onPinChange}
+              type="password"
+              placeholder={t('common.password')}
+              value={password}
+              onChange={onPasswordChange}
               error={!!error}
-              helperText={error ? t('pin.error.invalid') : t('pin.helper')}
             />
             <Button onClick={confirm}>
               {t('buttonText.next')}

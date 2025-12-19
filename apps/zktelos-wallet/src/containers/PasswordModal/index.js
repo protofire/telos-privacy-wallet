@@ -2,7 +2,7 @@ import { useContext, useState, useCallback } from 'react';
 
 import { ModalContext, ZkAccountContext } from 'contexts';
 import PasswordModal from 'components/PasswordModal';
-import usePinValidation from 'hooks/usePinValidation';
+
 
 export default () => {
   const {
@@ -13,49 +13,40 @@ export default () => {
     closePasswordModal
   } = useContext(ModalContext);
   const { unlockAccount, isLoadingZkAccount } = useContext(ZkAccountContext);
-  const [pin, setPin] = useState('');
-  const { validate, errorKey, setErrorKey, resetValidation } = usePinValidation();
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
-  const handlePinChange = useCallback(nextValue => {
-    setErrorKey(null);
-    setPin(nextValue);
-  }, [setErrorKey]);
+  const handlePasswordChange = useCallback(e => {
+    setError(null);
+    setPassword(e.target.value);
+  }, []);
 
   const confirm = useCallback(async () => {
-    if (!validate({ pin })) {
-      return;
-    }
     try {
-      const success = await unlockAccount(pin);
+      const success = await unlockAccount(password);
       if (success) {
-        setPin('');
-        resetValidation();
+        setPassword('');
         closePasswordModal();
-      } else {
-        setErrorKey('pin.error.invalid');
-        setPin('');
       }
     } catch (error) {
-      setErrorKey('pin.error.invalid');
-      setPin('');
+      setError(error);
     }
-  }, [closePasswordModal, pin, resetValidation, setErrorKey, unlockAccount, validate]);
+  }, [password, unlockAccount, closePasswordModal]);
 
   const reset = useCallback(async () => {
-    setPin('');
-    resetValidation();
+    setPassword('');
     openAccessAccountModal();
     closePasswordModal()
-  }, [closePasswordModal, openAccessAccountModal, resetValidation]);
+  }, [closePasswordModal, openAccessAccountModal]);
 
   return (
     <PasswordModal
       isOpen={isPasswordModalOpen}
-      pin={pin}
-      onPinChange={handlePinChange}
+      password={password}
+      onPasswordChange={handlePasswordChange}
       confirm={confirm}
       reset={reset}
-      errorKey={errorKey}
+      error={error}
       isAccountSetUpModalOpen={isAccessAccountModalOpen || isCreateAccountModalOpen}
       isLoading={isLoadingZkAccount}
     />
