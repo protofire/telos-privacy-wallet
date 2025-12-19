@@ -20,7 +20,7 @@ const STEP = {
   ENTER_SEEDPHRASE: 3,
   CREATE_INSTANT: 4,
   CONFIRM_INSTANT: 5,
-  SUGGEST_PASSWORD: 6,
+  REQUEST_PASSWORD: 6,
 };
 
 const AccessAccount = ({ setStep, generate }) => {
@@ -126,13 +126,13 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
 
   const confirmMnemonic = useCallback(() => {
     setIsNewAccount(true);
-    setStep(STEP.SUGGEST_PASSWORD);
+    setStep(STEP.REQUEST_PASSWORD);
   }, []);
 
   const restore = useCallback(mnemonic => {
     setNewMnemonic(mnemonic);
     setIsNewAccount(false);
-    setStep(STEP.SUGGEST_PASSWORD);
+    setStep(STEP.REQUEST_PASSWORD);
   }, []);
 
   const generate = useCallback(async () => {
@@ -153,8 +153,7 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       const isNew = !!mnemonic;
       setNewMnemonic(mnemonic);
       setIsNewAccount(isNew);
-      setStep(STEP.SUGGEST_PASSWORD);
-
+      setStep(STEP.REQUEST_PASSWORD);
     } catch (error) {
       console.error('Error generating account from signature:', error);
       closeModal();
@@ -202,7 +201,7 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       component = <Confirm mnemonic={newMnemonic} confirmMnemonic={confirmMnemonic} />;
       prevStep = STEP.CREATE_INSTANT;
       break;
-    case STEP.SUGGEST_PASSWORD:
+    case STEP.REQUEST_PASSWORD:
       title = t('accountSetupModal.createPassword.title');
       component = (
         <Password

@@ -17,9 +17,23 @@ const assetURL = (relPath) => {
 
 const config = {
   prod: {
-    defaultPool: '',
+    defaultPool: 'tlos_native',
     pools: {
-
+      'tlos_native': {
+        chainId: 40,
+        poolAddress: '0xB5340818eE78D6221f631495346E2e55DA5BcA58',
+        tokenAddress: '0xD102cE6A4dB07D247fcc28F366A623Df0938CA9E',
+        relayerUrls: ['https://d27792kvwtl6y7.cloudfront.net/'],
+        delegatedProverUrls: ['https://prover-staging.thgkjlr.website/'],
+        coldStorageConfigPath: '',
+        tokenSymbol: 'TLOS',
+        tokenDecimals: 18,
+        feeDecimals: 2,
+        depositScheme: 'approve',
+        addressPrefix: '',
+        parameters: 'prod',
+        isNative: true,
+      }
     },
     chains: {
       '40': {
