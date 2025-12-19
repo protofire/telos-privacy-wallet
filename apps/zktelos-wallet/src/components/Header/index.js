@@ -16,7 +16,8 @@ import { EyeIcon, EyeOffIcon, RefreshCcwIcon, ChevronDownIcon, MoonIcon, SunIcon
 import { BalanceVisibilityContext } from 'contexts';
 import ThemeContext from 'contexts/ThemeContext';
 
-import { ReactComponent as LogoDefault } from 'assets/telos-wallet-logo.svg';
+import logo from 'assets/telos-wallet-logo.svg';
+import logoDark from 'assets/telos-wallet-logo-dark.svg';
 
 // import { formatNumber } from 'utils';
 import { NETWORKS } from 'constants';
@@ -71,7 +72,7 @@ export default ({ empty }) => {
     return (
       <Row>
         <LogoSection>
-          <Logo />
+          <img src={theme === 'dark' ? logoDark : logo} alt="Welcome" />
         </LogoSection>
       </Row>
     );
@@ -150,7 +151,7 @@ export default ({ empty }) => {
     <>
       <Row>
         <LogoSection>
-          <Logo onClick={() => history.push('/')} />
+          <img src={theme === 'dark' ? logoDark : logo} alt="wallet logo" onClick={() => history.push('/')} />
         </LogoSection>
         <AccountSection>
           {!isMobile && networkDropdown}
@@ -218,14 +219,15 @@ const OnlyMobile = styled.div`
 
 const LogoSection = styled(Row)`
   justify-content: flex-start;
-`;
-
-const Logo = styled(LogoDefault)`
+  
+  & > img {
+    cursor: pointer;
     height: 35px;
     width: 135px;
     margin-left: 10px;
-    cursor: pointer;
+  }
 `;
+
 
 const AccountSection = styled(Row)`
   justify-content: center;
