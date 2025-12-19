@@ -75,14 +75,6 @@ const PrefixIconWrapper = styled.div`
   align-items: center;
   margin-right: 8px;
   cursor: ${props => props.$clickable ? 'pointer' : 'default'};
-  path {
-    fill: ${props => props.theme.icon.color.default};
-  }
-  &:hover {
-    path {
-      fill: ${props => props.theme.icon.color.hover};
-    }
-  }
 `;
 
 const PrivateAddressContainer = styled.div`
