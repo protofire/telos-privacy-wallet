@@ -139,7 +139,7 @@ install_dependencies() {
         log_info "node_modules exists, running yarn to update if needed..."
     fi
 
-    yarn install
+    yarn install --frozen-lockfile
 
     log_success "Dependencies installed!"
 }
