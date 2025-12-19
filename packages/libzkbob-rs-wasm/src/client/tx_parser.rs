@@ -1,43 +1,36 @@
+use crate::{Account, Note};
 use libzkbob_rs::libzeropool::{
+    constants,
+    fawkes_crypto::ff_uint::{Num, NumRepr, Uint},
     native::{
         account::Account as NativeAccount,
-        note::Note as NativeNote,
         cipher::{
-            self,
-            symcipher_decryption_keys,
-            decrypt_account_no_validate,
-            decrypt_note_no_validate, MessageEncryptionType
+            self, decrypt_account_no_validate, decrypt_note_no_validate, symcipher_decryption_keys,
+            MessageEncryptionType,
         },
-        key::{
-            self,derive_key_p_d
-        }
+        key::{self, derive_key_p_d},
+        note::{ExtraData, Note as NativeNote},
     },
-    fawkes_crypto::ff_uint::{ Num, NumRepr, Uint },
-    constants,
 };
 use libzkbob_rs::{
-    merkle::Hash,
+    delegated_deposit::{MemoDelegatedDeposit, MEMO_DELEGATED_DEPOSIT_SIZE},
     keys::Keys,
+    merkle::Hash,
     utils::zero_account,
-    delegated_deposit::{
-        MEMO_DELEGATED_DEPOSIT_SIZE,
-        MemoDelegatedDeposit
-    }
 };
-use wasm_bindgen::{prelude::*, JsCast};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::iter::IntoIterator;
 use thiserror::Error;
+use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::console;
-use crate::{ Account, Note };
 
 #[cfg(feature = "multicore")]
 use rayon::prelude::*;
 
-use crate::{PoolParams, Fr, IndexedNote, IndexedTx, Fs,
-            ParseTxsResult, POOL_PARAMS, helpers::vec_into_iter,
-            TxMemoChunk,
-        };
+use crate::{
+    helpers::vec_into_iter, Fr, Fs, IndexedNote, IndexedTx, ParseTxsResult, PoolParams,
+    TxMemoChunk, POOL_PARAMS,
+};
 
 #[derive(Debug, Error)]
 pub enum ParseError {
@@ -50,8 +43,8 @@ pub enum ParseError {
 impl ParseError {
     pub fn _index(&self) -> u64 {
         match *self {
-            ParseError::NoPrefix(idx)  => idx,
-            ParseError::IncorrectPrefix(idx,  _, _)  => idx,
+            ParseError::NoPrefix(idx) => idx,
+            ParseError::IncorrectPrefix(idx, _, _) => idx,
         }
     }
 }
@@ -65,7 +58,7 @@ pub struct StateUpdate {
     #[serde(rename = "newAccounts")]
     pub new_accounts: Vec<(u64, NativeAccount<Fr>)>,
     #[serde(rename = "newNotes")]
-    pub new_notes: Vec<Vec<(u64, NativeNote<Fr>)>>
+    pub new_notes: Vec<Vec<(u64, NativeNote<Fr>)>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
@@ -78,6 +71,8 @@ pub struct DecMemo {
     pub out_notes: Vec<IndexedNote>,
     #[serde(rename = "txHash")]
     pub tx_hash: Option<String>,
+
+    pub messages: Vec<ExtraData<Fr>>,
 }
 
 #[derive(Serialize, Default, Debug)]
@@ -85,7 +80,7 @@ pub struct ParseResult {
     #[serde(rename = "decryptedMemos")]
     pub decrypted_memos: Vec<DecMemo>,
     #[serde(rename = "stateUpdate")]
-    pub state_update: StateUpdate
+    pub state_update: StateUpdate,
 }
 #[derive(Serialize, Default)]
 pub struct ParseColdStorageResult {
@@ -115,8 +110,8 @@ pub struct TxParser {
 impl TxParser {
     #[wasm_bindgen(js_name = "new")]
     pub fn new() -> Result<TxParser, JsValue> {
-        Ok(TxParser{
-            params: POOL_PARAMS.clone()
+        Ok(TxParser {
+            params: POOL_PARAMS.clone(),
         })
     }
 
@@ -129,18 +124,25 @@ impl TxParser {
         let eta = keys.eta;
         let kappa = &keys.kappa;
 
-        let txs: Vec<IndexedTx> = serde_wasm_bindgen::from_value(txs.to_owned()).map_err(|err| js_err!(&err.to_string()))?;
+        let txs: Vec<IndexedTx> = serde_wasm_bindgen::from_value(txs.to_owned())
+            .map_err(|err| js_err!(&err.to_string()))?;
 
         let parse_results: Vec<_> = vec_into_iter(txs)
             .map(|tx| -> ParseResult {
-                let IndexedTx{index, memo, commitment} = tx;
+                let IndexedTx {
+                    index,
+                    memo,
+                    commitment,
+                } = tx;
                 let memo = hex::decode(memo).unwrap();
                 let commitment = hex::decode(commitment).unwrap();
-                
+
                 match parse_tx(index, &commitment, &memo, None, &eta, kappa, params) {
                     Ok(res) => res,
                     Err(err) => {
-                        console::log_1(&format!("[WASM TxParser] ERROR: {}", err.to_string()).into());
+                        console::log_1(
+                            &format!("[WASM TxParser] ERROR: {}", err.to_string()).into(),
+                        );
                         // Skip transaction in case of parsing errors (assume it doesn't belongs to the our account)
                         ParseResult {
                             state_update: StateUpdate {
@@ -159,19 +161,37 @@ impl TxParser {
             })
             .collect();
 
-        let parse_result = parse_results
-            .into_iter()
-            .fold(Default::default(), |acc: ParseResult, parse_result| {
-                ParseResult {
-                    decrypted_memos: vec![acc.decrypted_memos, parse_result.decrypted_memos].concat(),
-                    state_update: StateUpdate {
-                        new_leafs: vec![acc.state_update.new_leafs, parse_result.state_update.new_leafs].concat(),
-                        new_commitments: vec![acc.state_update.new_commitments, parse_result.state_update.new_commitments].concat(),
-                        new_accounts: vec![acc.state_update.new_accounts, parse_result.state_update.new_accounts].concat(),
-                        new_notes: vec![acc.state_update.new_notes, parse_result.state_update.new_notes].concat()
+        let parse_result =
+            parse_results
+                .into_iter()
+                .fold(Default::default(), |acc: ParseResult, parse_result| {
+                    ParseResult {
+                        decrypted_memos: vec![acc.decrypted_memos, parse_result.decrypted_memos]
+                            .concat(),
+                        state_update: StateUpdate {
+                            new_leafs: vec![
+                                acc.state_update.new_leafs,
+                                parse_result.state_update.new_leafs,
+                            ]
+                            .concat(),
+                            new_commitments: vec![
+                                acc.state_update.new_commitments,
+                                parse_result.state_update.new_commitments,
+                            ]
+                            .concat(),
+                            new_accounts: vec![
+                                acc.state_update.new_accounts,
+                                parse_result.state_update.new_accounts,
+                            ]
+                            .concat(),
+                            new_notes: vec![
+                                acc.state_update.new_notes,
+                                parse_result.state_update.new_notes,
+                            ]
+                            .concat(),
+                        },
                     }
-                }
-        });
+                });
 
         let parse_result = serde_wasm_bindgen::to_value(&parse_result)
             .unwrap()
@@ -193,43 +213,52 @@ impl TxParser {
         let kappa = keys.kappa;
         //(index, chunk, key)
         let result = symcipher_decryption_keys(eta, &kappa, memo, &self.params).unwrap_or(vec![]);
-    
+
         let chunks = result
-        .iter()
-        .map(|(chunk_idx, chunk, key)| {
-            let res = MemoChunk {
-                index: index + chunk_idx,
-                encrypted: chunk.clone(),
-                key: key.clone()
-            };
+            .iter()
+            .map(|(chunk_idx, chunk, key)| {
+                let res = MemoChunk {
+                    index: index + chunk_idx,
+                    encrypted: chunk.clone(),
+                    key: key.clone(),
+                };
 
-            serde_wasm_bindgen::to_value(&res)
-                .unwrap()
-                .unchecked_into::<TxMemoChunk>()
-        })
-        .collect();
-        
+                serde_wasm_bindgen::to_value(&res)
+                    .unwrap()
+                    .unchecked_into::<TxMemoChunk>()
+            })
+            .collect();
+
         Ok(chunks)
-
     }
 
     #[wasm_bindgen(js_name = "symcipherDecryptAcc")]
-    pub fn symcipher_decrypt_acc(&self, sym_key: &[u8], encrypted: &[u8] ) -> Result<Account, JsValue> {
+    pub fn symcipher_decrypt_acc(
+        &self,
+        sym_key: &[u8],
+        encrypted: &[u8],
+    ) -> Result<Account, JsValue> {
         let acc = decrypt_account_no_validate(sym_key, encrypted, &self.params)
-                                .ok_or_else(|| js_err!("Unable to decrypt account"))?;
-        
-        Ok(serde_wasm_bindgen::to_value(&acc).unwrap().unchecked_into::<Account>())
+            .ok_or_else(|| js_err!("Unable to decrypt account"))?;
+
+        Ok(serde_wasm_bindgen::to_value(&acc)
+            .unwrap()
+            .unchecked_into::<Account>())
     }
 
     #[wasm_bindgen(js_name = "symcipherDecryptNote")]
-    pub fn symcipher_decrypt_note(&self, sym_key: &[u8], encrypted: &[u8] ) -> Result<Note, JsValue> {
+    pub fn symcipher_decrypt_note(
+        &self,
+        sym_key: &[u8],
+        encrypted: &[u8],
+    ) -> Result<Note, JsValue> {
         let note = decrypt_note_no_validate(sym_key, encrypted, &self.params)
-                                .ok_or_else(|| js_err!("Unable to decrypt note"))?;
-        
-        Ok(serde_wasm_bindgen::to_value(&note).unwrap().unchecked_into::<Note>())
+            .ok_or_else(|| js_err!("Unable to decrypt note"))?;
+
+        Ok(serde_wasm_bindgen::to_value(&note)
+            .unwrap()
+            .unchecked_into::<Note>())
     }
-
-
 }
 
 pub fn parse_tx(
@@ -257,8 +286,8 @@ pub fn parse_tx(
     }
 
     match enc_type {
-        
-        MessageEncryptionType::Plain => {// Special case: transaction contains delegated deposits
+        MessageEncryptionType::Plain => {
+            // Special case: transaction contains delegated deposits
             let num_deposits = num_items as usize;
 
             let delegated_deposits = memo[4..]
@@ -330,7 +359,8 @@ pub fn parse_tx(
 
             return Ok(parse_result);
         }
-        MessageEncryptionType::Symmetric | MessageEncryptionType::ECDH => {// regular case: simple transaction memo
+        MessageEncryptionType::Symmetric | MessageEncryptionType::ECDH => {
+            // regular case: simple transaction memo
             let num_hashes = num_items;
             let hashes = (&memo[4..])
                 .chunks(32)
@@ -340,7 +370,7 @@ pub fn parse_tx(
             let pair = cipher::decrypt_out(*eta, kappa, &memo, params);
 
             match pair {
-                Some((account, notes)) => {
+                Some((account, notes, messages)) => {
                     let mut in_notes = Vec::new();
                     let mut out_notes = Vec::new();
                     notes.into_iter().enumerate().for_each(|(i, note)| {
@@ -370,6 +400,7 @@ pub fn parse_tx(
                                 Some(bytes) => Some(format!("0x{}", hex::encode(bytes))),
                                 _ => None,
                             },
+                            messages,
                             ..Default::default()
                         }],
                         state_update: StateUpdate {
@@ -381,7 +412,8 @@ pub fn parse_tx(
                     })
                 }
                 None => {
-                    let in_notes: Vec<(_, _)> = cipher::decrypt_in(*eta, &memo, params)
+                    let (notes, messages) = cipher::decrypt_in(*eta, &memo, params);
+                    let in_notes: Vec<(_, _)> = notes
                         .into_iter()
                         .enumerate()
                         .filter_map(|(i, note)| match note {

@@ -157,6 +157,7 @@ export interface DecryptedMemo {
     acc: Account | undefined;
     inNotes:  { note: Note, index: number }[];
     outNotes: { note: Note, index: number }[];
+    messages: { to: String, data: Uint8Array }[];
     txHash: string | undefined;
 }
 

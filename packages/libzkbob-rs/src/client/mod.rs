@@ -1,11 +1,9 @@
 use kvdb::KeyValueDB;
 use libzeropool::{
     constants,
-    fawkes_crypto::ff_uint::PrimeField,
     fawkes_crypto::{
         core::sizedvec::SizedVec,
-        ff_uint::Num,
-        ff_uint::{NumRepr, Uint},
+        ff_uint::{Num, NumRepr, PrimeField, Uint},
         rand::Rng,
     },
     native::{
@@ -13,7 +11,7 @@ use libzeropool::{
         boundednum::BoundedNum,
         cipher,
         key::derive_key_p_d,
-        note::Note,
+        note::{ExtraData, Note},
         params::PoolParams,
         tx::{
             make_delta, nullifier, nullifier_intermediate_hash, out_commitment_hash, tx_hash,
@@ -96,14 +94,8 @@ pub struct TxOperator<Fr: PrimeField> {
     pub prover_fee: TokenAmount<Fr>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ExtraItem {
-    pub to: String,    // whom to share this data with
-    pub data: Vec<u8>, // the data
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ExtraItemData<Fr: PrimeField> {
+pub struct ExtraItem<Fr: PrimeField> {
     pub d: BoundedNum<Fr, { constants::DIVERSIFIER_SIZE_BITS }>,
     pub p_d: Num<Fr>,
     pub data: Vec<u8>,
@@ -132,13 +124,13 @@ impl<Fr: PrimeField> TxOperator<Fr> {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TxType<Fr: PrimeField> {
     // operator, extra_data, tx_outputs
-    Transfer(TxOperator<Fr>, Vec<ExtraItem>, Vec<TxOutput<Fr>>),
+    Transfer(TxOperator<Fr>, Vec<ExtraItem<Fr>>, Vec<TxOutput<Fr>>),
     // operator, extra_data, deposit_amount
-    Deposit(TxOperator<Fr>, Vec<ExtraItem>, TokenAmount<Fr>),
+    Deposit(TxOperator<Fr>, Vec<ExtraItem<Fr>>, TokenAmount<Fr>),
     // operator, extra_data, deposit_amount, deadline, holder
     DepositPermittable(
         TxOperator<Fr>,
-        Vec<ExtraItem>,
+        Vec<ExtraItem<Fr>>,
         TokenAmount<Fr>,
         u64,
         Vec<u8>,
@@ -146,7 +138,7 @@ pub enum TxType<Fr: PrimeField> {
     // operator, extra_data, withdraw_amount, to, native_amount, energy_amount
     Withdraw(
         TxOperator<Fr>,
-        Vec<ExtraItem>,
+        Vec<ExtraItem<Fr>>,
         TokenAmount<Fr>,
         Vec<u8>,
         TokenAmount<Fr>,
@@ -294,12 +286,13 @@ where
 
     /// Attempts to decrypt notes.
     pub fn decrypt_notes(&self, data: Vec<u8>) -> Vec<Option<Note<P::Fr>>> {
-        cipher::decrypt_in(self.keys.eta, &data, &self.params)
+        cipher::decrypt_in(self.keys.eta, &data, &self.params).0
     }
 
     /// Attempts to decrypt account and notes.
     pub fn decrypt_pair(&self, data: Vec<u8>) -> Option<(Account<P::Fr>, Vec<Note<P::Fr>>)> {
-        cipher::decrypt_out(self.keys.eta, &self.keys.kappa, &data, &self.params)
+        let res = cipher::decrypt_out(self.keys.eta, &self.keys.kappa, &data, &self.params)?;
+        Some((res.0, res.1))
     }
 
     pub fn initial_account(&self) -> Account<P::Fr> {
@@ -381,7 +374,7 @@ where
                 .unwrap_or_else(|| self.state.tree.next_index())
         }));
 
-        let (fee, tx_data, raw_user_data) = {
+        let (fee, tx_data, user_data) = {
             let mut tx_data: Vec<u8> = vec![];
             match &tx {
                 TxType::Deposit(operator, user_data, _) => {
@@ -410,28 +403,6 @@ where
                 }
             }
         };
-
-        let user_data: Vec<ExtraItemData<P::Fr>> = raw_user_data
-            .iter()
-            .map(|data| {
-                let (to_d, to_p_d, _) =
-                    parse_address::<P>(&data.to, &self.params, self.pool_id).unwrap();
-                ExtraItemData {
-                    d: to_d,
-                    p_d: to_p_d,
-                    data: data.data.clone(),
-                }
-            })
-            .collect();
-        //let user_data_ciphertext = {
-            //let entropy: [u8; 32] = rng.gen();
-            //let item_data = user_data.as_slice();
-
-            //match self.is_obsolete_pool {
-                //true => cipher::_encrypt_old_user_data(&entropy, keys.eta, item_data, &self.params), // ECDH scheme
-                //false => panic!("encrypt_user_data: not implemented"),
-            //}
-        //};
 
         // Optimistic available notes
         let optimistic_available_notes = extra_state
@@ -468,37 +439,55 @@ where
 
         let mut output_value = Num::ZERO;
 
-        let (num_real_out_notes, out_notes): (_, SizedVec<_, { constants::OUT }>) =
-            if let TxType::Transfer(_, _, outputs) = &tx {
-                if outputs.len() > constants::OUT {
-                    return Err(CreateTxError::TooManyOutputs {
-                        max: constants::OUT,
-                        got: outputs.len(),
-                    });
-                }
+        let (num_real_out_notes, out_notes, messages): (
+            _,
+            SizedVec<_, { constants::OUT }>,
+            Vec<ExtraData<P::Fr>>,
+        ) = if let TxType::Transfer(_, extra_data, outputs) = &tx {
+            if outputs.len() > constants::OUT {
+                return Err(CreateTxError::TooManyOutputs {
+                    max: constants::OUT,
+                    got: outputs.len(),
+                });
+            }
 
-                let out_notes = outputs
-                    .iter()
-                    .map(|dest| {
-                        let (to_d, to_p_d, _) =
-                            parse_address::<P>(&dest.to, &self.params, self.pool_id)?;
-                        output_value += dest.amount.to_num();
-                        Ok(Note {
-                            d: to_d,
-                            p_d: to_p_d,
-                            b: dest.amount,
-                            t: rng.gen(),
-                        })
+            let out_notes = outputs
+                .iter()
+                .map(|dest| {
+                    let (to_d, to_p_d, _) =
+                        parse_address::<P>(&dest.to, &self.params, self.pool_id)?;
+                    output_value += dest.amount.to_num();
+                    Ok(Note {
+                        d: to_d,
+                        p_d: to_p_d,
+                        b: dest.amount,
+                        t: rng.gen(),
                     })
-                    // fill out remaining output notes with zeroes
-                    .chain((0..).map(|_| Ok(zero_note())))
-                    .take(constants::OUT)
-                    .collect::<Result<SizedVec<_, { constants::OUT }>, CreateTxError>>()?;
+                })
+                // fill out remaining output notes with zeroes
+                .chain((0..).map(|_| Ok(zero_note())))
+                .take(constants::OUT)
+                .collect::<Result<SizedVec<_, { constants::OUT }>, CreateTxError>>()?;
 
-                (outputs.len(), out_notes)
-            } else {
-                (0, (0..).map(|_| zero_note()).take(constants::OUT).collect())
-            };
+            let messages = extra_data
+                .iter()
+                .filter_map(|msg| {
+                    Some(ExtraData {
+                        d: msg.d,
+                        p_d: msg.p_d,
+                        data: msg.data.clone(),
+                    })
+                })
+                .collect();
+
+            (outputs.len(), out_notes, messages)
+        } else {
+            (
+                0,
+                (0..).map(|_| zero_note()).take(constants::OUT).collect(),
+                vec![],
+            )
+        };
 
         let mut delta_value = -fee;
         // By default all account energy will be withdrawn on withdraw tx
@@ -577,7 +566,20 @@ where
 
             match self.is_obsolete_pool {
                 true => {
-                    cipher::_encrypt_old(&entropy, keys.eta, out_account, out_notes, &self.params)
+                    let mut cipher = cipher::_encrypt_old(
+                        &entropy,
+                        keys.eta,
+                        out_account,
+                        out_notes,
+                        &self.params,
+                    );
+                    cipher.extend(cipher::_encrypt_old_user_data(
+                        &entropy,
+                        keys.eta,
+                        messages.as_slice(),
+                        &self.params,
+                    ));
+                    cipher
                 } // ECDH scheme
                 false => {
                     cipher::encrypt(&entropy, &keys.kappa, out_account, out_notes, &self.params)
@@ -644,10 +646,7 @@ where
             let tx_data_size = tx_data.len();
             let ciphertext_size_size = if self.is_obsolete_pool { 0 } else { 2 };
             let ciphertext_size = ciphertext.len();
-            let user_data_size = 0; //user_data.len();
-            Vec::with_capacity(
-                tx_data_size + ciphertext_size_size + ciphertext_size + user_data_size,
-            )
+            Vec::with_capacity(tx_data_size + ciphertext_size_size + ciphertext_size)
         };
 
         #[allow(clippy::redundant_clone)]
@@ -657,8 +656,6 @@ where
             memo_data.extend((ciphertext.len() as u16).to_be_bytes());
         }
         memo_data.extend(&ciphertext);
-        // TODO: append extra data here!
-        //
 
         let memo_hash = keccak256(&memo_data);
         let memo = Num::from_uint_reduced(NumRepr(Uint::from_big_endian(&memo_hash)));

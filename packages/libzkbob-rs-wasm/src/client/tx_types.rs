@@ -58,16 +58,7 @@ impl JsTxType for IDepositData {
             prover_fee: base_fields.prover_fee,
         };
 
-        let extra = base_fields
-            .data
-            .into_iter()
-            .map(|item| ExtraItem {
-                to: item.to,
-                data: item.data,
-            })
-            .collect::<Vec<_>>();
-
-        Ok(NativeTxType::Deposit(operator, extra, amount))
+        Ok(NativeTxType::Deposit(operator, vec![], amount))
     }
 }
 
@@ -98,18 +89,9 @@ impl JsTxType for IDepositPermittableData {
             prover_fee: base_fields.prover_fee,
         };
 
-        let extra = base_fields
-            .data
-            .into_iter()
-            .map(|item| ExtraItem {
-                to: item.to,
-                data: item.data,
-            })
-            .collect::<Vec<_>>();
-
         Ok(NativeTxType::DepositPermittable(
             operator,
-            extra,
+            vec![],
             amount,
             deadline.parse::<u64>().unwrap_or(0),
             holder,
@@ -157,7 +139,8 @@ impl JsTxType for ITransferData {
             .data
             .into_iter()
             .map(|item| ExtraItem {
-                to: item.to,
+                d: item.d,
+                p_d: item.p_d,
                 data: item.data,
             })
             .collect::<Vec<_>>();
@@ -195,18 +178,9 @@ impl JsTxType for IWithdrawData {
             prover_fee: base_fields.prover_fee,
         };
 
-        let extra = base_fields
-            .data
-            .into_iter()
-            .map(|item| ExtraItem {
-                to: item.to,
-                data: item.data,
-            })
-            .collect::<Vec<_>>();
-
         Ok(NativeTxType::Withdraw(
             operator,
-            extra,
+            vec![],
             amount,
             to,
             native_amount,
