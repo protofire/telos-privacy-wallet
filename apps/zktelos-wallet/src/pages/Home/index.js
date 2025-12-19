@@ -8,10 +8,9 @@ import LatestTransactions from 'components/LatestTransactions';
 import PublicAccount from 'components/PublicAccount';
 import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
-import CreatePrivateAccountButton from 'components/CreatePrivateAccount';
 import Skeleton from 'components/Skeleton';
 
-import { ZkAccountContext, WalletContext, ModalContext, PoolContext } from 'contexts';
+import { ZkAccountContext, PoolContext } from 'contexts';
 
 import { ShieldCheckIcon, GlobeIcon } from 'lucide-react';
 
@@ -19,8 +18,6 @@ export default () => {
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
-  const { address: account } = useContext(WalletContext);
-  const { openCreateAccountModal } = useContext(ModalContext);
   const { availablePools } = useContext(PoolContext);
   const {
     histories, zkAccount, pendingDirectDepositsByPool,
@@ -61,70 +58,56 @@ export default () => {
     history.push('/history' + location.search);
   };
 
+  if (isLoading && !zkAccount) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Skeleton width="480px" height="150px" />
+        <Skeleton width="480px" height="150px" />
+        <Skeleton width="480px" height="150px" />
+      </div>
+    );
+  }
+
   return (
     <ContentContainer>
-      {(!account && !zkAccount) && (
-        <CardsContainer>
-          <Card title={t('home.titleOffline')}>
-            <EmptyPortfolioContainer>
-              <EmptyPortfolioText>{t('home.description')}</EmptyPortfolioText>
-              <CreatePrivateAccountButton onClick={openCreateAccountModal}>
-                {t('common.createPrivateAccount')}
-              </CreatePrivateAccountButton>
-            </EmptyPortfolioContainer>
-          </Card>
-        </CardsContainer>
-      )}
+      <CardsContainer>
+        <Card
+          title={t('home.privateAccount')}
+          icon={<ShieldCheckIcon />}
+          titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
+        >
+          <PrivateAccount />
+        </Card>
+      </CardsContainer>
 
-      {(isLoading && !zkAccount) && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Skeleton width="480px" height="150px" />
-          <Skeleton width="480px" height="150px" />
-          <Skeleton width="480px" height="150px" />
-        </div>
-      )}
+      {zkAccount && (<CardsContainer>
+        <Card
+          title={t('home.publicAccount')}
+          icon={<GlobeIcon />}
+          titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
+        >
+          <PublicAccount />
+        </Card>
+      </CardsContainer>)}
 
-      {zkAccount && (
-        <>
-          <CardsContainer>
-            <Card
-              title={t('home.privateAccount')}
-              icon={<ShieldCheckIcon />}
-              titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
-            >
-              <PrivateAccount />
-            </Card>
-          </CardsContainer>
-
-          <CardsContainer>
-            <Card
-              title={t('home.publicAccount')}
-              icon={<GlobeIcon />}
-              titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
-            >
-              <PublicAccount />
-            </Card>
-          </CardsContainer>
-
-          <CardsContainer>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('home.latestTransactions')}</CardTitle>
-                {!isLatest5HistoryEmpty && (
-                  <ViewAllLink onClick={handleViewAll}>
-                    {t('latestAction.viewAll')}
-                  </ViewAllLink>
-                )}
-              </CardHeader>
-              {!isLatest5HistoryEmpty && (
-                <LatestTransactions
-                  transactions={last3Actions}
-                  zkAccount={zkAccount}
-                />
-              )}
-            </Card>
-          </CardsContainer>
-        </>)}
+      {zkAccount && (<CardsContainer>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('home.latestTransactions')}</CardTitle>
+            {!isLatest5HistoryEmpty && (
+              <ViewAllLink onClick={handleViewAll}>
+                {t('latestAction.viewAll')}
+              </ViewAllLink>
+            )}
+          </CardHeader>
+          {!isLatest5HistoryEmpty && (
+            <LatestTransactions
+              transactions={last3Actions}
+              zkAccount={zkAccount}
+            />
+          )}
+        </Card>
+      </CardsContainer>)}
     </ContentContainer>
   );
 };
@@ -159,23 +142,6 @@ const CardsContainer = styled.div`
   @media only screen and (max-width: 560px) {
     margin: 15px 0;
   }
-`;
-
-
-const EmptyPortfolioContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  gap: 16px;
-`;
-
-const EmptyPortfolioText = styled.span`
-  font-size: 14px;
-  color: ${props => props.theme.text.color.secondary};
-  text-align: left;
-  line-height: 1.5;
 `;
 
 const ContentContainer = styled.div`

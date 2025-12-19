@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ethers } from 'ethers';
 
-import { ReactComponent as RenewSVGIcon } from 'assets/renew.svg';
-import { ReactComponent as SpinnerIcon } from 'assets/spinner.svg';
-import { ZkAccountContext, PoolContext } from 'contexts';
+import { RefreshCcwIcon } from 'lucide-react'
+import { ZkAccountContext, PoolContext, ModalContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
 
@@ -22,6 +21,7 @@ export default () => {
   const history = useHistory();
   const location = useLocation();
   const { setCurrentPool, availablePools } = useContext(PoolContext);
+  const { openCreateAccountModal } = useContext(ModalContext);
 
   const {
     zkAccount,
@@ -122,19 +122,21 @@ export default () => {
     setShieldedAddresses(addressesMap);
   }, [zkAccount, zkClients, availablePools]);
 
-  const getRefreshIcon = () => {
-    if (isLoadingBalance) {
-      return <SpinnerIcon width={18} height={18} />;
-    }
-    return <RenewIcon width={18} height={18} />;
-  }
-
   useEffect(() => {
     if (!zkAccount) return;
     generateAndStoreAddresses();
   }, [zkAccount, generateAndStoreAddresses]);
 
-  if (!zkAccount) return null;
+  if (!zkAccount) {
+    return (
+      <EmptyState>
+        <EmptyStateDescription>{t('home.description')}</EmptyStateDescription>
+        <Button onClick={openCreateAccountModal} small>
+          {t('common.createPrivateAccount')}
+        </Button>
+      </EmptyState>
+    )
+  };
 
   return (
     <Container>
@@ -157,7 +159,7 @@ export default () => {
                   <TokenLabel>{tokenSymbol}:</TokenLabel>
                   {address ? (
                     <AddressWithCopy
-                      prefixIcon={getRefreshIcon()}
+                      prefixIcon={<RefreshCcwIcon width={16} height={16} />}
                       onPrefixClick={generateAndStoreAddresses}
                       $noBorder
                       $fontSize="13px"
@@ -198,10 +200,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-`;
-
-const RenewIcon = styled(RenewSVGIcon)`
-  cursor: pointer;
 `;
 
 const HeaderContainer = styled.div`

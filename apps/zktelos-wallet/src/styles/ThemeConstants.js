@@ -26,7 +26,6 @@ const darkTextPrimary = '#E0E0E0';
 const darkTextSecondary = '#D5D5D5';
 const darkBorder = '#333340';
 const darkInput = '#252530';
-const telosGradientDark = 'radial-gradient(circle at 0 120%,#8b3f98,transparent 50%),radial-gradient(circle at 100% 120%,#8b3f98,transparent 50%),radial-gradient(circle at 100% 0%,#348dcc,transparent 40%),radial-gradient(circle at 20% 0%,#73c58f,transparent 40%),#000000';
 const dropdownBackgroundLight = '#FFFFFF';
 const dropdownBackgroundDark = '#2D2D3A';
 
@@ -209,7 +208,6 @@ export const dark = {
     grey: darkBlack,
     darkGrey: darkBorder,
     black: white,
-    telosGradientSoft: telosGradientDark,
   },
   text: {
     ...light.text,
@@ -330,7 +328,7 @@ export const dark = {
       },
     },
   },
-  background: telosGradientDark,
+  background: 'linear-gradient(0.4turn, #071033, #6039a4)',
   dropdown: {
     background: dropdownBackgroundDark,
   },
