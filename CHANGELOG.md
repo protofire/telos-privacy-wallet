@@ -5,6 +5,29 @@ All notable changes to zkTelos Wallet will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2025-12-22
+
+### Added
+
+- **Production Pool Support**: Added Telos pool on production environment
+- **Empty State**: Added empty state UI for accounts with no funds (#43)
+- **Page Width Normalization**: Standardized page widths across all views for consistent layout
+
+### Changed
+
+- **Password Security**: Restored stronger password requirements (#45)
+- **UI Improvements**: Adjusted spacing, background colors, and logo contrast for better visibility (#44)
+- **Page Layout**: Normalized page widths for consistent user experience
+
+### Fixed
+
+- Fixed Telos RPC configuration and connection parameters
+- Fixed pool IDs in SDK configuration
+- Fixed logout error that occurred in certain scenarios
+- Fixed support URL link (#44)
+- Fixed home page display issues for various account state combinations (#44)
+- Removed unused components to improve code maintainability (#44)
+
 ## [0.0.4] - 2025-12-12
 
 ### Added
