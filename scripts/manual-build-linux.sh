@@ -106,34 +106,6 @@ check_prerequisites() {
     log_info "All prerequisites met!"
 }
 
-# Build macOS locally
-build_macos() {
-    log_info "Building macOS Electron app..."
-
-    # Install dependencies if needed
-    if [ ! -d "node_modules" ]; then
-        log_info "Installing dependencies..."
-        yarn install
-    fi
-
-    # Build zkbob-client-js
-    log_info "Building zkbob-client-js..."
-    yarn workspace zkbob-client-js build
-
-    # Build Rust library (libzkbob-rs-node)
-    log_info "Building libzkbob-rs-node (Rust library)..."
-    yarn workspace libzkbob-rs-node build
-
-    # Build Electron for macOS
-    log_info "Building macOS Electron installers (this may take several minutes)..."
-    export NODE_OPTIONS=--max-old-space-size=8192
-    export CI=false
-    yarn electron:build:mac
-
-    log_info "macOS build complete!"
-    log_info "Artifacts: apps/zktelos-wallet/dist/*.dmg"
-}
-
 # Build Linux on EC2
 build_linux_ec2() {
     log_info "Building Linux Electron app on EC2..."
@@ -177,55 +149,6 @@ ENDSSH
     log_info "Artifacts: dist-linux/"
 }
 
-# Create GitHub release
-create_release() {
-    log_info "Creating GitHub draft release..."
-
-    # Switch to team account if needed
-    if [ -n "$GH_USER" ]; then
-        gh auth switch --user "$GH_USER" 2>/dev/null || true
-    fi
-
-    # Create release
-    RELEASE_NOTES="## zkTelos Wallet ${VERSION}
-
-Built with native Rust support for macOS and Linux.
-
-### Downloads
-
-**macOS:**
-- \`zkTelos Wallet-${VERSION}.dmg\` - Universal installer (Intel + Apple Silicon)
-- \`zkTelos Wallet-${VERSION}-arm64.dmg\` - Apple Silicon (M1/M2/M3) optimized
-- \`zkTelos Wallet-${VERSION}-x64.dmg\` - Intel Mac
-
-**Linux:**
-- \`zkTelos Wallet-${VERSION}.AppImage\` - Portable application (no installation required)
-- \`zktelos-wallet_${VERSION}_amd64.deb\` - Debian/Ubuntu package
-
-### Build Details
-- Built with Rust library support
-- Node.js $(node --version)
-- Electron 27.0.0
-- Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-
-🦀 Built with Rust | ⚡ Powered by Electron"
-
-    RELEASE_URL=$(gh release create "$VERSION" \
-        apps/zktelos-wallet/dist/*.dmg \
-        dist-linux/*.AppImage \
-        dist-linux/*.deb \
-        --draft \
-        --repo "$REPO" \
-        --title "$VERSION - macOS + Linux Build" \
-        --notes "$RELEASE_NOTES")
-
-    log_info "Draft release created: $RELEASE_URL"
-    log_info ""
-    log_info "Next steps:"
-    log_info "1. Review the release at $RELEASE_URL"
-    log_info "2. Test the artifacts"
-    log_info "3. Publish the release when ready"
-}
 
 # Main execution
 main() {
@@ -235,25 +158,14 @@ main() {
 
     check_prerequisites
 
-    # Build macOS
-    log_info ""
-    log_info "Step 1/3: Building macOS artifacts..."
-    build_macos
-
     # Build Linux
     log_info ""
-    log_info "Step 2/3: Building Linux artifacts on EC2..."
+    log_info "Building Linux artifacts on EC2..."
     build_linux_ec2
-
-    # Create release
-    log_info ""
-    log_info "Step 3/3: Creating GitHub release..."
-    create_release
 
     log_info ""
     log_info "${GREEN}✓ Build and release complete!${NC}"
     log_info ""
-    log_info "${YELLOW}Note: Windows builds must be done separately on a Windows machine${NC}"
 }
 
 # Run main function
