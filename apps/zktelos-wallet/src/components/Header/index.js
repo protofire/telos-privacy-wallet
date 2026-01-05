@@ -53,7 +53,7 @@ export default ({ empty }) => {
     zkAccount, isLoadingZkAccount,
     updatePoolData, isPoolSwitching, isLoadingState,
   } = useContext(ZkAccountContext);
-  const { openAccessAccountModal } = useContext(ModalContext);
+  const { openAccessAccountModal, openSwapModal } = useContext(ModalContext);
   const { isVisible, toggleVisibility } = useContext(BalanceVisibilityContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { currentPool } = useContext(PoolContext);
@@ -155,9 +155,9 @@ export default ({ empty }) => {
         </LogoSection>
         <AccountSection>
           {!isMobile && networkDropdown}
-          {/* <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
+          <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
-          </BridgeButton> */}
+          </BridgeButton>
           {/* {!isMobile && walletDropdown} */}
 
           {!isMobile && zkAccountDropdown}
@@ -369,12 +369,12 @@ const Button = styled(ButtonDefault)`
   }
 `;
 
-// const BridgeButton = styled(Button)`
-//   background: ${props => props.theme.button.link.text.color};
-//   @media only screen and (max-width: 800px) {
-//     padding: 8px 12px;
-//   }
-// `;
+const BridgeButton = styled(Button)`
+  background: ${props => props.theme.button.link.text.color};
+  @media only screen and (max-width: 800px) {
+    padding: 8px 12px;
+  }
+`;
 
 const NetworkIcon = styled.img`
   width: 24px;

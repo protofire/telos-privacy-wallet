@@ -9,9 +9,9 @@ export default () => {
   const { width } = useWindowDimensions();
 
   const widgetConfig = {
-    integrator: 'zkBob',
+    integrator: 'zkTelos',
     fee: 0.00075,
-    variant: 'standard',
+    variant: 'compact',
     appearance: 'light',
     disableAppearance: true,
     containerStyle: {
@@ -35,7 +35,7 @@ export default () => {
       },
     },
     fromChain: 1,
-    fromToken: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    fromToken: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT Ethereum
     toChain: currentPool.chainId,
     toToken: currentPool.tokenAddress,
     disableTelemetry: true,
