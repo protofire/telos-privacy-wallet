@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useCallback } from 'react';
 import * as Sentry from '@sentry/react';
 import { ethers, BigNumber } from 'ethers';
-import { LiFi } from '@lifi/sdk';
+import { config } from '@lifi/sdk';
 import { Multicall } from 'ethereum-multicall';
 import { useTranslation } from 'react-i18next';
 
@@ -16,8 +16,8 @@ import { TX_STATUSES, NETWORKS } from 'constants';
 import { formatNumber } from 'utils';
 import { createPermitSignature, getPermitType, getNullifier } from './utils';
 
-const lifi = new LiFi({
-  integrator: 'zkBob',
+const lifi = config.set({
+  integrator: 'zkTelos',
 });
 
 const MULTIPLIER = BigNumber.from('1000000'); // 100%
@@ -314,12 +314,12 @@ export function usePayment(token, tokenAmount, amount, fee, pool, zkAddress, liF
           nullifier,
         );
         const compactSignature = ethers.utils.splitSignature(rawSignature).compact;
-        permitSignature = ethers.utils.solidityPack(['uint256','uint256','bytes'], [nullifier, deadline, compactSignature]);
+        permitSignature = ethers.utils.solidityPack(['uint256', 'uint256', 'bytes'], [nullifier, deadline, compactSignature]);
       }
 
       setTxStatus(TX_STATUSES.PREPARING_TRANSACTION);
-      let router ='0x0000000000000000000000000000000000000000';
-      let routerData ='0x';
+      let router = '0x0000000000000000000000000000000000000000';
+      let routerData = '0x';
       const isPoolToken = pool.tokenAddress.toLowerCase() === token.address.toLowerCase();
       const isUnwrappedPoolToken = pool.isNative && token.address === ethers.constants.AddressZero;
       if (isUnwrappedPoolToken) {

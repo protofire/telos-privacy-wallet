@@ -24,7 +24,7 @@
     "@dicebear/core": "^9.0.0",
     "@dicebear/glass": "^9.2.4",
     "@dicebear/pixel-art": "^4.10.2",
-    "@lifi/sdk": "^2.2.3",
+    "@lifi/sdk": "^3.14.1",
     "@lifi/widget": "^2.1.2",
     "@sentry/react": "^7.16.0",
     "@sentry/tracing": "^7.16.0",
