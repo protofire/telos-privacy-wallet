@@ -17,7 +17,6 @@ export default () => {
     isPasswordModalOpen,
     isAccountSetUpModalOpen,
     openAccountSetUpModal,
-    isTermsModalOpen,
   } = useContext(ModalContext);
   const { supportId } = useContext(SupportIdContext);
   const history = useHistory();
@@ -26,12 +25,12 @@ export default () => {
   const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
-    if ((giftCode || giftCard) && !isPasswordModalOpen && !isAccountSetUpModalOpen && !isTermsModalOpen) {
+    if ((giftCode || giftCard) && !isPasswordModalOpen && !isAccountSetUpModalOpen) {
       openRedeemGiftCardModal();
     }
   }, [
     giftCode, giftCard, openRedeemGiftCardModal, isPasswordModalOpen,
-    isAccountSetUpModalOpen, isTermsModalOpen,
+    isAccountSetUpModalOpen,
   ]);
 
   useEffect(() => {
