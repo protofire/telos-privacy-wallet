@@ -2,16 +2,18 @@ import { useContext, useCallback } from 'react';
 
 import ConfirmLogoutModal from 'components/ConfirmLogoutModal';
 
-import { ZkAccountContext, ModalContext } from 'contexts';
+import { ZkAccountContext, ModalContext, WalletContext } from 'contexts';
 
 export default () => {
   const { isConfirmLogoutModalOpen, closeConfirmLogoutModal } = useContext(ModalContext);
   const { removeZkAccountMnemonic } = useContext(ZkAccountContext);
+  const { disconnect } = useContext(WalletContext);
 
-  const confirmLogout = useCallback(() => {
+  const confirmLogout = useCallback(async () => {
     closeConfirmLogoutModal(false);
-    removeZkAccountMnemonic();
-  }, [closeConfirmLogoutModal, removeZkAccountMnemonic]);
+    await removeZkAccountMnemonic();
+    await disconnect();
+  }, [closeConfirmLogoutModal, removeZkAccountMnemonic, disconnect]);
 
   return (
     <ConfirmLogoutModal
