@@ -13,7 +13,7 @@ const TokenBalanceContext = createContext({ balance: null });
 export default TokenBalanceContext;
 
 export const TokenBalanceContextProvider = ({ children }) => {
-  const { address: account, getBalance, callContract } = useContext(WalletContext);
+  const { address: account, refetchNativeBalance, callContract } = useContext(WalletContext);
   const { currentPool, availablePools } = useContext(PoolContext);
   const [balances, setBalances] = useState({});
   const [nativeBalances, setNativeBalances] = useState({});
@@ -45,7 +45,7 @@ export const TokenBalanceContextProvider = ({ children }) => {
     try {
       [balance, nativeBalance] = await Promise.all([
         callContract(pool.tokenAddress, tokenAbi, 'balanceOf', [account]),
-        getBalance(),
+        refetchNativeBalance(),
       ]);
     } catch (error) {
       console.error(error);
@@ -56,7 +56,7 @@ export const TokenBalanceContextProvider = ({ children }) => {
     setBalances(prev => ({ ...prev, [poolAlias]: balance }));
     setNativeBalances(prev => ({ ...prev, [poolAlias]: nativeBalance }));
     setIsLoadingBalance(false);
-  }, [account, getBalance, callContract]);
+  }, [account, refetchNativeBalance, callContract]);
 
   // Update balances only for pools in active chain
   useEffect(() => {

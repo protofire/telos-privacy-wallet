@@ -10,7 +10,7 @@ import tokenAbi from 'abis/token.json';
 
 export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
   const { openTxModal, closeTxModal, setTxStatus, setTxError } = useContext(TransactionModalContext);
-  const { address: account, chain, switchNetwork, callContract, waitForTx } = useContext(WalletContext);
+  const { address: account, currentChainId, switchNetwork, callContract } = useContext(WalletContext);
   const [allowance, setAllowance] = useState(ethers.constants.Zero);
 
   const contractForApproval = useMemo(() =>
@@ -35,7 +35,7 @@ export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
   const approve = useCallback(async () => {
     try {
       openTxModal();
-      if (chain.id !== pool.chainId) {
+      if (currentChainId !== pool.chainId) {
         setTxStatus(TX_STATUSES.SWITCH_NETWORK);
         try {
           await switchNetwork();
@@ -47,9 +47,9 @@ export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
         }
       }
       setTxStatus(TX_STATUSES.APPROVE_TOKENS);
-      const tx = await callContract(tokenAddress, tokenAbi, 'approve', [contractForApproval, amount], true);
-      setTxStatus(TX_STATUSES.WAITING_FOR_TRANSACTION);
-      await waitForTx(tx);
+      await callContract(tokenAddress, tokenAbi, 'approve', [contractForApproval, amount], true);
+      // setTxStatus(TX_STATUSES.WAITING_FOR_TRANSACTION);
+      // await waitForTx(tx);
       closeTxModal();
       updateAllowance();
     } catch (error) {
@@ -61,8 +61,8 @@ export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
       setTxStatus(TX_STATUSES.REJECTED);
     }
   }, [
-    openTxModal, setTxStatus, setTxError, switchNetwork, chain,
-    waitForTx, updateAllowance, pool.chainId, tokenAddress, closeTxModal,
+    openTxModal, setTxStatus, setTxError, switchNetwork, currentChainId,
+    updateAllowance, pool.chainId, tokenAddress, closeTxModal,
     callContract, contractForApproval, amount,
   ]);
 
