@@ -328,7 +328,7 @@ export const dark = {
       },
     },
   },
-  background: 'linear-gradient(0.4turn, #071033, #6039a4)',
+  background: darkBlack,
   dropdown: {
     background: dropdownBackgroundDark,
   },
