@@ -18,13 +18,5 @@
     "build:zkbob": "yarn workspace zkbob-client-js build",
     "watch:zkbob": "yarn workspace zkbob-client-js watch",
     "dev": "concurrently \"yarn watch:zkbob\" \"yarn start\" --names \"zkbob,app\" --prefix-colors \"blue,green\""
-  },
-  "resolutions": {
-    "web3": "1.8.0",
-    "@types/bn.js": "^5.1.1",
-    "@walletconnect/modal": "2.7.0",
-    "@walletconnect/ethereum-provider": "2.11.0",
-    "@walletconnect/sign-client": "2.11.0",
-    "@mui/icons-material": "5.16.7"
-  }
+  } 
 }

@@ -1,95 +1,106 @@
-import { createContext, useCallback } from 'react';
-import { ethers } from 'ethers';
-
 import {
-  useAccount, useSignMessage, useConnect, useDisconnect,
-  useBalance, useProvider, useSigner, useNetwork,
-  useSwitchNetwork,
+  useConnection, useConnectors, useConnect,
+  useDisconnect, useSwitchChain, useBalance,
+  useSignMessage, useSignTypedData, useSendTransaction,
+  useWriteContract, useClient, useChainId
 } from 'wagmi';
+
+import { ethers } from 'ethers';
+import { isAddress } from 'viem'
+import { readContract } from 'viem/actions'
+import { useCallback, createContext, useMemo, useEffect } from 'react';
+
+const allowedConnectorId = ['io.metamask', 'walletConnect']
+
+const debugFn = (...message) => {
+  console.log('###', ...message);
+}
+
+const useEvmWallet = () => {
+  const { address, connector, status } = useConnection();
+  const currentChainId = useChainId();
+  const connectors = useConnectors();
+  const { mutateAsync: connectAsync } = useConnect();
+  const { mutateAsync: disconnectAsync } = useDisconnect();
+  const { mutateAsync: switchNetworkAsync } = useSwitchChain();
+  const { refetch } = useBalance({ address })
+  const { mutateAsync: signAsync } = useSignMessage();
+  const { mutateAsync: signTypedDataAsync } = useSignTypedData();
+  const { mutateAsync: sendTransactionAsync } = useSendTransaction();
+  const { mutateAsync: writeContractAsync } = useWriteContract();
+  const client = useClient();
+
+  const filteredConnectors = useMemo(() => {
+    return connectors.filter(connector => allowedConnectorId.includes(connector.id));
+  }, [connectors]);
+
+  const callContract = useCallback(async (address, abi, method, params = [], isSend = false) => {
+    if (isSend) {
+      return await writeContractAsync({ address, abi, functionName: method, args: params });
+    }
+
+    const result = await readContract(client, { address, abi, functionName: method, args: params });
+
+    if (typeof result === 'bigint') {
+      return ethers.BigNumber.from(result.toString());
+    }
+
+    if (typeof result === 'string' && /^\d+$/.test(result)) {
+      return ethers.BigNumber.from(result);
+    }
+
+    return result;
+  }, [writeContractAsync, client]);
+
+  const getBalance = useCallback(async () => {
+    try {
+      const { data: balanceData } = await refetch();
+      return ethers.BigNumber.from(balanceData?.value?.toString() || '0');
+    } catch (error) {
+      return ethers.constants.Zero;
+    }
+  }, [refetch]);
+
+  useEffect(() => {
+    debugFn('Status changed:', status);
+  }, [status]);
+
+  return {
+    address,
+    connector,
+    currentChainId,
+    status,
+    connectors: filteredConnectors,
+    connect: ({ connector }) => connectAsync({ connector }),
+    disconnect: disconnectAsync,
+    switchNetwork: switchNetworkAsync,
+    signMessageAsync: messageOrRaw => {
+      const isNotLiteralString = messageOrRaw instanceof Uint8Array || (typeof messageOrRaw === 'string' && /^0x[0-9a-fA-F]+$/.test(messageOrRaw));
+
+      if (isNotLiteralString) {
+        return signAsync({ message: { raw: messageOrRaw } });
+      }
+
+      return signAsync({ message: messageOrRaw });
+    },
+    // https://wagmi.sh/core/api/actions/signTypedData#types
+    signTypedDataAsync: (domain, types, message) => signTypedDataAsync({ domain, types, message }),
+    sendTransactionAsync: ({ to, value, data }) => sendTransactionAsync({ to, value, data }),
+    callContract,
+    refetchNativeBalance: getBalance,
+    isAddress,
+  }
+}
 
 const WalletContext = createContext({});
 
 export default WalletContext;
 
-const useEvmWallet = () => {
-  const { address, connector } = useAccount();
-  const { chain } = useNetwork();
-  const provider = useProvider({ chainId: chain?.id });
-  const { signMessageAsync } = useSignMessage();
-  const { connectAsync, connectors } = useConnect();
-  const { disconnectAsync } = useDisconnect();
-  const { refetch } = useBalance({
-    address,
-    chainId: chain?.id,
-    enabled: Boolean(address),
-    watch: Boolean(address),
-  });
-  const { data: signer } = useSigner({ chainId: chain?.id });
-
-  const { switchNetworkAsync } = useSwitchNetwork({
-    chainId: chain?.id,
-    throwForSwitchChainNotSupported: true,
-  });
-
-  const getBalance = useCallback(async () => {
-    let balance = ethers.constants.Zero;
-    try {
-      const { data: { value } } = await refetch();
-      balance = value;
-    } catch (error) { }
-    return balance;
-  }, [refetch]);
-
-  const callContract = useCallback(async (address, abi, method, params = [], isSend = false) => {
-    if (isSend) {
-      const contract = new ethers.Contract(address, abi, signer);
-      return contract[method](...params);
-    }
-    const providerConfigs = [...provider.providerConfigs].sort((a, b) => a.priority - b.priority);
-    async function call(index, providerConfigs) {
-      if (index >= provider.providerConfigs.length) {
-        throw new Error('Error calling contract');
-      }
-      try {
-        const contract = new ethers.Contract(address, abi, providerConfigs[index].provider);
-        return await contract[method](...params);
-      } catch (error) {
-        console.error(error);
-        return call(index + 1, providerConfigs);
-      }
-    }
-    return call(0, providerConfigs);
-  }, [provider, signer]);
-
-  return {
-    address,
-    chain,
-    provider,
-    signer,
-    connector,
-    connectors,
-    connect: connectAsync,
-    disconnect: disconnectAsync,
-    sign: message => signMessageAsync({ message }),
-    signMessage: message => signMessageAsync({ message }),
-    signTypedData: (domain, types, message) => signer?._signTypedData(domain, types, message),
-    sendTransaction: ({ to, value, data }) => signer?.sendTransaction({ to, value, data }),
-    switchNetwork: switchNetworkAsync,
-    getBalance,
-    callContract,
-    waitForTx: tx => tx.wait(),
-    isAddress: ethers.utils.isAddress,
-  };
-};
-
-
 export const WalletContextProvider = ({ children }) => {
   const evmWallet = useEvmWallet();
 
   return (
-    <WalletContext.Provider value={{
-      ...evmWallet,
-    }}>
+    <WalletContext.Provider value={evmWallet}>
       {children}
     </WalletContext.Provider>
   );
