@@ -390,7 +390,6 @@ export const ZkAccountContextProvider = ({ children }) => {
         }
       }
       const shieldedAmount = await toShieldedAmount(amount);
-      console.log("🚀 ~ ZkAccountContextProvider ~ isNative:", isNative)
       if (isNative) {
         await zp.directDeposit(account, sendTransactionAsync, activeClient, shieldedAmount, setTxStatus);
       } else {

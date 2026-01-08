@@ -12,12 +12,13 @@ export default () => {
   } = useContext(ModalContext);
   const { saveZkAccountMnemonic } = useContext(ZkAccountContext);
 
-  return (
-    <AccountSetUpModal
-      isOpen={isAccessAccountModalOpen || isCreateAccountModalOpen}
-      mode={isAccessAccountModalOpen ? 'access' : isCreateAccountModalOpen ? 'create' : null}
-      onClose={isAccessAccountModalOpen ? closeAccessAccountModal : closeCreateAccountModal}
-      saveZkAccountMnemonic={saveZkAccountMnemonic}
-    />
-  );
+  const mode = isAccessAccountModalOpen ? 'access' : isCreateAccountModalOpen ? 'create' : null;
+
+  return <AccountSetUpModal
+    key={mode}
+    isOpen={!!mode}
+    mode={mode}
+    onClose={isAccessAccountModalOpen ? closeAccessAccountModal : closeCreateAccountModal}
+    saveZkAccountMnemonic={saveZkAccountMnemonic}
+  />
 }

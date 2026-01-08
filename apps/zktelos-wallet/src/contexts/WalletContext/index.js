@@ -8,16 +8,12 @@ import {
 import { ethers } from 'ethers';
 import { isAddress } from 'viem'
 import { readContract } from 'viem/actions'
-import { useCallback, createContext, useMemo, useEffect } from 'react';
+import { useCallback, createContext, useMemo } from 'react';
 
 const allowedConnectorId = ['io.metamask', 'walletConnect']
 
-const debugFn = (...message) => {
-  console.log('###', ...message);
-}
-
 const useEvmWallet = () => {
-  const { address, connector, status } = useConnection();
+  const { address, connector } = useConnection();
   const currentChainId = useChainId();
   const connectors = useConnectors();
   const { mutateAsync: connectAsync } = useConnect();
@@ -61,15 +57,10 @@ const useEvmWallet = () => {
     }
   }, [refetch]);
 
-  useEffect(() => {
-    debugFn('Status changed:', status);
-  }, [status]);
-
   return {
     address,
     connector,
     currentChainId,
-    status,
     connectors: filteredConnectors,
     connect: ({ connector }) => connectAsync({ connector }),
     disconnect: disconnectAsync,
