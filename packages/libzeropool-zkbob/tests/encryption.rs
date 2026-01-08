@@ -40,7 +40,7 @@ fn test_encryption() {
         "Wrong outgoing data decrypted"
     );
 
-    let (notes_out,messages_out) = cipher::decrypt_in(receiver_eta, &ciphertext, &*POOL_PARAMS);
+    let (notes_out, messages_out) = cipher::decrypt_in(receiver_eta, &ciphertext, &*POOL_PARAMS);
 
     assert!(
         notes_out.len() == 2
@@ -50,4 +50,3 @@ fn test_encryption() {
         "Wrong incoming data decrypted"
     );
 }
-

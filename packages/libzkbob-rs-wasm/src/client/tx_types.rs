@@ -139,8 +139,7 @@ impl JsTxType for ITransferData {
             .data
             .into_iter()
             .map(|item| ExtraItem {
-                d: item.d,
-                p_d: item.p_d,
+                to: item.to,
                 data: item.data,
             })
             .collect::<Vec<_>>();

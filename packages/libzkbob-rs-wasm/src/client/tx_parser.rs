@@ -427,6 +427,14 @@ pub fn parse_tx(
                         })
                         .collect();
 
+                    let messages: Vec<_> = messages
+                        .into_iter()
+                        .filter_map(|data| match data {
+                            Some(data) => Some(data),
+                            _ => None,
+                        })
+                        .collect();
+
                     if !in_notes.is_empty() {
                         Ok(ParseResult {
                             decrypted_memos: vec![DecMemo {
@@ -442,6 +450,7 @@ pub fn parse_tx(
                                     Some(bytes) => Some(format!("0x{}", hex::encode(bytes))),
                                     None => None,
                                 },
+                                messages,
                                 ..Default::default()
                             }],
                             state_update: StateUpdate {

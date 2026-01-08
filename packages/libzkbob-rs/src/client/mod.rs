@@ -95,9 +95,8 @@ pub struct TxOperator<Fr: PrimeField> {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ExtraItem<Fr: PrimeField> {
-    pub d: BoundedNum<Fr, { constants::DIVERSIFIER_SIZE_BITS }>,
-    pub p_d: Num<Fr>,
+pub struct ExtraItem {
+    pub to: String,
     pub data: Vec<u8>,
 }
 
@@ -124,13 +123,13 @@ impl<Fr: PrimeField> TxOperator<Fr> {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TxType<Fr: PrimeField> {
     // operator, extra_data, tx_outputs
-    Transfer(TxOperator<Fr>, Vec<ExtraItem<Fr>>, Vec<TxOutput<Fr>>),
+    Transfer(TxOperator<Fr>, Vec<ExtraItem>, Vec<TxOutput<Fr>>),
     // operator, extra_data, deposit_amount
-    Deposit(TxOperator<Fr>, Vec<ExtraItem<Fr>>, TokenAmount<Fr>),
+    Deposit(TxOperator<Fr>, Vec<ExtraItem>, TokenAmount<Fr>),
     // operator, extra_data, deposit_amount, deadline, holder
     DepositPermittable(
         TxOperator<Fr>,
-        Vec<ExtraItem<Fr>>,
+        Vec<ExtraItem>,
         TokenAmount<Fr>,
         u64,
         Vec<u8>,
@@ -138,7 +137,7 @@ pub enum TxType<Fr: PrimeField> {
     // operator, extra_data, withdraw_amount, to, native_amount, energy_amount
     Withdraw(
         TxOperator<Fr>,
-        Vec<ExtraItem<Fr>>,
+        Vec<ExtraItem>,
         TokenAmount<Fr>,
         Vec<u8>,
         TokenAmount<Fr>,
@@ -374,32 +373,32 @@ where
                 .unwrap_or_else(|| self.state.tree.next_index())
         }));
 
-        let (fee, tx_data, user_data) = {
+        let (fee, tx_data) = {
             let mut tx_data: Vec<u8> = vec![];
             match &tx {
-                TxType::Deposit(operator, user_data, _) => {
+                TxType::Deposit(operator, _, _) => {
                     operator.serialize(&mut tx_data, self.is_obsolete_pool);
-                    (operator.total_fee(), tx_data, user_data)
+                    (operator.total_fee(), tx_data)
                 }
-                TxType::DepositPermittable(operator, user_data, _, deadline, holder) => {
+                TxType::DepositPermittable(operator, _, _, deadline, holder) => {
                     operator.serialize(&mut tx_data, self.is_obsolete_pool);
                     tx_data.write_all(&deadline.to_be_bytes()).unwrap();
                     tx_data.append(&mut holder.clone());
 
-                    (operator.total_fee(), tx_data, user_data)
+                    (operator.total_fee(), tx_data)
                 }
-                TxType::Transfer(operator, user_data, _) => {
+                TxType::Transfer(operator, _, _) => {
                     operator.serialize(&mut tx_data, self.is_obsolete_pool);
 
-                    (operator.total_fee(), tx_data, user_data)
+                    (operator.total_fee(), tx_data)
                 }
-                TxType::Withdraw(operator, user_data, _, reciever, native_amount, _) => {
+                TxType::Withdraw(operator, _, _, reciever, native_amount, _) => {
                     operator.serialize(&mut tx_data, self.is_obsolete_pool);
                     let raw_native_amount: u64 = native_amount.to_num().try_into().unwrap();
                     tx_data.write_all(&raw_native_amount.to_be_bytes()).unwrap();
                     tx_data.append(&mut reciever.clone());
 
-                    (operator.total_fee(), tx_data, user_data)
+                    (operator.total_fee(), tx_data)
                 }
             }
         };
@@ -472,11 +471,16 @@ where
             let messages = extra_data
                 .iter()
                 .filter_map(|msg| {
-                    Some(ExtraData {
-                        d: msg.d,
-                        p_d: msg.p_d,
-                        data: msg.data.clone(),
-                    })
+                    let res = parse_address::<P>(&msg.to, &self.params, self.pool_id);
+
+                    match res {
+                        Ok((to_d, to_p_d, _)) => Some(ExtraData {
+                            d: to_d,
+                            p_d: to_p_d,
+                            data: msg.data.clone(),
+                        }),
+                        _ => None,
+                    }
                 })
                 .collect();
 
