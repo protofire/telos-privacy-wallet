@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useSwitchNetwork } from 'wagmi';
+import { useSwitchChain } from 'wagmi';
 
 import Dropdown from 'components/Dropdown';
 import OptionButtonDefault from 'components/OptionButton';
@@ -19,7 +19,7 @@ const chainIds = Object.keys(config.chains).map(chainId => Number(chainId));
 const Content = ({ closeDropdown }) => {
   const { t } = useTranslation();
   const { activeChainId } = useContext(PoolContext);
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { mutateAsync } = useSwitchChain();
 
   const handleClick = useCallback(async (chainId) => {
     const external = config.chains[chainId]?.external;
@@ -31,12 +31,12 @@ const Content = ({ closeDropdown }) => {
     if (chainId === activeChainId) return;
 
     try {
-      await switchNetworkAsync?.(chainId);
+      await mutateAsync?.({ chainId });
       closeDropdown();
     } catch (error) {
       console.error('Failed to switch network:', error);
     }
-  }, [activeChainId, switchNetworkAsync, closeDropdown]);
+  }, [activeChainId, mutateAsync, closeDropdown]);
 
   return (
     <Container>
