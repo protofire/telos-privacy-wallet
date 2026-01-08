@@ -13,7 +13,7 @@ import { useCallback, createContext, useMemo } from 'react';
 const allowedConnectorId = ['io.metamask', 'walletConnect']
 
 const useEvmWallet = () => {
-  const { address, connector } = useConnection();
+  const { address, connector, status } = useConnection();
   const currentChainId = useChainId();
   const connectors = useConnectors();
   const { mutateAsync: connectAsync } = useConnect();
@@ -61,9 +61,14 @@ const useEvmWallet = () => {
     address,
     connector,
     currentChainId,
+    status,
     connectors: filteredConnectors,
     connect: ({ connector }) => connectAsync({ connector }),
-    disconnect: disconnectAsync,
+    disconnect: async () => {
+      connectors.forEach(async (connector) => {
+        await disconnectAsync({ connector });
+      });
+    },
     switchNetwork: switchNetworkAsync,
     signMessageAsync: messageOrRaw => {
       const isNotLiteralString = messageOrRaw instanceof Uint8Array || (typeof messageOrRaw === 'string' && /^0x[0-9a-fA-F]+$/.test(messageOrRaw));

@@ -34,7 +34,7 @@ const wagmiConfig = createConfig({
 });
 
 export default ({ children }) => (
-  <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
+  <WagmiProvider config={wagmiConfig}>
     <QueryClientProvider client={queryClient}>
       {children}
     </QueryClientProvider>

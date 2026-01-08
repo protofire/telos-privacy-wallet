@@ -21,7 +21,7 @@ export default ({ isOpen, close, currentPool }) => {
       title={title}
     >
       <Text>{description}</Text>
-      <WalletConnectors callback={close} />
+      <WalletConnectors nextStep={close} />
     </Modal>
   );
 };
