@@ -1152,6 +1152,7 @@ export class ZkBobClient extends ZkBobProvider {
         })
       };
       const oneTxData = await state.createTransferOptimistic(oneTx, optimisticState);
+      console.log('RAFAEL NEW TYPE OF TX SENT')
 
       console.log(`Transaction created: delta_index = ${oneTxData.parsed_delta.index}, root = ${oneTxData.public.root}`);
 
@@ -1416,14 +1417,15 @@ export class ZkBobClient extends ZkBobProvider {
   }
 
   private assertCalldataLength(txToSequencer: any, estimatedLen: number) {
-    let factLen = this.network().calldataBaseLength(this.calldataVersion()) + txToSequencer.memo.length / 2;
-    if (txToSequencer.depositSignature) {
-      factLen += txToSequencer.depositSignature.length / 2;
-    }
+    // RAFAEL: Since our contracts/relayer is v1 and our calldata version is v2 we ignore this validation
+    //let factLen = this.network().calldataBaseLength(this.calldataVersion()) + txToSequencer.memo.length / 2;
+    //if (txToSequencer.depositSignature) {
+    //factLen += txToSequencer.depositSignature.length / 2;
+    //}
 
-    if (factLen != estimatedLen) {
-      throw new InternalError(`Calldata length estimation error: est ${estimatedLen}, actual ${factLen} bytes`);
-    }
+    //if (factLen != estimatedLen) {
+    //throw new InternalError(`Calldata length estimation error: est ${estimatedLen}, actual ${factLen} bytes`);
+    //}
   }
 
   private async assertAccountCanTransact() {

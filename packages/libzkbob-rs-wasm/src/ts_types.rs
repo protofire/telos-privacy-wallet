@@ -152,12 +152,18 @@ export interface IWithdrawData extends ITxBaseFields {
     energy_amount: string;
 }
 
+export interface ExtraData{
+    d: string;
+    p_d: string;
+    data: Uint8Array;
+}
+
 export interface DecryptedMemo {
     index: number;
     acc: Account | undefined;
     inNotes:  { note: Note, index: number }[];
     outNotes: { note: Note, index: number }[];
-    messages: { to: String, data: Uint8Array }[];
+    messages: ExtraData[];
     txHash: string | undefined;
 }
 

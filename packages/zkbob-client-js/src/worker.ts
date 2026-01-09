@@ -50,7 +50,7 @@ const obj = {
       txParams[name] = snarkParams;
     }
 
-    txParser = wasm.TxParser._new()
+    txParser = wasm.TxParser.new()
 
     console.info('Web worker init complete.');
   },
@@ -97,6 +97,7 @@ const obj = {
   async parseTxs(sk: Uint8Array, txs: IndexedTx[]): Promise<ParseTxsResult> {
     console.debug('Web worker: parseTxs');
     const result = txParser.parseTxs(sk, txs)
+    console.log('RAFAEL RAW PARSE TXS', result)
     sk.fill(0)
     return result;
   },
