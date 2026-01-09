@@ -225,9 +225,10 @@ export const ZkAccountContextProvider = ({ children }) => {
         isPendingIncoming = !!history.find(item =>
           item.state === HistoryRecordState.Pending && item.type === HistoryTransactionType.TransferIn
         );
-        pendingActions = history.filter(item =>
-          item.state === HistoryRecordState.Pending && item.type !== HistoryTransactionType.TransferIn
-        );
+        const poolConfig = config.pools[poolAlias];
+        pendingActions = history
+          .filter(item => item.state === HistoryRecordState.Pending && item.type !== HistoryTransactionType.TransferIn)
+          .map(item => ({ ...item, poolAlias, pool: poolConfig }));
         isPending = pendingActions.length > 0;
       } catch (error) {
         console.error(error);
