@@ -7,7 +7,7 @@ import {
 
 import { ethers } from 'ethers';
 import { isAddress } from 'viem'
-import { readContract } from 'viem/actions'
+import { readContract, waitForTransactionReceipt } from 'viem/actions'
 import { useCallback, createContext, useMemo } from 'react';
 
 const allowedConnectorId = ['io.metamask', 'walletConnect']
@@ -57,11 +57,14 @@ const useEvmWallet = () => {
     }
   }, [refetch]);
 
+  const waitForTransaction = useCallback(async (hash) => {
+    return waitForTransactionReceipt(client, { hash });
+  }, [client]);
+
   return {
     address,
     connector,
     currentChainId,
-    status,
     connectors: filteredConnectors,
     connect: ({ connector }) => connectAsync({ connector }),
     disconnect: async () => {
@@ -84,6 +87,7 @@ const useEvmWallet = () => {
     sendTransactionAsync: ({ to, value, data }) => sendTransactionAsync({ to, value, data }),
     callContract,
     refetchNativeBalance: getBalance,
+    waitForTransaction,
     isAddress,
   }
 }
