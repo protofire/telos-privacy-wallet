@@ -42,8 +42,8 @@ export const ZkAccountContextProvider = ({ children }) => {
   const { currentPool, setCurrentPool } = useContext(PoolContext);
   const previousPoolAlias = usePrevious(currentPool.alias);
   const {
-    address: account, chain, switchNetwork,
-    sign, signTypedData, sendTransaction,
+    address: account, currentChainId, switchNetwork,
+    signMessageAsync, signTypedDataAsync, sendTransactionAsync,
   } = useContext(WalletContext);
   const { openTxModal, setTxStatus, setTxAmount, setTxError } = useContext(TransactionModalContext);
   const { openPasswordModal, closeAllModals } = useContext(ModalContext);
@@ -378,7 +378,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     setTxAmount(amount);
     const activeClient = zkClients[currentPool.alias];
     try {
-      if (chain.id !== currentPool.chainId) {
+      if (currentChainId !== currentPool.chainId) {
         setTxStatus(TX_STATUSES.SWITCH_NETWORK);
         try {
           await switchNetwork();
@@ -391,9 +391,9 @@ export const ZkAccountContextProvider = ({ children }) => {
       }
       const shieldedAmount = await toShieldedAmount(amount);
       if (isNative) {
-        await zp.directDeposit(account, sendTransaction, activeClient, shieldedAmount, setTxStatus);
+        await zp.directDeposit(account, sendTransactionAsync, activeClient, shieldedAmount, setTxStatus);
       } else {
-        await zp.deposit(account, sign, signTypedData, activeClient, shieldedAmount, relayerFee, setTxStatus);
+        await zp.deposit(account, signMessageAsync, signTypedDataAsync, activeClient, shieldedAmount, relayerFee, setTxStatus);
       }
       updatePoolData(currentPool.alias);
       setTimeout(updateTokenBalance, 5000);
@@ -416,9 +416,9 @@ export const ZkAccountContextProvider = ({ children }) => {
       }
     }
   }, [
-    zkClients, updatePoolData, signTypedData, openTxModal, setTxAmount,
+    zkClients, updatePoolData, signTypedDataAsync, openTxModal, setTxAmount,
     setTxStatus, updateTokenBalance, toShieldedAmount, setTxError,
-    chain, switchNetwork, currentPool, sendTransaction, account, sign,
+    currentChainId, switchNetwork, currentPool, sendTransactionAsync, account, signMessageAsync,
   ]);
 
   const transfer = useCallback(async (to, amount, relayerFee) => {

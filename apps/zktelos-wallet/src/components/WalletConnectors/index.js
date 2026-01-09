@@ -5,28 +5,27 @@ import { WalletContext } from 'contexts';
 
 import { CONNECTORS_ICONS } from 'constants';
 
-export default ({ callback, gaIdPrefix = '', descriptions = {} }) => {
-  const { connectors, disconnect, connect } = useContext(WalletContext);
-
+export default ({ nextStep, gaIdPrefix = '', descriptions = {} }) => {
+  const { connectors, connect, disconnect, connector: currentConnector } = useContext(WalletContext);
 
   const connectWallet = useCallback(async connector => {
-    if (connector.id === connector?.id) {
-      await disconnect();
-    }
     try {
-      const connectorChainId = connector.chains[0].id;
-      await connect({ connector, chainId: connectorChainId });
-      callback?.(connector);
+      if (connector.id === currentConnector?.id) {
+        await disconnect();
+      }
+
+      await connect({ connector });
+      nextStep();
     } catch (error) {
-      console.error('Error connecting wallet:', error);
+      console.error('Error while connecting with connector:', connector.name, error);
     }
-  }, [callback, disconnect, connect]);
+  }, [connect, disconnect, currentConnector, nextStep]);
 
   const hasDescriptions = Object.keys(descriptions).length > 0;
 
   return (
     <>
-      {connectors.map((connector, index) => connector.ready &&
+      {connectors.map((connector, index) =>
         <WalletConnector
           key={index}
           onClick={() => connectWallet(connector)}

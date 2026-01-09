@@ -29,9 +29,6 @@ export const ModalContextProvider = ({ children }) => {
   const openChangePasswordModal = () => setIsChangePasswordModalOpen(true);
   const closeChangePasswordModal = () => setIsChangePasswordModalOpen(false);
 
-  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
-  const openTermsModal = () => setIsTermsModalOpen(true);
-  const closeTermsModal = () => setIsTermsModalOpen(false);
 
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const openSwapModal = () => setIsSwapModalOpen(true);
@@ -127,7 +124,6 @@ export const ModalContextProvider = ({ children }) => {
         isCreateAccountModalOpen, openCreateAccountModal, closeCreateAccountModal,
         isPasswordModalOpen, openPasswordModal, closePasswordModal,
         isChangePasswordModalOpen, openChangePasswordModal, closeChangePasswordModal,
-        isTermsModalOpen, openTermsModal, closeTermsModal,
         isSwapModalOpen, openSwapModal, closeSwapModal,
         isConfirmLogoutModalOpen, openConfirmLogoutModal, closeConfirmLogoutModal,
         isSeedPhraseModalOpen, openSeedPhraseModal, closeSeedPhraseModal,

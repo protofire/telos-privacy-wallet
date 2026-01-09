@@ -11,7 +11,7 @@ import PrivateAddress from 'components/AdressWithCopy';
 
 // import { ReactComponent as BackIconDefault } from 'assets/back.svg';
 
-import { ZkAccountContext, ModalContext, WalletContext, PoolContext } from 'contexts';
+import { ZkAccountContext, ModalContext, PoolContext } from 'contexts';
 
 const Content = ({
   zkClients, logout, close, isLoadingState, zkAccount,
@@ -19,7 +19,6 @@ const Content = ({
   const { t } = useTranslation();
   const [shieldedAddresses, setShieldedAddresses] = useState({});
   // const [showQRCode, setShowQRCode] = useState(false);
-  const { disconnect } = useContext(WalletContext);
   const { allPools } = useContext(PoolContext);
 
   const generatePrivateAddress = useCallback(async () => {
@@ -70,11 +69,10 @@ const Content = ({
   //   }
   // }, [initializeGiftCard, close]);
 
-  const handleOptionClick = useCallback(async ([logout, disconnect]) => {
+  const handleOptionClick = useCallback(async () => {
     close();
-    await disconnect();
     await logout();
-  }, [close]);
+  }, [close, logout]);
 
   // if (showQRCode) {
   //   return (
@@ -157,7 +155,7 @@ const Content = ({
           {t('buttonText.redeemGiftCard')}
         </OptionButton>
       </QRCodeReader> */}
-      <OptionButton onClick={() => handleOptionClick([logout, disconnect])} data-ga-id="zkaccount-logout">
+      <OptionButton onClick={() => handleOptionClick()} data-ga-id="zkaccount-logout">
         {t('buttonText.logout')}
       </OptionButton>
     </Container>

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import * as Sentry from '@sentry/react';
 import { useLocation } from 'react-router-dom';
-import { useNetwork } from 'wagmi';
+import { useChainId } from 'wagmi';
 
 import config from 'config';
 
@@ -11,8 +11,7 @@ export default PoolContext;
 
 export const PoolContextProvider = ({ children }) => {
   const location = useLocation();
-  const { chain } = useNetwork();
-  const activeChainId = chain?.id;
+  const activeChainId = useChainId();
 
   const allPools = useMemo(() => {
     return Object.keys(config.pools).map(alias => ({ alias, ...config.pools[alias] }));

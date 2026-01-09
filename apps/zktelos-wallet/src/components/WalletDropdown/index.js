@@ -52,9 +52,9 @@ const Content = ({
     changeWallet();
   }, [changeWallet, close]);
 
-  const onDisconnect = useCallback(() => {
+  const onDisconnect = useCallback(async () => {
     close();
-    disconnect();
+    await disconnect();
   }, [disconnect, close]);
 
   return (

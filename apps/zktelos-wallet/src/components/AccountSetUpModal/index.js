@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import { useState, useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 import md5 from 'js-md5';
@@ -13,6 +13,7 @@ import Create from './Create';
 import Confirm from './Confirm';
 import Restore from './Restore';
 import Password from './Password';
+import Sign from './Sign';
 
 const STEP = {
   ACCESS_ACCOUNT: 1,
@@ -20,10 +21,11 @@ const STEP = {
   ENTER_SEEDPHRASE: 3,
   CREATE_INSTANT: 4,
   CONFIRM_INSTANT: 5,
-  REQUEST_PASSWORD: 6,
+  REQUEST_SIGNATURE: 6,
+  REQUEST_PASSWORD: 7,
 };
 
-const AccessAccount = ({ setStep, generate }) => {
+const AccessAccount = ({ setStep }) => {
   const { t } = useTranslation();
 
   const walletDescriptions = {
@@ -36,9 +38,9 @@ const AccessAccount = ({ setStep, generate }) => {
       <SectionTitle>{t('accountSetupModal.access.sectionTitle')}</SectionTitle>
 
       <WalletConnectors
-        callback={generate}
         gaIdPrefix="access-"
         descriptions={walletDescriptions}
+        nextStep={() => setStep(STEP.REQUEST_SIGNATURE)}
       />
 
       <Divider>
@@ -59,7 +61,7 @@ const AccessAccount = ({ setStep, generate }) => {
   );
 };
 
-const CreateAccount = ({ setStep, generate }) => {
+const CreateAccount = ({ setStep }) => {
   const { t } = useTranslation();
 
   const walletDescriptions = {
@@ -72,9 +74,9 @@ const CreateAccount = ({ setStep, generate }) => {
       <SectionTitle>{t('accountSetupModal.create.sectionTitle')}</SectionTitle>
 
       <WalletConnectors
-        callback={generate}
         gaIdPrefix="create-"
         descriptions={walletDescriptions}
+        nextStep={() => setStep(STEP.REQUEST_SIGNATURE)}
       />
 
       <Divider>
@@ -97,24 +99,20 @@ const CreateAccount = ({ setStep, generate }) => {
 
 export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => {
   const { t } = useTranslation();
-  const evmWallet = useContext(WalletContext);
+  const { signMessageAsync, disconnect } = useContext(WalletContext);
   const initialStep = mode === 'create' ? STEP.CREATE_ACCOUNT : STEP.ACCESS_ACCOUNT;
   const [step, setStep] = useState(initialStep);
   const [newMnemonic, setNewMnemonic] = useState();
   const [isNewAccount, setIsNewAccount] = useState(false);
 
-  const closeModal = useCallback(() => {
+  const closeModal = useCallback(async (shouldDisconnect = true) => {
     setStep(initialStep);
     setNewMnemonic(null);
     onClose();
-  }, [onClose, initialStep]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setStep(initialStep);
-      setNewMnemonic(null);
+    if (shouldDisconnect) {
+      await disconnect();
     }
-  }, [isOpen, mode, initialStep]);
+  }, [onClose, initialStep, disconnect]);
 
   const setNextStep = useCallback(nextStep => {
     if (nextStep === STEP.CREATE_INSTANT) {
@@ -137,9 +135,8 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
 
   const generate = useCallback(async () => {
     try {
-      const { signMessage } = evmWallet;
       const message = 'Access zkTelos account.\n\nOnly sign this message for a trusted client';
-      let signedMessage = await signMessage(message);
+      let signedMessage = await signMessageAsync(message);
       if (!window.location.host.includes(process.env.REACT_APP_LEGACY_SIGNATURE_DOMAIN)) {
         // Metamask with ledger returns V=0/1 here too, we need to adjust it to be ethereum's valid value (27 or 28)
         const MIN_VALID_V_VALUE = 27;
@@ -158,11 +155,11 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       console.error('Error generating account from signature:', error);
       closeModal();
     }
-  }, [evmWallet, closeModal]);
+  }, [signMessageAsync, closeModal]);
 
   const handlePasswordSet = useCallback(password => {
     saveZkAccountMnemonic(newMnemonic, password, isNewAccount);
-    closeModal();
+    closeModal(false); // Keeps web3 wallet connected
   }, [newMnemonic, isNewAccount, saveZkAccountMnemonic, closeModal]);
 
   // const handlePasswordSkip = useCallback(() => {
@@ -178,12 +175,12 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
     default:
     case STEP.ACCESS_ACCOUNT:
       title = t('accountSetupModal.access.title');
-      component = <AccessAccount setStep={setStep} generate={generate} />;
+      component = <AccessAccount setStep={setStep} />;
       prevStep = null;
       break;
     case STEP.CREATE_ACCOUNT:
       title = t('accountSetupModal.create.title');
-      component = <CreateAccount setStep={setNextStep} generate={generate} />;
+      component = <CreateAccount setStep={setNextStep} />;
       prevStep = null;
       break;
     case STEP.ENTER_SEEDPHRASE:
@@ -201,6 +198,11 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       component = <Confirm mnemonic={newMnemonic} confirmMnemonic={confirmMnemonic} />;
       prevStep = STEP.CREATE_INSTANT;
       break;
+    case STEP.REQUEST_SIGNATURE:
+      title = mode === 'create' ? t('accountSetupModal.signToCreate.title') : t('accountSetupModal.signToAccess.title');
+      component = <Sign sign={generate} isCreation={mode === 'create'} />;
+      prevStep = null;
+      break;
     case STEP.REQUEST_PASSWORD:
       title = t('accountSetupModal.createPassword.title');
       component = (
@@ -210,6 +212,7 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
       );
       prevStep = null;
       break;
+
   }
 
   return (
