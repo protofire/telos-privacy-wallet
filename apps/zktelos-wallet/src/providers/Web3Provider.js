@@ -9,15 +9,10 @@ if (!process.env.REACT_APP_WALLETCONNECT_PROJECT_ID) {
   throw new Error('REACT_APP_WALLETCONNECT_PROJECT_ID is not set');
 }
 
-const wagmiConfig = createConfig({
-  chains: [telos, telosTestnet],
-  ssr: false,
-  syncConnectedChain: false,
-  transports: {
-    [telos.id]: http('https://rpc.telos.net'),
-    [telosTestnet.id]: http('https://rpc.testnet.telos.net'),
-  },
-  connectors: [injected(), walletConnect({
+const supportedChains = [telos, telosTestnet];
+
+const connectors = [
+  walletConnect({
     showQrModal: true,
     projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID,
     metadata: {
@@ -30,7 +25,21 @@ const wagmiConfig = createConfig({
       themeMode: 'dark',
       enableExplorer: false
     }
-  })],
+  })];
+
+if (process.env.REACT_APP_BUILD_TARGET === 'web') {
+  connectors.push(injected());
+}
+
+const wagmiConfig = createConfig({
+  chains: supportedChains,
+  ssr: false,
+  syncConnectedChain: false,
+  transports: {
+    [telos.id]: http('https://rpc.telos.net'),
+    [telosTestnet.id]: http('https://rpc.testnet.telos.net'),
+  },
+  connectors,
 });
 
 export default ({ children }) => (
