@@ -370,7 +370,6 @@ const Button = styled(ButtonDefault)`
 `;
 
 const BridgeButton = styled(Button)`
-  background: ${props => props.theme.button.link.text.color};
   @media only screen and (max-width: 800px) {
     padding: 8px 12px;
   }

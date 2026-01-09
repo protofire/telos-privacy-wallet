@@ -40,6 +40,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     font-family: 'Gilroy';
+    background-color: ${props => props.theme.isDark ? '#17191a' : 'transparent'}; 
   }
   button, input, textarea, .Toastify__toast {
     font-family: 'Gilroy';

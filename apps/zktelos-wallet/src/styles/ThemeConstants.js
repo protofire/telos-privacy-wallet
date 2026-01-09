@@ -202,6 +202,7 @@ export const light = {
 
 export const dark = {
   ...light,
+  isDark: true, // For App.js background color
   color: {
     ...light.color,
     white: darkCard,
@@ -221,11 +222,11 @@ export const dark = {
   },
   button: {
     ...light.button,
-    background: 'linear-gradient(0.4turn,#071033,#6039a4)',
+    background: 'transparent',
     primary: {
       ...light.button.primary,
       border: {
-        color: '#6039a4',
+        color: '#b96bcd',
       },
       background: {
         ...light.button.primary.background,
@@ -328,7 +329,7 @@ export const dark = {
       },
     },
   },
-  background: darkBlack,
+  background: telosGradientSoft,
   dropdown: {
     background: dropdownBackgroundDark,
   },
