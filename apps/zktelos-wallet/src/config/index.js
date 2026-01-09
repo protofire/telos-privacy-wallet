@@ -115,4 +115,4 @@ const config = {
   }
 };
 
-export default config[process.env.REACT_APP_CONFIG || 'dev'];
+export default config['prod'];

@@ -1144,12 +1144,12 @@ export class ZkBobClient extends ZkBobProvider {
         prover: this.network().addressToBytes(onePart.fee.proverAddress),
         proxy_fee: onePart.fee.proxyPart.toString(),
         prover_fee: onePart.fee.proverPart.toString(),
-        data: [{
-          leaf_index: 0,
-          pad_length: 0,
-          need_encrypt: false,
-          data: new Uint8Array([0, 1, 2, 3, 4, 5])
-        }],
+        data: onePart.outNotes.map((aNote) => {
+          return {
+            to: aNote.destination,
+            data: new Uint8Array([0, 1, 2, 3, 4, 5])
+          }
+        })
       };
       const oneTxData = await state.createTransferOptimistic(oneTx, optimisticState);
 

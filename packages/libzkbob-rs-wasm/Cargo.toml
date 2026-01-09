@@ -1,5 +1,5 @@
 [package]
-name = "libzkbob-rs-wasm"
+name = "libzkbob-rs-wasm-web"
 description = "A higher level zkBob API for Wasm"
 version = "1.7.0"
 authors = ["Dmitry Vdovin <voidxnull@gmail.com>"]
