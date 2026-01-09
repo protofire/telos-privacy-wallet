@@ -160,10 +160,14 @@ export const ZkAccountContextProvider = ({ children }) => {
     setIsLoadingZkAccount(false);
   }, [zkClients]);
 
-  const fromShieldedAmount = useCallback(async shieldedAmount => {
-    if (!zkClient) return BigNumber.from(0);
-    const wei = await zkClient.shieldedAmountToWei(shieldedAmount);
+  const shieldedAmountToWei = async (client, shieldedAmount) => {
+    if (!client) return BigNumber.from(0);
+    const wei = await client.shieldedAmountToWei(shieldedAmount);
     return BigNumber.from(wei);
+  };
+
+  const fromShieldedAmount = useCallback(async shieldedAmount => {
+    return shieldedAmountToWei(zkClient, shieldedAmount);
   }, [zkClient]);
 
   const toShieldedAmount = useCallback(wei => {
@@ -178,7 +182,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       setIsLoadingState(true);
       try {
         balance = await client.getTotalBalance();
-        balance = await fromShieldedAmount(balance);
+        balance = await shieldedAmountToWei(client, balance);
       } catch (error) {
         console.error(error);
         Sentry.captureException(error, { tags: { method: 'ZkAccountContext.updateBalance', pool: poolAlias } });
@@ -187,7 +191,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     }
     setBalances(prev => ({ ...prev, [poolAlias]: balance }));
     setIsLoadingState(false);
-  }, [zkAccount, zkClients, fromShieldedAmount, currentPool.alias]);
+  }, [zkAccount, zkClients, currentPool.alias]);
 
   const updateHistory = useCallback(async (poolAlias = currentPool.alias) => {
     let history = [];
@@ -211,9 +215,9 @@ export const ZkAccountContextProvider = ({ children }) => {
           failed: [HistoryRecordState.RejectedByRelayer, HistoryRecordState.RejectedByPool].includes(item.state),
           actions: await Promise.all(item.actions.map(async action => ({
             ...action,
-            amount: await fromShieldedAmount(action.amount)
+            amount: await shieldedAmountToWei(client, action.amount)
           }))),
-          fee: await fromShieldedAmount(item.fee),
+          fee: await shieldedAmountToWei(client, item.fee),
         })));
         history = splitDirectDeposits(history);
         history = aggregateFees(history);
@@ -236,7 +240,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     setIsPendingByPool(prev => ({ ...prev, [poolAlias]: isPending }));
     setIsPendingIncomingByPool(prev => ({ ...prev, [poolAlias]: isPendingIncoming }));
     setIsLoadingHistory(false);
-  }, [zkAccount, zkClients, fromShieldedAmount, currentPool.alias, previousPoolAlias]);
+  }, [zkAccount, zkClients, currentPool.alias, previousPoolAlias]);
 
   const updatePendingDirectDeposits = useCallback(async (poolAlias = currentPool.alias) => {
     let pendingDirectDeposits = [];
@@ -249,9 +253,9 @@ export const ZkAccountContextProvider = ({ children }) => {
           type: HistoryTransactionType.DirectDeposit,
           actions: [{
             to: item.destination,
-            amount: await fromShieldedAmount(item.amount),
+            amount: await shieldedAmountToWei(client, item.amount),
           }],
-          fee: await fromShieldedAmount(item.fee),
+          fee: await shieldedAmountToWei(client, item.fee),
         })));
       } catch (error) {
         console.error(error);
@@ -259,7 +263,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       }
     }
     setPendingDirectDepositsByPool(prev => ({ ...prev, [poolAlias]: pendingDirectDeposits }));
-  }, [zkAccount, zkClients, fromShieldedAmount, currentPool.alias]);
+  }, [zkAccount, zkClients, currentPool.alias]);
 
 
   const updateLimits = useCallback(async (poolAlias = currentPool.alias) => {
@@ -270,27 +274,27 @@ export const ZkAccountContextProvider = ({ children }) => {
     try {
       const data = await client.getLimits(account);
       limits = {
-        singleDepositLimit: await fromShieldedAmount(BigInt(data.deposit.components.singleOperation)),
-        singleDirectDepositLimit: await fromShieldedAmount(BigInt(data.dd.components.singleOperation)),
+        singleDepositLimit: await shieldedAmountToWei(client, BigInt(data.deposit.components.singleOperation)),
+        singleDirectDepositLimit: await shieldedAmountToWei(client, BigInt(data.dd.components.singleOperation)),
         dailyDepositLimitPerAddress: {
-          total: await fromShieldedAmount(BigInt(data.deposit.components.dailyForAddress.total)),
-          available: await fromShieldedAmount(BigInt(data.deposit.components.dailyForAddress.available))
+          total: await shieldedAmountToWei(client, BigInt(data.deposit.components.dailyForAddress.total)),
+          available: await shieldedAmountToWei(client, BigInt(data.deposit.components.dailyForAddress.available))
         },
         dailyDirectDepositLimitPerAddress: {
-          total: await fromShieldedAmount(BigInt(data.dd.components.dailyForAddress.total)),
-          available: await fromShieldedAmount(BigInt(data.dd.components.dailyForAddress.available))
+          total: await shieldedAmountToWei(client, BigInt(data.dd.components.dailyForAddress.total)),
+          available: await shieldedAmountToWei(client, BigInt(data.dd.components.dailyForAddress.available))
         },
         dailyDepositLimit: {
-          total: await fromShieldedAmount(BigInt(data.deposit.components.dailyForAll.total)),
-          available: await fromShieldedAmount(BigInt(data.deposit.components.dailyForAll.available))
+          total: await shieldedAmountToWei(client, BigInt(data.deposit.components.dailyForAll.total)),
+          available: await shieldedAmountToWei(client, BigInt(data.deposit.components.dailyForAll.available))
         },
         dailyWithdrawalLimit: {
-          total: await fromShieldedAmount(BigInt(data.withdraw.components.dailyForAll.total)),
-          available: await fromShieldedAmount(BigInt(data.withdraw.components.dailyForAll.available))
+          total: await shieldedAmountToWei(client, BigInt(data.withdraw.components.dailyForAll.total)),
+          available: await shieldedAmountToWei(client, BigInt(data.withdraw.components.dailyForAll.available))
         },
         poolSizeLimit: {
-          total: await fromShieldedAmount(BigInt(data.deposit.components.poolLimit.total)),
-          available: await fromShieldedAmount(BigInt(data.deposit.components.poolLimit.available))
+          total: await shieldedAmountToWei(client, BigInt(data.deposit.components.poolLimit.total)),
+          available: await shieldedAmountToWei(client, BigInt(data.deposit.components.poolLimit.available))
         },
       };
     } catch (error) {
@@ -300,7 +304,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     }
     setLimitsByPool(prev => ({ ...prev, [poolAlias]: limits }));
     setIsLoadingLimits(false);
-  }, [zkAccount, zkClients, account, fromShieldedAmount, currentPool.alias]);
+  }, [zkAccount, zkClients, account, currentPool.alias]);
 
   const calcMaxTransferable = useCallback(async (type, relayerFee, amountToConvert = ethers.constants.Zero) => {
     let max = ethers.constants.Zero;
@@ -323,14 +327,14 @@ export const ZkAccountContextProvider = ({ children }) => {
     if (zkAccount && client) {
       try {
         minTxAmount = await client.minTxAmount();
-        minTxAmount = await fromShieldedAmount(minTxAmount);
+        minTxAmount = await shieldedAmountToWei(client, minTxAmount);
       } catch (error) {
         console.error(error);
         Sentry.captureException(error, { tags: { method: 'ZkAccountContext.loadMinTxAmount', pool: poolAlias } });
       }
     }
     setMinTxAmountByPool(prev => ({ ...prev, [poolAlias]: minTxAmount }));
-  }, [zkAccount, zkClients, fromShieldedAmount, currentPool.alias]);
+  }, [zkAccount, zkClients, currentPool.alias]);
 
   const loadRelayerVersion = useCallback(async () => {
     if (!zkClient) return;
