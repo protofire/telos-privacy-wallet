@@ -13,7 +13,7 @@ const TokenBalanceContext = createContext({ balance: null });
 export default TokenBalanceContext;
 
 export const TokenBalanceContextProvider = ({ children }) => {
-  const { address: account, refetchNativeBalance, callContract, status } = useContext(WalletContext);
+  const { address: account, refetchNativeBalance, callContract } = useContext(WalletContext);
   const { currentPool, availablePools } = useContext(PoolContext);
   const [balances, setBalances] = useState({});
   const [nativeBalances, setNativeBalances] = useState({});
@@ -61,7 +61,6 @@ export const TokenBalanceContextProvider = ({ children }) => {
   // Update balances only for pools in active chain
   useEffect(() => {
     if (!account) return;
-    if (status !== 'connected') return;
 
     const poolAliases = availablePools.map(p => p.alias);
 
@@ -69,7 +68,7 @@ export const TokenBalanceContextProvider = ({ children }) => {
       .catch(error => {
         console.error('Error updating pool balances:', error);
       });
-  }, [account, updateBalance, availablePools, status]);
+  }, [account, updateBalance, availablePools]);
 
   // Wrapper for backward compatibility: if no poolAlias provided, update current pool
   const updateBalanceWrapper = useCallback(async (poolAlias) => {

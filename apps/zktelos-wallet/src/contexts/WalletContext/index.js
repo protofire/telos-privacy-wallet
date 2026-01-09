@@ -13,7 +13,7 @@ import { useCallback, createContext, useMemo } from 'react';
 const allowedConnectorId = ['io.metamask', 'walletConnect']
 
 const useEvmWallet = () => {
-  const { address, connector, status } = useConnection();
+  const { address, connector } = useConnection();
   const currentChainId = useChainId();
   const connectors = useConnectors();
   const { mutateAsync: connectAsync } = useConnect();
