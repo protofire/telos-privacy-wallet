@@ -1095,7 +1095,7 @@ export class ZkBobClient extends ZkBobProvider {
   // Transfer shielded funds to the shielded address
   // This method can produce several transactions in case of insufficient input notes (constants::IN per tx)
   // Returns jobIds from the sequencer or throw an Error
-  public async transferMulti(transfers: TransferRequest[], sequencerFee?: SequencerFee): Promise<SequencerJob[]> {
+  public async transferMulti(transfers: TransferRequest[], sequencerFee?: SequencerFee, messages?: IExtraItem[]): Promise<SequencerJob[]> {
     const state = this.zpState();
     const sequencer = this.sequencer();
 
@@ -1144,15 +1144,10 @@ export class ZkBobClient extends ZkBobProvider {
         prover: this.network().addressToBytes(onePart.fee.proverAddress),
         proxy_fee: onePart.fee.proxyPart.toString(),
         prover_fee: onePart.fee.proverPart.toString(),
-        data: onePart.outNotes.map((aNote) => {
-          return {
-            to: aNote.destination,
-            data: new Uint8Array([0, 1, 2, 3, 4, 5])
-          }
-        })
+        data: messages || []
       };
       const oneTxData = await state.createTransferOptimistic(oneTx, optimisticState);
-      console.log('RAFAEL NEW TYPE OF TX SENT')
+      console.log('RAFAEL TX CREATEED', oneTx)
 
       console.log(`Transaction created: delta_index = ${oneTxData.parsed_delta.index}, root = ${oneTxData.public.root}`);
 
