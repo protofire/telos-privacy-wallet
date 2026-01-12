@@ -20,6 +20,28 @@ import { PoolContext, ZkAccountContext } from 'contexts';
 import { formatNumber } from 'utils';
 import { useFee } from 'hooks';
 
+const parseCSVRow = (row) => {
+  const trimmedRow = row.trim();
+  let address, amount, memo;
+
+  if (trimmedRow.includes('"')) {
+    const quotedMatch = trimmedRow.match(/^([^,]+),([^,]+)(?:,"([^"]*)")?$/);
+    if (quotedMatch) {
+      address = quotedMatch[1].trim();
+      amount = quotedMatch[2].trim();
+      memo = quotedMatch[3] ? quotedMatch[3].trim() : '';
+    } else {
+      const rowData = trimmedRow.replace(/^,+|,+$/g, '').split(',').map(item => item.trim().replace(/^"|"$/g, ''));
+      [address, amount, memo] = rowData;
+    }
+  } else {
+    const rowData = trimmedRow.replace(/^,+|,+$/g, '').split(',').map(item => item.trim());
+    [address, amount, memo] = rowData;
+  }
+
+  return { address, amount, memo };
+};
+
 export default forwardRef((props, ref) => {
   const { t } = useTranslation();
   const {
@@ -51,23 +73,7 @@ export default forwardRef((props, ref) => {
       const memosMap = {};
       const parsedData = await Promise.all(rows.map(async (row, index) => {
         try {
-          let address, amount, memo;
-
-          const trimmedRow = row.trim();
-          if (trimmedRow.includes('"')) {
-            const match = trimmedRow.match(/^([^,]+),([^,]+)(?:,"([^"]*)")?$/);
-            if (match) {
-              address = match[1].trim();
-              amount = match[2].trim();
-              memo = match[3] ? match[3].trim() : '';
-            } else {
-              const rowData = trimmedRow.replace(/^,+|,+$/g, '').split(',').map(item => item.trim().replace(/^"|"$/g, ''));
-              [address, amount, memo] = rowData;
-            }
-          } else {
-            const rowData = trimmedRow.replace(/^,+|,+$/g, '').split(',').map(item => item.trim());
-            [address, amount, memo] = rowData;
-          }
+          const { address, amount, memo } = parseCSVRow(row);
 
           if (!address || !amount) throw Error;
 

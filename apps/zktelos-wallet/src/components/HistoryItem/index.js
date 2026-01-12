@@ -12,7 +12,7 @@ import Button from 'components/Button';
 import MultitransferDetailsModal from 'components/MultitransferDetailsModal';
 import { ZkAvatar } from 'components/ZkAccountIdentifier';
 
-import { formatNumber, shortAddress } from 'utils';
+import { formatNumber, shortAddress, decodeTextFromData } from 'utils';
 import { useDateFromNow, useHistoricalTokenSymbol } from 'hooks';
 import { NETWORKS, TOKENS_ICONS } from 'constants';
 
@@ -70,34 +70,18 @@ export function getSign(item) {
   return actions[item.type].sign;
 }
 
+
 const decodeMemo = (extraInfo) => {
   if (!extraInfo || !Array.isArray(extraInfo) || extraInfo.length === 0) {
     return null;
   }
 
-  try {
-    const firstMessage = extraInfo[0];
-    if (!firstMessage || !firstMessage.data) {
-      return null;
-    }
-
-    let dataToDecode;
-    if (firstMessage.data instanceof Uint8Array) {
-      dataToDecode = firstMessage.data;
-    } else if (Array.isArray(firstMessage.data)) {
-      dataToDecode = new Uint8Array(firstMessage.data);
-    } else {
-      return null;
-    }
-
-    const decoder = new TextDecoder();
-    const decoded = decoder.decode(dataToDecode);
-    const trimmed = decoded.trim();
-    return trimmed || null;
-  } catch (error) {
-    console.warn('Failed to decode memo:', error);
+  const firstMessage = extraInfo[0];
+  if (!firstMessage || !firstMessage.data) {
     return null;
   }
+
+  return decodeTextFromData(firstMessage.data);
 };
 
 const decodeMemos = (extraInfo, actions = []) => {
@@ -106,37 +90,22 @@ const decodeMemos = (extraInfo, actions = []) => {
   }
 
   const memosMap = {};
-  const decoder = new TextDecoder();
 
-  try {
-    extraInfo.forEach((message, index) => {
-      if (!message || !message.data) {
-        return;
-      }
+  extraInfo.forEach((message, index) => {
+    if (!message || !message.data) {
+      return;
+    }
 
-      const addressKey = actions[index]?.to || message.to;
-      if (!addressKey) {
-        return;
-      }
+    const addressKey = actions[index]?.to || message.to;
+    if (!addressKey) {
+      return;
+    }
 
-      let dataToDecode;
-      if (message.data instanceof Uint8Array) {
-        dataToDecode = message.data;
-      } else if (Array.isArray(message.data)) {
-        dataToDecode = new Uint8Array(message.data);
-      } else {
-        return;
-      }
-
-      const decoded = decoder.decode(dataToDecode);
-      const trimmed = decoded.trim();
-      if (trimmed) {
-        memosMap[addressKey] = trimmed;
-      }
-    });
-  } catch (error) {
-    console.warn('Failed to decode memos:', error);
-  }
+    const decodedText = decodeTextFromData(message.data);
+    if (decodedText) {
+      memosMap[addressKey] = decodedText;
+    }
+  });
 
   return memosMap;
 };

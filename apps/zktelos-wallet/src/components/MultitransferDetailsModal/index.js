@@ -10,8 +10,25 @@ import { ZkAvatar } from 'components/ZkAccountIdentifier';
 
 import { ReactComponent as Shield } from 'assets/shield.svg';
 
-import { formatNumber, shortAddress } from 'utils';
+import { formatNumber, shortAddress, normalizeAddress } from 'utils';
 import { TOKENS_ICONS } from 'constants';
+
+const findMemoForAddress = (addressKey, transferTo, memos) => {
+  if (!addressKey) return null;
+
+  const normalizedAddressKey = normalizeAddress(addressKey);
+  const normalizedTransferTo = normalizeAddress(transferTo);
+
+  const matchingKey = Object.keys(memos).find(key => {
+    const normalizedKey = normalizeAddress(key);
+    return normalizedKey === normalizedAddressKey ||
+      normalizedKey === normalizedTransferTo ||
+      key === addressKey ||
+      key === transferTo;
+  });
+
+  return matchingKey ? memos[matchingKey] : null;
+};
 
 const ListItem = ({ index, data, zkAccount, currentPool, memo }) => {
   const { t } = useTranslation();
@@ -98,29 +115,7 @@ export default ({ isOpen, onClose, onBack, transfers, isSent, zkAccount, current
         <List>
           {transfers.map((transfer, index) => {
             const addressKey = transfer.address || transfer.to;
-            let memo = memos[addressKey];
-
-            if (!memo && addressKey) {
-              const normalizeAddress = (addr) => {
-                if (!addr) return '';
-                return addr.replace(/\/$/, '').trim();
-              };
-
-              const normalizedAddressKey = normalizeAddress(addressKey);
-              const normalizedTransferTo = normalizeAddress(transfer.to);
-
-              const matchingKey = Object.keys(memos).find(key => {
-                const normalizedKey = normalizeAddress(key);
-                return normalizedKey === normalizedAddressKey ||
-                  normalizedKey === normalizedTransferTo ||
-                  key === addressKey ||
-                  key === transfer.to;
-              });
-
-              if (matchingKey) {
-                memo = memos[matchingKey];
-              }
-            }
+            const memo = memos[addressKey] || findMemoForAddress(addressKey, transfer.to, memos);
 
             return (
               <ListItem
