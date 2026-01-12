@@ -12,6 +12,7 @@ import AccountSetUpButton from 'containers/AccountSetUpButton';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
 import { useWindowDimensions } from 'hooks';
+import { decodeTextFromData } from 'utils';
 
 export default () => {
   const { t } = useTranslation();
@@ -59,11 +60,26 @@ export default () => {
     setCurrentPage(1);
   }, [zkAccount]);
 
+  const decodeMemoForAction = (extraInfo, actionIndex, actions) => {
+    if (!extraInfo || !Array.isArray(extraInfo) || extraInfo.length === 0) {
+      return '';
+    }
+
+    const message = extraInfo[actionIndex];
+    if (!message || !message.data) {
+      return '';
+    }
+
+    const decodedText = decodeTextFromData(message.data);
+    return decodedText || '';
+  };
 
   const exportData = () => {
-    const headers = ['amount', 'from', 'to', 'toYourself', 'commitment', 'extraInfo', 'failed', 'fee', 'from', 'txHash', 'type', 'state', 'failureReason', 'timestamp'];
+    const headers = ['amount', 'from', 'to', 'toYourself', 'commitment', 'memo', 'failed', 'fee', 'from', 'txHash', 'type', 'state', 'failureReason', 'timestamp'];
     let csvContent = items.map(item => {
-      let result = item.actions.map(action => {
+      let result = item.actions.map((action, actionIndex) => {
+        const memo = decodeMemoForAction(item.extraInfo, actionIndex, item.actions);
+        const memoEscaped = memo ? `"${memo.replace(/"/g, '""')}"` : '';
 
         return [
           getSign(item) + action.amount.toString(),
@@ -71,7 +87,7 @@ export default () => {
           action.to,
           action.isLoopback.toString(),
           item.commitment,
-          item.extraInfo,
+          memoEscaped,
           item.failed.toString(),
           item.fee,
           item.from,
