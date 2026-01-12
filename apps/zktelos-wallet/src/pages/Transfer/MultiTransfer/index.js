@@ -12,6 +12,7 @@ import Button from 'components/Button';
 import ButtonLoading from 'components/ButtonLoading';
 import TextEditor from 'components/TextEditor';
 import ConfirmTransactionModal from 'components/ConfirmTransactionModal';
+import MemoInput from 'components/MemoInput';
 
 import { ReactComponent as CrossIcon } from 'assets/red-cross.svg';
 
@@ -28,6 +29,7 @@ export default forwardRef((props, ref) => {
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const [data, setData] = useState('');
+  const [memo, setMemo] = useState('');
   const [parsedData, setParsedData] = useState([]);
   const [errors, setErrors] = useState([]);
   const [errorType, setErrorType] = useState(null);
@@ -122,8 +124,9 @@ export default forwardRef((props, ref) => {
   const onTransfer = useCallback(() => {
     setIsConfirmModalOpen(false);
     setData('');
-    transferMulti(parsedData, relayerFee);
-  }, [parsedData, transferMulti, relayerFee]);
+    setMemo('');
+    transferMulti(parsedData, relayerFee, memo);
+  }, [parsedData, transferMulti, relayerFee, memo]);
 
   const openDetailsModal = useCallback(() => {
     setIsConfirmModalOpen(false);
@@ -137,6 +140,7 @@ export default forwardRef((props, ref) => {
 
   useEffect(() => {
     setData('');
+    setMemo('');
     setParsedData([]);
     setErrors([]);
     setErrorType(null);
@@ -152,6 +156,12 @@ export default forwardRef((props, ref) => {
         placeholder={`${currentPool.addressPrefix}:M7dg2KkZuuSK8CU7N5pLMyuSCc1RoagsRWhH5yux1thVyUk57mpYrT2k6jh21cB, 100.75`}
         errorLines={errors}
         error={errorType}
+      />
+      <MemoInput
+        placeholder={t('multitransfer.memoPlaceholder')}
+        hint={t('multitransfer.memoHint')}
+        value={memo}
+        onChange={setMemo}
       />
       {!!errorType &&
         <ErrorRow>

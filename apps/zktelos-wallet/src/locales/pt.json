@@ -112,7 +112,9 @@
     "title": "Transferir",
     "note": "A transferência será realizada de forma privada. Remetente, destinatário e valor nunca são revelados.",
     "addressInputPlaceholder": "Inserir endereço do destinatário zkTelos",
-    "addressInputHint": "O endereço pode ser gerado na janela de modal da conta"
+    "addressInputHint": "O endereço pode ser gerado na janela de modal da conta",
+    "memoPlaceholder": "Memo opcional (máximo 200 caracteres)",
+    "memoHint": "Adicione uma mensagem pessoal a esta transferência"
   },
   "multitransfer": {
     "title": "Multitransferir",
@@ -127,7 +129,9 @@
     },
     "addressesList": "Lista de endereços",
     "willBeTransferredTo": "será transferido para {{count}} endereço zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
-    "hasBeenTransferredTo": "foi transferido para {{count}} endereço zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
+    "hasBeenTransferredTo": "foi transferido para {{count}} endereço zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
+    "memoPlaceholder": "Memo opcional para todas as transferências (máximo 200 caracteres)",
+    "memoHint": "Adicione uma mensagem pessoal que será incluída em todas as transferências"
   },
   "withdraw": {
     "title": "Sacar",

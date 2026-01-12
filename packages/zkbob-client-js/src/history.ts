@@ -1049,7 +1049,6 @@ export class HistoryStorage {
                   BigInt(details.commitment),
                   memo.messages
                 );
-                console.log('RAFAEL MEMO MESSAGES', memo)
                 allRecords.push(HistoryRecordIdx.create(rec, memo.index));
               }
             } else {

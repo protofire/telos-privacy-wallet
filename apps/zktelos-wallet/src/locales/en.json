@@ -112,7 +112,9 @@
     "title": "Transfer",
     "note": "The transfer will be performed privately. Sender, recipient and amount are never disclosed.",
     "addressInputPlaceholder": "Enter address of zkTelos receiver",
-    "addressInputHint": "The address can be generated in the account modal window"
+    "addressInputHint": "The address can be generated in the account modal window",
+    "memoPlaceholder": "Optional memo (max 200 characters)",
+    "memoHint": "Add a personal message to this transfer"
   },
   "multitransfer": {
     "title": "Multitransfer",
@@ -127,7 +129,9 @@
     },
     "addressesList": "Addresses list",
     "willBeTransferredTo": "will be transferred to {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
-    "hasBeenTransferredTo": "has been transferred to {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
+    "hasBeenTransferredTo": "has been transferred to {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
+    "memoPlaceholder": "Optional memo for all transfers (max 200 characters)",
+    "memoHint": "Add a personal message that will be included in all transfers"
   },
   "withdraw": {
     "title": "Withdraw",

@@ -112,7 +112,9 @@
     "title": "转账",
     "note": "转账将会以隐私的方式完成。发送人，收款人，及转账金额将不会被公开。",
     "addressInputPlaceholder": "请输入zkTelos收款人地址",
-    "addressInputHint": "地址可以在账户模态窗口中生成"
+    "addressInputHint": "地址可以在账户模态窗口中生成",
+    "memoPlaceholder": "可选备注（最多200个字符）",
+    "memoHint": "为此转账添加个人消息"
   },
   "multitransfer": {
     "title": "转账至多个地址",
@@ -127,7 +129,9 @@
     },
     "addressesList": "地址列表",
     "willBeTransferredTo": "将发送至 {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
-    "hasBeenTransferredTo": "已发送至{{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
+    "hasBeenTransferredTo": "已发送至{{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
+    "memoPlaceholder": "所有转账的可选备注（最多200个字符）",
+    "memoHint": "添加一条将包含在所有转账中的个人消息"
   },
   "withdraw": {
     "title": "提款",
