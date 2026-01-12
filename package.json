@@ -8,13 +8,15 @@
     "packages/*"
   ],
   "scripts": {
+    "preinstall": "yarn build:wasm",
     "start": "yarn workspace zktelos-wallet start",
-    "build": "yarn workspace zktelos-wallet build",
+    "build": "build:wasm && yarn workspace zktelos-wallet build",
     "test": "yarn workspace zktelos-wallet test",
     "electron:build:prod": "yarn workspace zktelos-wallet electron:build:prod",
     "electron:build:mac": "yarn workspace zktelos-wallet electron:build:mac",
     "electron:build:win": "yarn workspace zktelos-wallet electron:build:win",
     "electron:build:linux": "yarn workspace zktelos-wallet electron:build:linux",
+    "build:wasm": "yarn workspace libzkbob-rs-wasm build",
     "build:zkbob": "yarn workspace zkbob-client-js build",
     "watch:zkbob": "yarn workspace zkbob-client-js watch",
     "dev": "concurrently \"yarn watch:zkbob\" \"yarn start\" --names \"zkbob,app\" --prefix-colors \"blue,green\""

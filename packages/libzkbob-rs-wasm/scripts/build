@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Toolchain configuration
+# Note: Ensure these versions are available; 1.84+ are current as of 2025.
+RUSTUP_MT_TOOLCHAIN=nightly-2025-01-01  # Example for recent nightly
+RUSTUP_ST_TOOLCHAIN=stable              # Standard stable
+PARENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )"
+
+# Detect OS
+detect_os() {
+    case "$OSTYPE" in
+        darwin*)  echo "macos" ;;
+        linux*)   echo "linux" ;;
+        msys*|cygwin*|mingw*) echo "windows" ;;
+        *)        echo "unknown" ;;
+    esac
+}
+
+OS_TYPE=$(detect_os)
+echo "Detected OS: $OS_TYPE"
+
+# Cross-platform sed -i wrapper
+# Usage: sedi 'sed_expression' file
+sedi() {
+    local expression="$1"
+    local file="$2"
+    if [[ "$OS_TYPE" == "macos" ]]; then
+        sed -i '' -E "$expression" "$file"
+    else
+        sed -i -E "$expression" "$file"
+    fi
+}
+
+# Cross-platform sed -i for find -exec (creates temp script approach)
+# Usage: sedi_find 'sed_expression' file
+sedi_find() {
+    local expression="$1"
+    local file="$2"
+    if [[ "$OS_TYPE" == "macos" ]]; then
+        sed -i '' "$expression" "$file"
+    else
+        sed -i "$expression" "$file"
+    fi
+}
+
+function install_jq() {
+    echo "Installing jq..."
+    case "$OS_TYPE" in
+        macos)
+            if command -v brew &> /dev/null; then
+                brew install jq
+            else
+                echo "Error: Homebrew not found. Please install jq manually: https://stedolan.github.io/jq/download/"
+                exit 1
+            fi
+            ;;
+        linux)
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update && sudo apt-get install -y jq
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y jq
+            elif command -v pacman &> /dev/null; then
+                sudo pacman -S --noconfirm jq
+            else
+                echo "Error: No supported package manager found. Please install jq manually."
+                exit 1
+            fi
+            ;;
+        windows)
+            if command -v choco &> /dev/null; then
+                choco install jq -y
+            elif command -v scoop &> /dev/null; then
+                scoop install jq
+            else
+                echo "Error: No supported package manager found (choco/scoop). Please install jq manually."
+                exit 1
+            fi
+            ;;
+        *)
+            echo "Error: Unsupported OS. Please install jq manually."
+            exit 1
+            ;;
+    esac
+}
+
+function install_binaryen() {
+    echo "Installing binaryen (wasm-opt)..."
+    case "$OS_TYPE" in
+        macos)
+            if command -v brew &> /dev/null; then
+                brew install binaryen
+            else
+                echo "Error: Homebrew not found. Please install binaryen manually."
+                exit 1
+            fi
+            ;;
+        linux)
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update && sudo apt-get install -y binaryen
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y binaryen
+            elif command -v pacman &> /dev/null; then
+                sudo pacman -S --noconfirm binaryen
+            else
+                echo "Error: No supported package manager found. Please install binaryen manually."
+                exit 1
+            fi
+            ;;
+        windows)
+            if command -v choco &> /dev/null; then
+                choco install binaryen -y
+            elif command -v scoop &> /dev/null; then
+                scoop install binaryen
+            else
+                echo "Error: No supported package manager found (choco/scoop). Please install binaryen manually."
+                exit 1
+            fi
+            ;;
+        *)
+            echo "Error: Unsupported OS. Please install binaryen manually."
+            exit 1
+            ;;
+    esac
+}
+
+function prepare_env () {
+    echo "--- Preparing Build Environment ---"
+
+    # Install jq if missing
+    if ! command -v jq &> /dev/null; then
+        install_jq
+    fi
+
+    # Ensure rustup is installed
+    if ! command -v rustup &> /dev/null; then
+        echo "Installing rustup..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source "$HOME/.cargo/env"
+    fi
+
+    echo "Installing toolchains: $RUSTUP_ST_TOOLCHAIN and $RUSTUP_MT_TOOLCHAIN..."
+    rustup toolchain install $RUSTUP_ST_TOOLCHAIN
+    rustup toolchain install $RUSTUP_MT_TOOLCHAIN
+
+    echo "Adding wasm32 targets..."
+    rustup target add wasm32-unknown-unknown --toolchain $RUSTUP_ST_TOOLCHAIN
+    rustup target add wasm32-unknown-unknown --toolchain $RUSTUP_MT_TOOLCHAIN
+
+    echo "Installing rust-src for nightly (required for -Z build-std)..."
+    rustup component add rust-src --toolchain $RUSTUP_MT_TOOLCHAIN
+
+    # Install wasm-pack if missing
+    if ! command -v wasm-pack &> /dev/null; then
+        echo "Installing wasm-pack..."
+        curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    fi
+
+    # Install wasm-opt if missing (part of binaryen)
+    if ! command -v wasm-opt &> /dev/null; then
+        install_binaryen
+    fi
+    
+    echo "--- Environment Ready ---"
+}
+
+function patch_package_json () {
+    echo "Patching package.json for $1..."
+    sedi "s/\"name\": \"libzkbob-rs-wasm\"/\"name\": \"libzkbob-rs-wasm-$1\"/g" "$PARENT_DIR/$1/package.json"
+    jq '.files |= . + ["snippets"]' "$PARENT_DIR/$1/package.json" > "$PARENT_DIR/$1/tmp.json" \
+        && mv "$PARENT_DIR/$1/tmp.json" "$PARENT_DIR/$1/package.json"
+}
+
+# build $name $features $is_mt 
+function build () {
+    echo "Building $1 (MT: $3)..."
+    if [ "$3" = true ] ; then	
+        # Export RUSTFLAGS to ensure wasm-bindgen-rayon sees them
+        export RUSTFLAGS='-C target-feature=+atomics,+bulk-memory,+mutable-globals'
+        rustup run $RUSTUP_MT_TOOLCHAIN \
+            wasm-pack build --release --target web -d "$PARENT_DIR/$1" \
+            -- --features "$2" -Z build-std=panic_abort,std	
+
+        # Fix workerHelpers.js imports (cross-platform)
+        while IFS= read -r -d '' file; do
+            sedi_find "s|'../../..'|'../../../libzkbob_rs_wasm_web.js'|g" "$file"
+        done < <(find "$PARENT_DIR/$1/snippets" -name "workerHelpers.js" -print0)
+    else
+        export RUSTFLAGS=''
+        rustup run $RUSTUP_ST_TOOLCHAIN \
+            wasm-pack build --release --target web -d "$PARENT_DIR/$1" -- --features "$2"	
+    fi
+
+    wasm-opt -o "$PARENT_DIR/$1/wasm-opt.wasm" -O3 "$PARENT_DIR/$1/libzkbob_rs_wasm_web_bg.wasm" \
+        && mv "$PARENT_DIR/$1/wasm-opt.wasm" "$PARENT_DIR/$1/libzkbob_rs_wasm_web_bg.wasm"
+
+    sedi '/BroccoliDestroyInstance/d' "$PARENT_DIR/$1/libzkbob_rs_wasm_web.d.ts"
+    sedi '/BroccoliDestroyInstance/d' "$PARENT_DIR/$1/libzkbob_rs_wasm_web_bg.wasm.d.ts"
+    rm "$PARENT_DIR/$1/libzkbob_rs_wasm_web_bg.wasm.d.ts"
+
+    patch_package_json "$1"
+}
+
+# --- Main Execution ---
+prepare_env
+
+# Run the builds
+# build [folder_name] [features] [is_multicore] 
+build web web false
+build web-mt web,multicore true
+
+echo "Builds completed successfully!"

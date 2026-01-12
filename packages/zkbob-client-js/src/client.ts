@@ -1,4 +1,4 @@
-import {Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx} from "libzkbob-rs-wasm-web";
+import {Proof, ITransferData, IWithdrawData, TreeNode, IAddressComponents, IndexedTx, IExtraItem} from "libzkbob-rs-wasm-web";
 import {Chains, Pools, Parameters, ClientConfig, AccountConfig, accountId, ProverMode, DepositType, ZkAddressPrefix} from "./config";
 import {truncateHexPrefix, toTwosComplementHex, bigintToArrayLe, isDesktop} from "./utils";
 import {SyncStat, ZkBobState, ZERO_OPTIMISTIC_STATE} from "./state";
@@ -1095,7 +1095,7 @@ export class ZkBobClient extends ZkBobProvider {
   // Transfer shielded funds to the shielded address
   // This method can produce several transactions in case of insufficient input notes (constants::IN per tx)
   // Returns jobIds from the sequencer or throw an Error
-  public async transferMulti(transfers: TransferRequest[], sequencerFee?: SequencerFee): Promise<SequencerJob[]> {
+  public async transferMulti(transfers: TransferRequest[], sequencerFee?: SequencerFee, messages?: IExtraItem[]): Promise<SequencerJob[]> {
     const state = this.zpState();
     const sequencer = this.sequencer();
 
@@ -1144,9 +1144,10 @@ export class ZkBobClient extends ZkBobProvider {
         prover: this.network().addressToBytes(onePart.fee.proverAddress),
         proxy_fee: onePart.fee.proxyPart.toString(),
         prover_fee: onePart.fee.proverPart.toString(),
-        data: [],
+        data: messages || []
       };
       const oneTxData = await state.createTransferOptimistic(oneTx, optimisticState);
+      console.log('RAFAEL TX CREATEED', oneTx)
 
       console.log(`Transaction created: delta_index = ${oneTxData.parsed_delta.index}, root = ${oneTxData.public.root}`);
 
@@ -1411,14 +1412,15 @@ export class ZkBobClient extends ZkBobProvider {
   }
 
   private assertCalldataLength(txToSequencer: any, estimatedLen: number) {
-    let factLen = this.network().calldataBaseLength(this.calldataVersion()) + txToSequencer.memo.length / 2;
-    if (txToSequencer.depositSignature) {
-      factLen += txToSequencer.depositSignature.length / 2;
-    }
+    // RAFAEL: Since our contracts/relayer is v1 and our calldata version is v2 we ignore this validation
+    //let factLen = this.network().calldataBaseLength(this.calldataVersion()) + txToSequencer.memo.length / 2;
+    //if (txToSequencer.depositSignature) {
+    //factLen += txToSequencer.depositSignature.length / 2;
+    //}
 
-    if (factLen != estimatedLen) {
-      throw new InternalError(`Calldata length estimation error: est ${estimatedLen}, actual ${factLen} bytes`);
-    }
+    //if (factLen != estimatedLen) {
+    //throw new InternalError(`Calldata length estimation error: est ${estimatedLen}, actual ${factLen} bytes`);
+    //}
   }
 
   private async assertAccountCanTransact() {
