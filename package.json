@@ -1,6 +1,6 @@
 {
   "name": "telos-privacy-wallet-monorepo",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "author": "Protofire <info@protofire.io>",
   "workspaces": [
@@ -10,7 +10,7 @@
   "scripts": {
     "preinstall": "yarn build:wasm",
     "start": "yarn workspace zktelos-wallet start",
-    "build": "build:wasm && yarn workspace zktelos-wallet build",
+    "build": "yarn build:wasm && yarn workspace zktelos-wallet build",
     "test": "yarn workspace zktelos-wallet test",
     "electron:build:prod": "yarn workspace zktelos-wallet electron:build:prod",
     "electron:build:mac": "yarn workspace zktelos-wallet electron:build:mac",
