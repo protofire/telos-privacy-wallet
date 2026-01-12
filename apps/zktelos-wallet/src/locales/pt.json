@@ -209,7 +209,8 @@
     "highFee": "Essa transação exigiu operações adicionais, resultando em taxas mais altas.",
     "failed": "falhou",
     "noDescription": "Sem descrição",
-    "viewTx": "Ver tx"
+    "viewTx": "Ver tx",
+    "memo": "Memo"
   },
   "loadingError": {
     "titles": {

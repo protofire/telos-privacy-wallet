@@ -70,6 +70,36 @@ export function getSign(item) {
   return actions[item.type].sign;
 }
 
+const decodeMemo = (extraInfo) => {
+  if (!extraInfo || !Array.isArray(extraInfo) || extraInfo.length === 0) {
+    return null;
+  }
+
+  try {
+    const firstMessage = extraInfo[0];
+    if (!firstMessage || !firstMessage.data) {
+      return null;
+    }
+
+    let dataToDecode;
+    if (firstMessage.data instanceof Uint8Array) {
+      dataToDecode = firstMessage.data;
+    } else if (Array.isArray(firstMessage.data)) {
+      dataToDecode = new Uint8Array(firstMessage.data);
+    } else {
+      return null;
+    }
+
+    const decoder = new TextDecoder();
+    const decoded = decoder.decode(dataToDecode);
+    const trimmed = decoded.trim();
+    return trimmed || null;
+  } catch (error) {
+    console.warn('Failed to decode memo:', error);
+    return null;
+  }
+};
+
 const AddressLink = ({ action, isMobile, currentChainId }) => {
   const address = action.type === Deposit ? action.actions[0].from : action.actions[0].to;
   return (
@@ -140,6 +170,8 @@ export default ({ item, zkAccount, isMobile }) => {
     (item.sender && item.sender === itemPool.paymentContractAddress?.toLowerCase()) ||
     (item.actions[0]?.from && item.actions[0].from === itemPool.paymentContractAddress?.toLowerCase())
   );
+
+  const memo = decodeMemo(item.extraInfo);
 
   return (
     <Container>
@@ -304,6 +336,12 @@ export default ({ item, zkAccount, isMobile }) => {
             )}
           </Row>
         </RowSpaceBetween>
+        {memo && (
+          <MemoContainer>
+            <MemoLabel>{t('history.memo')}: </MemoLabel>
+            <MemoText>{memo}</MemoText>
+          </MemoContainer>
+        )}
       </Column>
       {item.actions?.length > 1 && (
         <MultitransferDetailsModal
@@ -435,4 +473,26 @@ const FeeMobile = styled(Row)`
   @media only screen and (max-width: 500px) {
     display: flex;
   }
+`;
+
+const MemoContainer = styled.div`
+  padding: 0px 4px;
+  background-color: ${props => props.theme.input.background.secondary || '#f5f5f5'};
+  border-radius: 8px;
+  border-left: 3px solid ${props => props.theme.color.purple || props.theme.input.border.color.focus || '#7c3aed'};
+`;
+
+const MemoLabel = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  font-weight: ${props => props.theme.text.weight.bold || 600};
+  margin-right: 4px;
+`;
+
+const MemoText = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  font-style: italic;
+  word-break: break-word;
+  line-height: 1.4;
 `;

@@ -209,7 +209,8 @@
     "highFee": "本次交易需要额外操作，将产生更高的手续费。",
     "failed": "失败",
     "noDescription": "无说明",
-    "viewTx": "浏览交易哈希"
+    "viewTx": "浏览交易哈希",
+    "memo": "备注"
   },
   "loadingError": {
     "titles": {

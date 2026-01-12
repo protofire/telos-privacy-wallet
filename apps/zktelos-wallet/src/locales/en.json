@@ -209,7 +209,8 @@
     "highFee": "This transaction required additional operations, resulting in higher fees.",
     "failed": "failed",
     "noDescription": "No description",
-    "viewTx": "View tx"
+    "viewTx": "View tx",
+    "memo": "Memo"
   },
   "loadingError": {
     "titles": {
