@@ -10,10 +10,27 @@ import { ZkAvatar } from 'components/ZkAccountIdentifier';
 
 import { ReactComponent as Shield } from 'assets/shield.svg';
 
-import { formatNumber, shortAddress } from 'utils';
+import { formatNumber, shortAddress, normalizeAddress } from 'utils';
 import { TOKENS_ICONS } from 'constants';
 
-const ListItem = ({ index, data, zkAccount, currentPool }) => {
+const findMemoForAddress = (addressKey, transferTo, memos) => {
+  if (!addressKey) return null;
+
+  const normalizedAddressKey = normalizeAddress(addressKey);
+  const normalizedTransferTo = normalizeAddress(transferTo);
+
+  const matchingKey = Object.keys(memos).find(key => {
+    const normalizedKey = normalizeAddress(key);
+    return normalizedKey === normalizedAddressKey ||
+      normalizedKey === normalizedTransferTo ||
+      key === addressKey ||
+      key === transferTo;
+  });
+
+  return matchingKey ? memos[matchingKey] : null;
+};
+
+const ListItem = ({ index, data, zkAccount, currentPool, memo }) => {
   const { t } = useTranslation();
   const [isCopied, setIsCopied] = useState(false);
 
@@ -26,38 +43,48 @@ const ListItem = ({ index, data, zkAccount, currentPool }) => {
 
   return (
     <ItemContainer>
-      <Index>{index + 1}</Index>
-      {data.isLoopback ? (
-        <ZkAvatar seed={zkAccount} size={16} />
-      ) : (
-        <Shield width={16} height={16} />
-      )}
-      <Tooltip
-        content={data.address}
-        delay={0.3}
-        placement="bottom"
-        width={300}
-        style={{
-          wordBreak: 'break-all',
-          textAlign: 'center',
-        }}
-      >
-        <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>
-          <CopyToClipboard text={data.address} onCopy={onCopy}>
-            <Address>
-              {shortAddress(data.address, 22)}
-            </Address>
-          </CopyToClipboard>
-        </Tooltip>
-      </Tooltip>
-      <Amount>
-        {formatNumber(data.amount, currentPool.tokenDecimals, 18)} {currentPool.tokenSymbol}
-      </Amount>
+      <ItemContent>
+        <ItemRow>
+          <Index>{index + 1}</Index>
+          {data.isLoopback ? (
+            <ZkAvatar seed={zkAccount} size={16} />
+          ) : (
+            <Shield width={16} height={16} />
+          )}
+          <Tooltip
+            content={data.address}
+            delay={0.3}
+            placement="bottom"
+            width={300}
+            style={{
+              wordBreak: 'break-all',
+              textAlign: 'center',
+            }}
+          >
+            <Tooltip content={t('common.copied')} placement="right" visible={isCopied}>
+              <CopyToClipboard text={data.address} onCopy={onCopy}>
+                <Address>
+                  {shortAddress(data.address, 22)}
+                </Address>
+              </CopyToClipboard>
+            </Tooltip>
+          </Tooltip>
+          <Amount>
+            {formatNumber(data.amount, currentPool.tokenDecimals, 18)} {currentPool.tokenSymbol}
+          </Amount>
+        </ItemRow>
+        {memo && (
+          <MemoContainer>
+            <MemoLabel>{t('history.memo')}: </MemoLabel>
+            <MemoText>{memo}</MemoText>
+          </MemoContainer>
+        )}
+      </ItemContent>
     </ItemContainer>
   );
 }
 
-export default ({ isOpen, onClose, onBack, transfers, isSent, zkAccount, currentPool }) => {
+export default ({ isOpen, onClose, onBack, transfers, isSent, zkAccount, currentPool, memos = {} }) => {
   const { t } = useTranslation();
   return (
     <Modal
@@ -86,15 +113,21 @@ export default ({ isOpen, onClose, onBack, transfers, isSent, zkAccount, current
           </Text>
         </DetailsContainer>
         <List>
-          {transfers.map((transfer, index) => (
-            <ListItem
-              key={index}
-              index={index}
-              data={transfer}
-              zkAccount={zkAccount}
-              currentPool={currentPool}
-            />
-          ))}
+          {transfers.map((transfer, index) => {
+            const addressKey = transfer.address || transfer.to;
+            const memo = memos[addressKey] || findMemoForAddress(addressKey, transfer.to, memos);
+
+            return (
+              <ListItem
+                key={index}
+                index={index}
+                data={transfer}
+                zkAccount={zkAccount}
+                currentPool={currentPool}
+                memo={memo}
+              />
+            );
+          })}
         </List>
       </Container>
     </Modal>
@@ -160,7 +193,19 @@ const MediumText = styled.span`
 
 const ItemContainer = styled.div`
   display: flex;
+  flex-direction: column;
   margin-bottom: 16px;
+`;
+
+const ItemContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const ItemRow = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const Text = styled(MediumText)`
@@ -192,4 +237,28 @@ const Amount = styled.span`
 const Address = styled(Amount)`
   margin-left: 5px;
   cursor: pointer;
+`;
+
+const MemoContainer = styled.div`
+  margin-top: 8px;
+  margin-left: 22px;
+  padding: 6px 10px;
+  background-color: ${props => props.theme.input.background.secondary || '#f5f5f5'};
+  border-radius: 8px;
+  border-left: 3px solid ${props => props.theme.color.purple || props.theme.input.border.color.focus || '#7c3aed'};
+`;
+
+const MemoLabel = styled.span`
+  font-size: 12px;
+  color: ${props => props.theme.text.color.secondary};
+  font-weight: ${props => props.theme.text.weight.bold || 600};
+  margin-right: 4px;
+`;
+
+const MemoText = styled.span`
+  font-size: 12px;
+  color: ${props => props.theme.text.color.secondary};
+  font-style: italic;
+  word-break: break-word;
+  line-height: 1.4;
 `;

@@ -118,9 +118,9 @@
   },
   "multitransfer": {
     "title": "Multitransfer",
-    "instruction": "Add zkAddress, the amount of {{symbol}} to transfer. 1 address per row.",
+    "instruction": "Add zkAddress, the amount of {{symbol}} to transfer, and optional memo. 1 address per row.",
     "uploadCSV": "Upload CSV",
-    "uploadCSVHint": "Click Upload CSV to add a prepared .csv file from your machine. Each row should contain: zkAddress, amount",
+    "uploadCSVHint": "Click Upload CSV to add a prepared .csv file from your machine. Each row should contain: zkAddress, amount, memo (optional). Format: address, amount, \"memo text\"",
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} }) with incorrect $t(glossary.addresses, {\"count\": {{count}} }) or formatting $t(glossary.issues, {\"count\": {{count}} }).",
       "duplicates": "Duplicate addresses found.",
@@ -209,7 +209,8 @@
     "highFee": "This transaction required additional operations, resulting in higher fees.",
     "failed": "failed",
     "noDescription": "No description",
-    "viewTx": "View tx"
+    "viewTx": "View tx",
+    "memo": "Memo"
   },
   "loadingError": {
     "titles": {

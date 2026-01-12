@@ -45,6 +45,37 @@ export const minBigNumber = (...numbers) =>
 export const maxBigNumber = (...numbers) =>
   numbers.reduce((p, v) => (p.gt(v) ? p : v));
 
+export const normalizeAddress = (address) => {
+  if (!address) return '';
+  return address.replace(/\/$/, '').trim();
+};
+
+export const convertDataToUint8Array = (data) => {
+  if (data instanceof Uint8Array) {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return new Uint8Array(data);
+  }
+  return null;
+};
+
+export const decodeTextFromData = (data) => {
+  const dataToDecode = convertDataToUint8Array(data);
+  if (!dataToDecode) {
+    return null;
+  }
+
+  try {
+    const decoder = new TextDecoder();
+    const decoded = decoder.decode(dataToDecode);
+    return decoded.trim() || null;
+  } catch (error) {
+    console.warn('Failed to decode text from data:', error);
+    return null;
+  }
+};
+
 export const showLoadingError = cause => {
   toast.error(
     <span>

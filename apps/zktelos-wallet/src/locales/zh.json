@@ -118,9 +118,9 @@
   },
   "multitransfer": {
     "title": "转账至多个地址",
-    "instruction": "1 address per row. 输入zk地址，以及需要转账的{{symbol}}数量。每行一个地址。",
+    "instruction": "1 address per row. 输入zk地址，需要转账的{{symbol}}数量，以及可选的备注。每行一个地址。",
     "uploadCSV": "上传CSV文件",
-    "uploadCSVHint": "点击“上传CSV文件”并从设备中添加.csv文件。每行应包括：zk地址，转账金额",
+    "uploadCSVHint": "点击\"上传CSV文件\"并从设备中添加.csv文件。每行应包括：zk地址，转账金额，备注（可选）。格式：地址，金额，\"备注文本\"",
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} })与$t(glossary.addresses, {\"count\": {{count}} })错误，或格式化 $t(glossary.issues, {\"count\": {{count}} })。",
       "duplicates": "地址重复。",
@@ -209,7 +209,8 @@
     "highFee": "本次交易需要额外操作，将产生更高的手续费。",
     "failed": "失败",
     "noDescription": "无说明",
-    "viewTx": "浏览交易哈希"
+    "viewTx": "浏览交易哈希",
+    "memo": "备注"
   },
   "loadingError": {
     "titles": {
@@ -320,7 +321,7 @@
     "title": "登出并清除浏览记录",
     "description": "登出后，您的zk账户信息将从缓存中移除，您将无法使用密码再次访问，请使用助记词和新密码以恢复账户和显示余额。"
   },
-    "disablePasswordModal": {
+  "disablePasswordModal": {
     "title": "停用密码",
     "description": "请输入现用密码"
   },

@@ -12,7 +12,7 @@ import Button from 'components/Button';
 import MultitransferDetailsModal from 'components/MultitransferDetailsModal';
 import { ZkAvatar } from 'components/ZkAccountIdentifier';
 
-import { formatNumber, shortAddress } from 'utils';
+import { formatNumber, shortAddress, decodeTextFromData } from 'utils';
 import { useDateFromNow, useHistoricalTokenSymbol } from 'hooks';
 import { NETWORKS, TOKENS_ICONS } from 'constants';
 
@@ -69,6 +69,46 @@ export function getSign(item) {
   }
   return actions[item.type].sign;
 }
+
+
+const decodeMemo = (extraInfo) => {
+  if (!extraInfo || !Array.isArray(extraInfo) || extraInfo.length === 0) {
+    return null;
+  }
+
+  const firstMessage = extraInfo[0];
+  if (!firstMessage || !firstMessage.data) {
+    return null;
+  }
+
+  return decodeTextFromData(firstMessage.data);
+};
+
+const decodeMemos = (extraInfo, actions = []) => {
+  if (!extraInfo || !Array.isArray(extraInfo) || extraInfo.length === 0) {
+    return {};
+  }
+
+  const memosMap = {};
+
+  extraInfo.forEach((message, index) => {
+    if (!message || !message.data) {
+      return;
+    }
+
+    const addressKey = actions[index]?.to || message.to;
+    if (!addressKey) {
+      return;
+    }
+
+    const decodedText = decodeTextFromData(message.data);
+    if (decodedText) {
+      memosMap[addressKey] = decodedText;
+    }
+  });
+
+  return memosMap;
+};
 
 const AddressLink = ({ action, isMobile, currentChainId }) => {
   const address = action.type === Deposit ? action.actions[0].from : action.actions[0].to;
@@ -140,6 +180,11 @@ export default ({ item, zkAccount, isMobile }) => {
     (item.sender && item.sender === itemPool.paymentContractAddress?.toLowerCase()) ||
     (item.actions[0]?.from && item.actions[0].from === itemPool.paymentContractAddress?.toLowerCase())
   );
+
+  const memo = decodeMemo(item.extraInfo);
+  const memos = item.type === TransferOut && item.actions?.length > 1
+    ? decodeMemos(item.extraInfo, item.actions)
+    : {};
 
   return (
     <Container>
@@ -304,6 +349,12 @@ export default ({ item, zkAccount, isMobile }) => {
             )}
           </Row>
         </RowSpaceBetween>
+        {memo && item.actions?.length <= 1 && (
+          <MemoContainer>
+            <MemoLabel>{t('history.memo')}: </MemoLabel>
+            <MemoText>{memo}</MemoText>
+          </MemoContainer>
+        )}
       </Column>
       {item.actions?.length > 1 && (
         <MultitransferDetailsModal
@@ -313,6 +364,7 @@ export default ({ item, zkAccount, isMobile }) => {
           zkAccount={zkAccount}
           isSent={true}
           currentPool={itemPool}
+          memos={memos}
         />
       )}
     </Container>
@@ -435,4 +487,26 @@ const FeeMobile = styled(Row)`
   @media only screen and (max-width: 500px) {
     display: flex;
   }
+`;
+
+const MemoContainer = styled.div`
+  padding: 0px 4px;
+  background-color: ${props => props.theme.input.background.secondary || '#f5f5f5'};
+  border-radius: 8px;
+  border-left: 3px solid ${props => props.theme.color.purple || props.theme.input.border.color.focus || '#7c3aed'};
+`;
+
+const MemoLabel = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  font-weight: ${props => props.theme.text.weight.bold || 600};
+  margin-right: 4px;
+`;
+
+const MemoText = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  font-style: italic;
+  word-break: break-word;
+  line-height: 1.4;
 `;

@@ -445,7 +445,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     setTxStatus, toShieldedAmount, setTxAmount, currentPool.alias,
   ]);
 
-  const transferMulti = useCallback(async (data, relayerFee, memo = '') => {
+  const transferMulti = useCallback(async (data, relayerFee, memos = {}) => {
     openTxModal();
     const activeClient = zkClients[currentPool.alias];
     try {
@@ -454,7 +454,7 @@ export const ZkAccountContextProvider = ({ children }) => {
         destination: address,
         amountGwei: await toShieldedAmount(amount)
       })));
-      await zp.transfer(activeClient, transfers, relayerFee, setTxStatus, true, memo);
+      await zp.transfer(activeClient, transfers, relayerFee, setTxStatus, true, memos);
       updatePoolData(currentPool.alias);
     } catch (error) {
       console.error(error);
