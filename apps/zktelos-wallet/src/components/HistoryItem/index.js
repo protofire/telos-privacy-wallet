@@ -100,6 +100,47 @@ const decodeMemo = (extraInfo) => {
   }
 };
 
+const decodeMemos = (extraInfo, actions = []) => {
+  if (!extraInfo || !Array.isArray(extraInfo) || extraInfo.length === 0) {
+    return {};
+  }
+
+  const memosMap = {};
+  const decoder = new TextDecoder();
+
+  try {
+    extraInfo.forEach((message, index) => {
+      if (!message || !message.data) {
+        return;
+      }
+
+      const addressKey = actions[index]?.to || message.to;
+      if (!addressKey) {
+        return;
+      }
+
+      let dataToDecode;
+      if (message.data instanceof Uint8Array) {
+        dataToDecode = message.data;
+      } else if (Array.isArray(message.data)) {
+        dataToDecode = new Uint8Array(message.data);
+      } else {
+        return;
+      }
+
+      const decoded = decoder.decode(dataToDecode);
+      const trimmed = decoded.trim();
+      if (trimmed) {
+        memosMap[addressKey] = trimmed;
+      }
+    });
+  } catch (error) {
+    console.warn('Failed to decode memos:', error);
+  }
+
+  return memosMap;
+};
+
 const AddressLink = ({ action, isMobile, currentChainId }) => {
   const address = action.type === Deposit ? action.actions[0].from : action.actions[0].to;
   return (
@@ -172,6 +213,9 @@ export default ({ item, zkAccount, isMobile }) => {
   );
 
   const memo = decodeMemo(item.extraInfo);
+  const memos = item.type === TransferOut && item.actions?.length > 1
+    ? decodeMemos(item.extraInfo, item.actions)
+    : {};
 
   return (
     <Container>
@@ -336,7 +380,7 @@ export default ({ item, zkAccount, isMobile }) => {
             )}
           </Row>
         </RowSpaceBetween>
-        {memo && (
+        {memo && item.actions?.length <= 1 && (
           <MemoContainer>
             <MemoLabel>{t('history.memo')}: </MemoLabel>
             <MemoText>{memo}</MemoText>
@@ -351,6 +395,7 @@ export default ({ item, zkAccount, isMobile }) => {
           zkAccount={zkAccount}
           isSent={true}
           currentPool={itemPool}
+          memos={memos}
         />
       )}
     </Container>

@@ -67,11 +67,17 @@ const directDeposit = async (from, sendTransaction, zkClient, amount, setTxStatu
   setTxStatus(TX_STATUSES.DEPOSITED);
 };
 
-const transfer = async (zkClient, transfers, fee, setTxStatus, isMulti, memo = '') => {
+const transfer = async (zkClient, transfers, fee, setTxStatus, isMulti, memoOrMemos = '') => {
   setTxStatus(TX_STATUSES.GENERATING_PROOF);
+  const encoder = new TextEncoder();
   const testMessages = transfers.map(t => {
-    const encoder = new TextEncoder();
-    return { to: t.destination, data: encoder.encode(memo || '') }
+    let memoText = '';
+    if (typeof memoOrMemos === 'string') {
+      memoText = memoOrMemos || '';
+    } else if (typeof memoOrMemos === 'object' && memoOrMemos !== null) {
+      memoText = memoOrMemos[t.destination] || '';
+    }
+    return { to: t.destination, data: encoder.encode(memoText) }
   })
   const jobIds = await zkClient.transferMulti(transfers, fee, testMessages);
   setTxStatus(TX_STATUSES.WAITING_FOR_RELAYER);

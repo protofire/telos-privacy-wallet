@@ -12,7 +12,6 @@ import Button from 'components/Button';
 import ButtonLoading from 'components/ButtonLoading';
 import TextEditor from 'components/TextEditor';
 import ConfirmTransactionModal from 'components/ConfirmTransactionModal';
-import MemoInput from 'components/MemoInput';
 
 import { ReactComponent as CrossIcon } from 'assets/red-cross.svg';
 
@@ -29,8 +28,8 @@ export default forwardRef((props, ref) => {
   } = useContext(ZkAccountContext);
   const { currentPool } = useContext(PoolContext);
   const [data, setData] = useState('');
-  const [memo, setMemo] = useState('');
   const [parsedData, setParsedData] = useState([]);
+  const [memos, setMemos] = useState({});
   const [errors, setErrors] = useState([]);
   const [errorType, setErrorType] = useState(null);
   const [wrongPoolAddresses, setWrongPoolAddresses] = useState([]);
@@ -49,11 +48,28 @@ export default forwardRef((props, ref) => {
       let errors = [];
       const wrongPools = [];
       const rows = data.split('\n');
+      const memosMap = {};
       const parsedData = await Promise.all(rows.map(async (row, index) => {
         try {
-          const rowData = row.replace(/\s/g, '').replace(/^,+|,+$/g, '').split(',');
-          const [address, amount] = rowData;
-          if (!address || !amount || rowData.length !== 2) throw Error;
+          let address, amount, memo;
+
+          const trimmedRow = row.trim();
+          if (trimmedRow.includes('"')) {
+            const match = trimmedRow.match(/^([^,]+),([^,]+)(?:,"([^"]*)")?$/);
+            if (match) {
+              address = match[1].trim();
+              amount = match[2].trim();
+              memo = match[3] ? match[3].trim() : '';
+            } else {
+              const rowData = trimmedRow.replace(/^,+|,+$/g, '').split(',').map(item => item.trim().replace(/^"|"$/g, ''));
+              [address, amount, memo] = rowData;
+            }
+          } else {
+            const rowData = trimmedRow.replace(/^,+|,+$/g, '').split(',').map(item => item.trim());
+            [address, amount, memo] = rowData;
+          }
+
+          if (!address || !amount) throw Error;
 
           const addressValidation = await verifyShieldedAddressWithPoolInfo(address);
           if (!addressValidation.isValid || !(Number(amount) > 0)) {
@@ -63,12 +79,18 @@ export default forwardRef((props, ref) => {
             throw Error;
           }
 
+          if (memo && memo.length > 0) {
+            memosMap[address] = memo;
+          }
+
           return { address, amount: ethers.utils.parseUnits(amount, currentPool.tokenDecimals) };
         } catch (err) {
           errors.push(index);
           return null;
         }
       }));
+
+      setMemos(memosMap);
       setErrors(errors);
       setWrongPoolAddresses(wrongPools);
       if (errors.length > 0) {
@@ -124,9 +146,9 @@ export default forwardRef((props, ref) => {
   const onTransfer = useCallback(() => {
     setIsConfirmModalOpen(false);
     setData('');
-    setMemo('');
-    transferMulti(parsedData, relayerFee, memo);
-  }, [parsedData, transferMulti, relayerFee, memo]);
+    setMemos({});
+    transferMulti(parsedData, relayerFee, memos);
+  }, [parsedData, transferMulti, relayerFee, memos]);
 
   const openDetailsModal = useCallback(() => {
     setIsConfirmModalOpen(false);
@@ -140,7 +162,7 @@ export default forwardRef((props, ref) => {
 
   useEffect(() => {
     setData('');
-    setMemo('');
+    setMemos({});
     setParsedData([]);
     setErrors([]);
     setErrorType(null);
@@ -153,15 +175,9 @@ export default forwardRef((props, ref) => {
       <TextEditor
         value={data}
         onChange={setData}
-        placeholder={`${currentPool.addressPrefix}:M7dg2KkZuuSK8CU7N5pLMyuSCc1RoagsRWhH5yux1thVyUk57mpYrT2k6jh21cB, 100.75`}
+        placeholder={`M7dg2KkZuuSK8CU7N5pLMyuSCc1RoagsRWhH5yux1thVyUk57mpYrT2k6jh21cB, 100.75, "Optional memo"`}
         errorLines={errors}
         error={errorType}
-      />
-      <MemoInput
-        placeholder={t('multitransfer.memoPlaceholder')}
-        hint={t('multitransfer.memoHint')}
-        value={memo}
-        onChange={setMemo}
       />
       {!!errorType &&
         <ErrorRow>
@@ -207,7 +223,7 @@ export default forwardRef((props, ref) => {
         numberOfTxs={numberOfTxs}
         type="multitransfer"
         currentPool={currentPool}
-        memo={memo}
+        memos={memos}
       />
       <MultitransferDetailsModal
         isOpen={isDetailsModalOpen}
@@ -215,6 +231,7 @@ export default forwardRef((props, ref) => {
         transfers={parsedData}
         zkAccount={zkAccount}
         currentPool={currentPool}
+        memos={memos}
       />
     </>
   );

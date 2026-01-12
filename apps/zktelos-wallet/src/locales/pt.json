@@ -118,9 +118,9 @@
   },
   "multitransfer": {
     "title": "Multitransferir",
-    "instruction": "Adicione o endereço zk, a quantidade de {{symbol}} a ser transferida. 1 endereço por linha.",
+    "instruction": "Adicione o endereço zk, a quantidade de {{symbol}} a ser transferida e memo opcional. 1 endereço por linha.",
     "uploadCSV": "Enviar CSV",
-    "uploadCSVHint": "Clique em Enviar CSV para adicionar um arquivo .csv preparado de sua máquina. Cada linha deve conter: endereço zk, quantidade",
+    "uploadCSVHint": "Clique em Enviar CSV para adicionar um arquivo .csv preparado de sua máquina. Cada linha deve conter: endereço zk, quantidade, memo (opcional). Formato: endereço, quantidade, \"texto do memo\"",
     "errors": {
       "syntax": "{{count}} $t(glossary.rows, {\"count\": {{count}} }) com endereços $t(glossary.addresses, {\"count\": {{count}} }) ou formatação incorretos $t(glossary.issues, {\"count\": {{count}} }).",
       "duplicates": "Endereços duplicados encontrados.",

@@ -16,7 +16,7 @@ export default ({
   isZkAddress, fee, numberOfTxs, type, isLoadingFee,
   isMultitransfer, transfers, openDetails, currentPool,
   amountToConvert = ethers.constants.Zero, convertionDetails,
-  memo,
+  memo, memos = {},
 }) => {
   const { t } = useTranslation();
   const displayedFee = useDisplayedFee(currentPool, fee);
@@ -55,7 +55,11 @@ export default ({
           {isMultitransfer ? (
             <>
               <MediumTextMulti>{t('confirmTransaction.sendToMultiple', { count: transfers.length })}</MediumTextMulti>
-              <ViewAllButton type="link" onClick={openDetails}>{t('confirmTransaction.viewAll')}</ViewAllButton>
+              <ViewAllButton type="link" onClick={() => {
+                if (openDetails) {
+                  openDetails();
+                }
+              }}>{t('confirmTransaction.viewAll')}</ViewAllButton>
             </>
           ) : (
             <>
