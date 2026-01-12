@@ -112,7 +112,9 @@
     "title": "Перевод",
     "note": "Перевод будет выполнен конфиденциально. Отправитель, получатель и сумма никогда не будут раскрыты.",
     "addressInputPlaceholder": "Введите адрес получателя zkTelos",
-    "addressInputHint": "Адрес можно сгенерировать в окне аккаунта"
+    "addressInputHint": "Адрес можно сгенерировать в окне аккаунта",
+    "memoPlaceholder": "Необязательное примечание (максимум 200 символов)",
+    "memoHint": "Добавьте личное сообщение к этому переводу"
   },
   "multitransfer": {
     "title": "Мультиперевод",
@@ -127,7 +129,9 @@
     },
     "addressesList": "Список адресов",
     "willBeTransferredTo": "Будет переведено на {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
-    "hasBeenTransferredTo": "Было переведено на {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })"
+    "hasBeenTransferredTo": "Было переведено на {{count}} zkTelos $t(glossary.addresses, {\"count\": {{count}} })",
+    "memoPlaceholder": "Необязательное примечание для всех переводов (максимум 200 символов)",
+    "memoHint": "Добавьте личное сообщение, которое будет включено во все переводы"
   },
   "withdraw": {
     "title": "Вывод",

@@ -12,6 +12,7 @@ import Button from 'components/Button';
 import ButtonLoading from 'components/ButtonLoading';
 import ConfirmTransactionModal from 'components/ConfirmTransactionModal';
 import MultilineInput from 'components/MultilineInput';
+import MemoInput from 'components/MemoInput';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
 
@@ -30,6 +31,7 @@ export default ({ poolOptions = [], onPoolSelect }) => {
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const [receiver, setReceiver] = useState('');
+  const [memo, setMemo] = useState('');
   const [addressValidation, setAddressValidation] = useState({ isValid: false, poolInfo: null });
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const { fee, relayerFee, numberOfTxs, isLoadingFee } = useFee(amount, TxType.Transfer);
@@ -40,8 +42,9 @@ export default ({ poolOptions = [], onPoolSelect }) => {
     setIsConfirmModalOpen(false);
     setDisplayAmount('');
     setReceiver('');
-    transfer(receiver, amount, relayerFee);
-  }, [receiver, amount, transfer, relayerFee]);
+    setMemo('');
+    transfer(receiver, amount, relayerFee, memo);
+  }, [receiver, amount, transfer, relayerFee, memo]);
 
   const setMax = useCallback(async () => {
     setDisplayAmount(ethers.utils.formatUnits(maxTransferable, currentPool.tokenDecimals));
@@ -72,6 +75,7 @@ export default ({ poolOptions = [], onPoolSelect }) => {
   useEffect(() => {
     setDisplayAmount('');
     setReceiver('');
+    setMemo('');
   }, [currentPool.alias]);
 
   let button = null;
@@ -127,6 +131,12 @@ export default ({ poolOptions = [], onPoolSelect }) => {
         hint={t('transfer.addressInputHint')}
         value={receiver}
         onChange={setReceiver}
+      />
+      <MemoInput
+        placeholder={t('transfer.memoPlaceholder')}
+        hint={t('transfer.memoHint')}
+        value={memo}
+        onChange={setMemo}
       />
       {button}
       <ConfirmTransactionModal
