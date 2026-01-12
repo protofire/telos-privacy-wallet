@@ -5,6 +5,26 @@ All notable changes to zkTelos Wallet will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-01-12
+
+### Added
+
+- **Memo Cipher**: Added encryption and decryption functionality for transaction memos (#47)
+- **Memo Field**: Added memo field to transaction form (#48)
+
+### Changed
+
+- **LiFi Integration**: Updated LiFi SDK integration (#46)
+
+### Fixed
+
+- Fixed token prices calculation and display
+- Fixed passing pool information to history items
+- Fixed transaction wait mechanism
+- Fixed native balance refresh functionality
+- Fixed race condition when calculating transaction limits
+- Fixed Linux build script
+
 ## [0.0.5] - 2025-12-22
 
 ### Added
