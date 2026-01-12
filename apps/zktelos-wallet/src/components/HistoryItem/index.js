@@ -19,8 +19,9 @@ import { NETWORKS, TOKENS_ICONS } from 'constants';
 import { ReactComponent as DepositIcon } from 'assets/deposit.svg';
 import { ReactComponent as WithdrawIcon } from 'assets/withdraw.svg';
 import { ReactComponent as TransferIcon } from 'assets/transfer.svg';
-import { ReactComponent as Shield } from 'assets/shield.svg';
 import { ReactComponent as InfoIconDefault } from 'assets/info.svg';
+
+import { ShieldCheckIcon } from 'lucide-react'
 
 const {
   Deposit,
@@ -269,7 +270,7 @@ export default ({ item, zkAccount, isMobile }) => {
                     <CopyToClipboard text={item.actions[0].to} onCopy={onCopy}>
                       <ZkAddress>
                         {(item.type === TransferOut && !item.actions[0].isLoopback) ? (
-                          <Shield width={16} height={16} />
+                          <ShieldCheckIcon size={16} />
                         ) : (
                           <ZkAvatar seed={zkAccount} size={16} />
                         )}
@@ -287,7 +288,7 @@ export default ({ item, zkAccount, isMobile }) => {
                 <ZkAddress>
                   {item.type === TransferOut ? (
                     <>
-                      <Shield width={16} height={16} />
+                      <ShieldCheckIcon size={16} />
                       <Button
                         type="link"
                         onClick={() => setIsDetailsModalOpen(true)}
@@ -446,6 +447,10 @@ const SpinnerSmall = styled(Spinner)`
 
 const ZkAddress = styled(Row)`
   cursor: pointer;
+
+   svg {
+    color: ${props => props.theme.icon.color.default};
+  }
 `;
 
 const MultitransferLabel = styled.div`

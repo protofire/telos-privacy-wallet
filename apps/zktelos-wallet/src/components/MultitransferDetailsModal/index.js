@@ -8,10 +8,10 @@ import Modal from 'components/Modal';
 import Tooltip from 'components/Tooltip';
 import { ZkAvatar } from 'components/ZkAccountIdentifier';
 
-import { ReactComponent as Shield } from 'assets/shield.svg';
-
 import { formatNumber, shortAddress, normalizeAddress } from 'utils';
 import { TOKENS_ICONS } from 'constants';
+
+import { ShieldCheckIcon } from 'lucide-react'
 
 const findMemoForAddress = (addressKey, transferTo, memos) => {
   if (!addressKey) return null;
@@ -49,7 +49,7 @@ const ListItem = ({ index, data, zkAccount, currentPool, memo }) => {
           {data.isLoopback ? (
             <ZkAvatar seed={zkAccount} size={16} />
           ) : (
-            <Shield width={16} height={16} />
+            <ShieldCheckIcon size={16} />
           )}
           <Tooltip
             content={data.address}
@@ -138,7 +138,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: 440px;
+  max-height: 70vh;
   box-sizing: border-box;
   & > * {
     margin-bottom: 16px;
@@ -206,6 +206,9 @@ const ItemContent = styled.div`
 const ItemRow = styled.div`
   display: flex;
   align-items: center;
+  svg {
+    color: ${props => props.theme.icon.color.default};
+  }
 `;
 
 const Text = styled(MediumText)`
@@ -217,7 +220,28 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  max-height: 200px;
+  overflow-x: hidden;
+  max-height: calc(70vh - 200px);
+  min-height: 100px;
+  padding-right: 4px;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: ${props => props.theme.color.grey || '#f1f1f1'};
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: ${props => props.theme.text.color.secondary || '#888'};
+    border-radius: 3px;
+    
+    &:hover {
+      background: ${props => props.theme.text.color.primary || '#555'};
+    }
+  }
 `;
 
 const Index = styled.span`
