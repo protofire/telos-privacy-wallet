@@ -1147,7 +1147,6 @@ export class ZkBobClient extends ZkBobProvider {
         data: messages || []
       };
       const oneTxData = await state.createTransferOptimistic(oneTx, optimisticState);
-      console.log('RAFAEL TX CREATEED', oneTx)
 
       console.log(`Transaction created: delta_index = ${oneTxData.parsed_delta.index}, root = ${oneTxData.public.root}`);
 
