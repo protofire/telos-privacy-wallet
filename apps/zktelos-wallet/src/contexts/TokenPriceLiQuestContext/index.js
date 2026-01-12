@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef, useCallback, useMemo, useContext } from 'react';
 import * as Sentry from '@sentry/react';
+import { getToken } from '@lifi/sdk';
 
 import { PoolContext } from 'contexts';
 
@@ -7,14 +8,17 @@ const TokenPriceLiQuestContext = createContext({ priceMap: null, isLoading: fals
 
 export default TokenPriceLiQuestContext;
 
+// TODO: Since TLOS is not supported in LiFi SDK we are getting prices from Ethereum.
+// When LiFi adds TELOS support, change ETHEREUM_CHAIN_ID to TELOS chain ID.
+const ETHEREUM_CHAIN_ID = 1;
+
 const tokens = [
   { address: "0x0000000000000000000000000000000000000000", symbol: "ETH" },
-  { address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", symbol: "USDC" },
+  { address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", symbol: "USDC.e" },
   { address: "0x193f4A4a6ea24102F49b931DEeeb931f6E32405d", symbol: "TLOS" },
 ];
-const baseUrl = "https://li.quest/v1/token";
-const refreshInterval = 30_000;
 
+const REFRESH_INTERVAL_MS = 30_000;
 
 export const TokenPriceLiQuestProvider = ({ children }) => {
   const { currentPool } = useContext(PoolContext);
@@ -26,24 +30,22 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
   const fetchPrices = useCallback(async () => {
     if (!currentPool) return;
 
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
+    setIsLoading(true);
+
     try {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      abortControllerRef.current = new AbortController();
-      setIsLoading(true);
-
-      const signal = abortControllerRef.current.signal;
-
       const pricePromises = tokens.map(async ({ address, symbol }) => {
-        const url = `${baseUrl}?chain=1&token=${address}`;
-        const response = await fetch(url, { signal });
-        const data = await response.json();
-        return { symbol, price: data.priceUSD ? parseFloat(data.priceUSD) : null };
+        const tokenInfo = await getToken(ETHEREUM_CHAIN_ID, address, { signal });
+        return { symbol, price: tokenInfo.priceUSD ? parseFloat(tokenInfo.priceUSD) : null };
       });
 
       const results = await Promise.all(pricePromises);
+
       const priceMapData = new Map([
         ['PUSD', 1], // Mocked price for ProtoUSD
       ]);
@@ -65,23 +67,17 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
     }
   }, [currentPool]);
 
-  const refetch = useCallback(() => {
-    return fetchPrices();
-  }, [fetchPrices]);
+  const refetch = useCallback(() => fetchPrices(), [fetchPrices]);
 
   useEffect(() => {
     if (!currentPool) return;
 
     fetchPrices();
-    intervalRef.current = setInterval(fetchPrices, refreshInterval);
+    intervalRef.current = setInterval(fetchPrices, REFRESH_INTERVAL_MS);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (abortControllerRef.current) abortControllerRef.current.abort();
     };
   }, [fetchPrices, currentPool]);
 
