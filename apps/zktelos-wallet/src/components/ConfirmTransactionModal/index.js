@@ -16,6 +16,7 @@ export default ({
   isZkAddress, fee, numberOfTxs, type, isLoadingFee,
   isMultitransfer, transfers, openDetails, currentPool,
   amountToConvert = ethers.constants.Zero, convertionDetails,
+  memo,
 }) => {
   const { t } = useTranslation();
   const displayedFee = useDisplayedFee(currentPool, fee);
@@ -62,6 +63,12 @@ export default ({
                 {isZkAddress ? t('confirmTransaction.sendToZk') : t('confirmTransaction.sendTo')}
               </SmallText>
               <SmallText>{receiver}</SmallText>
+              {memo && (
+                <MemoContainer>
+                  <MemoLabel>{t('history.memo')}: </MemoLabel>
+                  <MemoText>{memo}</MemoText>
+                </MemoContainer>
+              )}
             </>
           )}
           <SmallText>{t(`confirmTransaction.details.${type}`)}</SmallText>
@@ -179,4 +186,30 @@ const MediumTextMulti = styled(MediumText)`
 const ConvertedAmount = styled(MediumText)`
   font-weight: ${props => props.theme.text.weight.bold};
   margin-top: 10px;
+`;
+
+const MemoContainer = styled.div`
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: ${props => props.theme.input.background.secondary || '#f5f5f5'};
+  border-radius: 8px;
+  border-left: 3px solid ${props => props.theme.color.purple || props.theme.input.border.color.focus || '#7c3aed'};
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const MemoLabel = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  font-weight: ${props => props.theme.text.weight.bold || 600};
+  margin-right: 4px;
+`;
+
+const MemoText = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  font-style: italic;
+  word-break: break-word;
+  line-height: 1.4;
 `;

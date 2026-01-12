@@ -152,6 +152,7 @@ export default ({ poolOptions = [], onPoolSelect }) => {
         numberOfTxs={numberOfTxs}
         type="transfer"
         currentPool={currentPool}
+        memo={memo}
       />
     </>
   );

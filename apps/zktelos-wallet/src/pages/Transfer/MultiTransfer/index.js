@@ -207,6 +207,7 @@ export default forwardRef((props, ref) => {
         numberOfTxs={numberOfTxs}
         type="multitransfer"
         currentPool={currentPool}
+        memo={memo}
       />
       <MultitransferDetailsModal
         isOpen={isDetailsModalOpen}
