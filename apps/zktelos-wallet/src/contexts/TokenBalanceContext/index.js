@@ -12,78 +12,79 @@ const TokenBalanceContext = createContext({ balance: null });
 
 export default TokenBalanceContext;
 
+const pools = Object.entries(config.pools).map(
+  ([poolAlias, poolConfig]) => ({
+    poolAlias,
+    tokenAddress: poolConfig.tokenAddress,
+  })
+);
+
 export const TokenBalanceContextProvider = ({ children }) => {
   const { address: account, refetchNativeBalance, callContract } = useContext(WalletContext);
-  const { currentPool, availablePools } = useContext(PoolContext);
+  const { currentPool } = useContext(PoolContext);
   const [balances, setBalances] = useState({});
-  const [nativeBalances, setNativeBalances] = useState({});
+  const [nativeBalance, setNativeBalance] = useState(ethers.constants.Zero);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
   // Computed values pointing to current pool
   const balance = useMemo(() => account ? balances[currentPool.alias] : ethers.constants.Zero, [balances, currentPool.alias, account]);
-  const nativeBalance = useMemo(() => account ? nativeBalances[currentPool.alias] : ethers.constants.Zero, [nativeBalances, currentPool.alias, account]);
 
-  const updateBalance = useCallback(async (poolAlias) => {
+  const updateBalance = useCallback(async () => {
     if (!account) return;
-    if (!poolAlias) {
-      console.error('updateBalance called without poolAlias');
-      return;
-    }
 
     setIsLoadingBalance(true);
-    let balance = ethers.constants.Zero;
-    let nativeBalance = ethers.constants.Zero;
-
-    const pool = config.pools[poolAlias];
-    if (!pool) {
-      console.error(`Pool not found: ${poolAlias}`);
-      setIsLoadingBalance(false);
-      return;
-    }
-
-
     try {
-      [balance, nativeBalance] = await Promise.all([
-        callContract(pool.tokenAddress, tokenAbi, 'balanceOf', [account]),
-        refetchNativeBalance(),
-      ]);
+      const results = await Promise.all(
+        pools.map(async ({ poolAlias, tokenAddress }) => {
+          const balance = await callContract(
+            tokenAddress,
+            tokenAbi,
+            'balanceOf',
+            [account]
+          );
+
+          return { poolAlias, balance };
+        })
+      );
+
+      const nextBalances = results.reduce((acc, { poolAlias, balance }) => {
+        acc[poolAlias] = balance;
+        return acc;
+      }, {});
+
+      setBalances((prev) => ({
+        ...prev,
+        ...nextBalances,
+      }));
     } catch (error) {
-      console.error(error);
-      Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateBalance', pool: poolAlias } });
+      Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateTokenBalances' } });
       showLoadingError('walletBalance');
     }
 
-    setBalances(prev => ({ ...prev, [poolAlias]: balance }));
-    setNativeBalances(prev => ({ ...prev, [poolAlias]: nativeBalance }));
-    setIsLoadingBalance(false);
+    try {
+      const nativeBalance = await refetchNativeBalance();
+      setNativeBalance(nativeBalance);
+    } catch (error) {
+      Sentry.captureException(error, { tags: { method: 'TokenBalanceContext.updateNativeBalance' } });
+      showLoadingError('walletBalance');
+    } finally {
+      setIsLoadingBalance(false);
+    }
   }, [account, refetchNativeBalance, callContract]);
 
-  // Update balances only for pools in active chain
+  // Update balances when account changes
   useEffect(() => {
     if (!account) return;
-
-    const poolAliases = availablePools.map(p => p.alias);
-
-    Promise.all(poolAliases.map(poolAlias => updateBalance(poolAlias)))
-      .catch(error => {
-        console.error('Error updating pool balances:', error);
-      });
-  }, [account, updateBalance, availablePools]);
-
-  // Wrapper for backward compatibility: if no poolAlias provided, update current pool
-  const updateBalanceWrapper = useCallback(async (poolAlias) => {
-    const targetPool = poolAlias || currentPool.alias;
-    return updateBalance(targetPool);
-  }, [updateBalance, currentPool.alias]);
+    updateBalance();
+  }, [account, updateBalance]);
 
   return (
     <TokenBalanceContext.Provider
       value={{
         balance, // Current pool balance (computed)
-        nativeBalance, // Current pool native balance (computed)
-        balances, // All pools balances (object keyed by poolAlias)
-        nativeBalances, // All pools native balances (object keyed by poolAlias)
-        updateBalance: updateBalanceWrapper,
+        nativeBalance, // Native balance (computed)
+        balances,
+        updateBalance,
         isLoadingBalance: isLoadingBalance,
       }}>
       {children}
