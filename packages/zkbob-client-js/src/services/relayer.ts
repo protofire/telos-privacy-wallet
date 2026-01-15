@@ -321,10 +321,13 @@ export class ZkBobRelayer implements IZkBobService {
   
   public async fee(idx?: number): Promise<RelayerFee> {
     const headers = defaultHeaders(this.supportId);
-    const url = new URL('/fee-telos', this.url(idx));
+    const url = new URL('/fee', this.url(idx));
+    const urlForDepositFee = new URL('/fee-telos', this.url(idx));
 
-    const proxyFee = await fetchJson(url.toString(), {headers}, this.type());
-
+    const [proxyFee, relayerFeeResponse] = await Promise.all([
+      fetchJson(url.toString(), {headers}, this.type()),
+      fetchJson(urlForDepositFee.toString(), {headers}, this.type()).catch(() => null)
+    ]);
 
     if (typeof proxyFee !== 'object' || proxyFee === null || 
         (!proxyFee.hasOwnProperty('fee') && !proxyFee.hasOwnProperty('baseFee')))
@@ -332,8 +335,8 @@ export class ZkBobRelayer implements IZkBobService {
       throw new ServiceError(this.type(), 200, 'Incorrect response for dynamic fees');
     }
 
-    
     const feeResp = proxyFee.fee ?? proxyFee.baseFee;
+    const depositFeeFromRelayer = this.extractDepositFeeFromRelayer(relayerFeeResponse);
 
     if (typeof feeResp === 'object' &&
         feeResp.hasOwnProperty('deposit') &&
@@ -343,7 +346,7 @@ export class ZkBobRelayer implements IZkBobService {
     ){
       return {
         fee: {
-          deposit: BigInt(feeResp.deposit),
+          deposit: depositFeeFromRelayer ?? BigInt(feeResp.deposit),
           transfer: BigInt(feeResp.transfer),
           withdrawal: BigInt(feeResp.withdrawal),
           permittableDeposit: BigInt(feeResp.permittableDeposit),
@@ -351,23 +354,47 @@ export class ZkBobRelayer implements IZkBobService {
         oneByteFee: BigInt(proxyFee.oneByteFee ?? '0'),
         nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? '0'),
       };
-    } else if (typeof feeResp === 'string' || 
+    } else if (typeof feeResp === 'string' ||
                 typeof feeResp === 'number' ||
                 typeof feeResp === 'bigint'
     ) {
-      const parsedFee = ethers.BigNumber.from("0x" + feeResp);
+      const parsedFee = BigInt(feeResp);
       return {
         fee: {
-          deposit: parsedFee.toBigInt(),
-          transfer: parsedFee.toBigInt(),
-          withdrawal: parsedFee.toBigInt(),
-          permittableDeposit: parsedFee.toBigInt(),
+          deposit: depositFeeFromRelayer ?? parsedFee,
+          transfer: parsedFee,
+          withdrawal: parsedFee,
+          permittableDeposit: parsedFee,
         },
         oneByteFee: BigInt(proxyFee.oneByteFee ?? "0"),
         nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? "0"),
       };
     } else {
       throw new ServiceError(this.type(), 200, 'Incorrect fee field');
+    }
+  }
+
+  private extractDepositFeeFromRelayer(relayerFeeResponse: any): bigint | null {
+    if (!relayerFeeResponse || typeof relayerFeeResponse !== 'object') {
+      return null;
+    }
+
+    if (!relayerFeeResponse.hasOwnProperty('fee') || typeof relayerFeeResponse.fee !== 'string') {
+      return null;
+    }
+
+    const feeString = relayerFeeResponse.fee.trim();
+    if (feeString.length === 0) {
+      return null;
+    }
+
+    try {
+      const hexValue = feeString.startsWith('0x') || feeString.startsWith('0X')
+        ? feeString
+        : `0x${feeString}`;
+      return BigInt(hexValue);
+    } catch {
+      return null;
     }
   }
   
