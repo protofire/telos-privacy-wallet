@@ -349,10 +349,10 @@ export class ZkBobRelayer implements IZkBobService {
           deposit: depositFeeFromRelayer ?? BigInt(feeResp.deposit),
           transfer: BigInt(feeResp.transfer),
           withdrawal: BigInt(feeResp.withdrawal),
-          permittableDeposit: BigInt(feeResp.permittableDeposit),
+          permittableDeposit: depositFeeFromRelayer ?? BigInt(feeResp.permittableDeposit),
         },
-        oneByteFee: BigInt(proxyFee.oneByteFee ?? '0'),
-        nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? '0'),
+        oneByteFee: BigInt(proxyFee.oneByteFee ?? "0"),
+        nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? "0"),
       };
     } else if (typeof feeResp === 'string' ||
                 typeof feeResp === 'number' ||
@@ -364,7 +364,7 @@ export class ZkBobRelayer implements IZkBobService {
           deposit: depositFeeFromRelayer ?? parsedFee,
           transfer: parsedFee,
           withdrawal: parsedFee,
-          permittableDeposit: parsedFee,
+          permittableDeposit: depositFeeFromRelayer ?? parsedFee,
         },
         oneByteFee: BigInt(proxyFee.oneByteFee ?? "0"),
         nativeConvertFee: BigInt(proxyFee.nativeConvertFee ?? "0"),
