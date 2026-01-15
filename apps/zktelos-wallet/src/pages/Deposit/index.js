@@ -33,13 +33,6 @@ import { useDepositLimit, useMaxAmountExceeded } from './hooks';
 
 import { formatNumber, minBigNumber } from 'utils';
 
-const HARD_CODED_FEE_BPS = 10; // 0.1%
-
-const useHardcodedFee = amount => useMemo(
-  () => amount.mul(HARD_CODED_FEE_BPS).div(10_000),
-  [amount],
-);
-
 export default () => {
   const { t } = useTranslation();
   const location = useLocation();
@@ -57,7 +50,7 @@ export default () => {
   const [displayAmount, setDisplayAmount] = useState('');
   const amount = useParsedAmount(displayAmount, currentPool.tokenDecimals);
   const latestAction = useLatestAction(HistoryTransactionType.Deposit);
-  const { fee, relayerFee, isLoadingFee, directDepositFee } = useFee(amount, TxType.BridgeDeposit);
+  const { fee, relayerFee, isLoadingFee } = useFee(amount, TxType.BridgeDeposit);
   // Deposit is on-chain, so only show pools in active chain
   const poolOptions = useMemo(
     () => availablePools.map(pool => ({
@@ -98,26 +91,10 @@ export default () => {
     () => isNativeTokenUsed ? nativeBalance : balance,
     [isNativeTokenUsed, nativeBalance, balance],
   );
-  const usedFee = useMemo(
-    () => isNativeTokenUsed ? directDepositFee : fee,
-    [isNativeTokenUsed, directDepositFee, fee],
-  );
-  const hardcodedNativeFee = useHardcodedFee(amount);
-  const shouldUseHardcodedFee = useMemo(
-    () => {
-      if (!isNativeTokenUsed) return false;
-      if (!directDepositFee || typeof directDepositFee.isZero !== 'function') return false;
-      return directDepositFee.isZero();
-    },
-    [isNativeTokenUsed, directDepositFee],
-  );
-  const displayedFeeValue = useMemo(
-    () => (shouldUseHardcodedFee ? hardcodedNativeFee : usedFee),
-    [shouldUseHardcodedFee, hardcodedNativeFee, usedFee],
-  );
+
   const { isApproved, approve } = useApproval(currentPool, currentPool.tokenAddress, amount.add(fee), balance, currentPool.depositScheme);
   const depositLimit = useDepositLimit(limits, isNativeTokenUsed);
-  const maxAmountExceeded = useMaxAmountExceeded(amount, usedBalance, usedFee, depositLimit);
+  const maxAmountExceeded = useMaxAmountExceeded(amount, usedBalance, fee, depositLimit);
 
   const onDeposit = useCallback(() => {
     setDisplayAmount('');
@@ -127,15 +104,15 @@ export default () => {
   const setMax = useCallback(async () => {
     try {
       let max = ethers.constants.Zero;
-      if (usedBalance.gt(usedFee)) {
-        max = minBigNumber(usedBalance.sub(usedFee), depositLimit);
+      if (usedBalance.gt(fee)) {
+        max = minBigNumber(usedBalance.sub(fee), depositLimit);
       }
       setDisplayAmount(ethers.utils.formatUnits(max, currentPool.tokenDecimals));
     } catch (error) {
       console.error(error);
       Sentry.captureException(error, { tags: { method: 'Deposit.setMax' } });
     }
-  }, [usedFee, depositLimit, usedBalance, currentPool.tokenDecimals]);
+  }, [fee, depositLimit, usedBalance, currentPool.tokenDecimals]);
 
   useEffect(() => {
     setDisplayAmount('');
@@ -166,7 +143,7 @@ export default () => {
           amount={displayAmount}
           onChange={setDisplayAmount}
           shielded={false}
-          fee={displayedFeeValue}
+          fee={fee}
           isLoadingFee={isLoadingFee}
           setMax={setMax}
           maxAmountExceeded={maxAmountExceeded}
@@ -202,8 +179,8 @@ export default () => {
           else if (amount.gt(usedBalance)) {
             return <Button disabled>{t('buttonText.insufficientBalance', { symbol: currentPool.tokenSymbol })}</Button>;
           }
-          else if (amount.gt(usedBalance.sub(usedFee))) {
-            return <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(usedFee, currentPool.tokenDecimals) })}</Button>;
+          else if (amount.gt(usedBalance.sub(fee))) {
+            return <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>;
           }
           else if (amount.gt(depositLimit)) {
             return <Button disabled>{t('buttonText.amountExceedsLimit')}</Button>;
