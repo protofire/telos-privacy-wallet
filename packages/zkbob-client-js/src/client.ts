@@ -930,7 +930,7 @@ export class ZkBobClient extends ZkBobProvider {
       deadline: BigInt(deadline),
       nullifier: "0x" + toTwosComplementHex(BigInt(txData.public.nullifier), 32),
     };
-    console.log("🚀 ~ ZkBobClient ~ deposit ~ dataToSign:", dataToSign)
+
     const depositSigner = DepositSignerFactory.createSigner(this.network(), pool.depositScheme);
     await depositSigner.checkIsDataValid(dataToSign); // may throw an error in case of the owner isn't prepared for requested deposit scheme
     const signReq = await depositSigner.buildSignatureRequest(dataToSign);
@@ -1089,7 +1089,6 @@ export class ZkBobClient extends ZkBobProvider {
     }
 
     const rawTx = await processor.prepareDirectDeposit(type, zkAddress, fullAmountNative, fromAddress, true);
-    console.log("🚀 ~ ZkBobClient ~ directDeposit ~ rawTx:", rawTx)
     const txHash = await sendTxCallback(rawTx);
 
     console.log(`DD transaction sent: ${txHash}`);
