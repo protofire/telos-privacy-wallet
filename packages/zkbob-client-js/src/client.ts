@@ -880,8 +880,8 @@ export class ZkBobClient extends ZkBobProvider {
     let estimatedFee = await this.feeEstimateInternal([amountGwei], txType, usedFee, 0n, false, true);
     // const feeGwei = estimatedFee.fee.proxyPart + estimatedFee.fee.proverPart;
     // Remove the fee because it will be deducted from the amount at the contract level
-    const txAmount = amountGwei + estimatedFee.fee.total; 
-    // const txAmount = amountGwei
+    // const txAmount = amountGwei + estimatedFee.fee.total; 
+    const txAmount = amountGwei
 
     const deadline = Math.floor(Date.now() / 1000) + PERMIT_DEADLINE_INTERVAL;
     // Creating raw deposit transaction object
@@ -1054,8 +1054,9 @@ export class ZkBobClient extends ZkBobProvider {
       throw new TxLimitError(amount, limits.dd.total);
     }
 
-    const fee = await processor.getFee();
-    let fullAmountNative = await this.shieldedAmountToWei(amount + fee);
+    // const fee = await processor.getFee();
+    let fullAmountNative = await this.shieldedAmountToWei(amount);
+    // let fullAmountNative = await this.shieldedAmountToWei(amount + fee);
 
     // Sync by block number if needed
     if (blockNumber !== undefined) {
@@ -1088,6 +1089,7 @@ export class ZkBobClient extends ZkBobProvider {
     }
 
     const rawTx = await processor.prepareDirectDeposit(type, zkAddress, fullAmountNative, fromAddress, true);
+    console.log("🚀 ~ ZkBobClient ~ directDeposit ~ rawTx:", rawTx)
     const txHash = await sendTxCallback(rawTx);
 
     console.log(`DD transaction sent: ${txHash}`);
