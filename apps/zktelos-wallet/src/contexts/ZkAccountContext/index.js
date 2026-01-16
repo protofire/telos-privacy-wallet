@@ -411,9 +411,17 @@ export const ZkAccountContextProvider = ({ children }) => {
       } else if (message?.includes('Internal account validation failed')) {
         setTxStatus(TX_STATUSES.SUSPICIOUS_ACCOUNT_DEPOSIT);
       } else {
-        if (message?.includes('user rejected transaction')) {
+        if (
+          error?.code === 4001 ||
+          error?.code === 'ACTION_REJECTED' ||
+          message?.includes('user rejected transaction') ||
+          message?.includes('User denied transaction signature')
+        ) {
           message = 'User rejected transaction.';
-        } else if (message?.includes('user rejected signing')) {
+        } else if (
+          message?.includes('user rejected signing') ||
+          message?.includes('User denied message signature')
+        ) {
           message = 'User rejected message signing.';
         }
         setTxError(message);

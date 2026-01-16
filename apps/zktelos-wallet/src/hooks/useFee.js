@@ -2,6 +2,23 @@ import { useState, useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
 
 import { ZkAccountContext, PoolContext } from 'contexts';
+import { TxType } from 'zkbob-client-js';
+
+const calculateDynamicDepositFee = (amount, relayerFee, tokenDecimals) => {
+  if (!relayerFee) return ethers.constants.Zero;
+  if (amount.eq(ethers.constants.Zero)) return ethers.constants.Zero;
+
+  const scale = ethers.BigNumber.from(10).pow(tokenDecimals);
+  const denominator = scale.mul(100);
+
+  let feeApplied = amount.mul(relayerFee).div(denominator);
+
+  if (feeApplied.lt(relayerFee)) {
+    feeApplied = relayerFee;
+  }
+
+  return feeApplied;
+}
 
 export default (amount, txType, amountToConvert) => {
   const { estimateFee } = useContext(ZkAccountContext);
@@ -20,7 +37,14 @@ export default (amount, txType, amountToConvert) => {
         txType,
         amountToConvert,
       );
-      const fee = data?.fee;
+
+      let fee = ethers.constants.Zero;
+      // Dynamic fee only for deposits
+      if (txType === TxType.Deposit || txType === TxType.BridgeDeposit) {
+        fee = calculateDynamicDepositFee(amount, data?.fee, currentPool.tokenDecimals);
+      } else {
+        fee = data?.fee;
+      }
       const numberOfTxs = data?.numberOfTxs;
       setFee(fee || ethers.constants.Zero);
       setRelayerFee(data?.relayerFee);

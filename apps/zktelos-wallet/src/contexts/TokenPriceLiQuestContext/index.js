@@ -27,9 +27,19 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
   const intervalRef = useRef(null);
   const abortControllerRef = useRef(null);
 
+  const isAbortError = (error) => {
+    return (
+      error.name === 'AbortError' ||
+      error.code === 'ABORT_ERR' ||
+      (error.message && error.message.includes('AbortError')) ||
+      (error.message && error.message.includes('aborted'))
+    );
+  };
+
   const fetchPrices = useCallback(async () => {
     if (!currentPool) return;
 
+    // Abort any previous pending request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -40,11 +50,18 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
 
     try {
       const pricePromises = tokens.map(async ({ address, symbol }) => {
+        // Check if already aborted before making request
+        if (signal.aborted) {
+          return { symbol, price: null };
+        }
         const tokenInfo = await getToken(ETHEREUM_CHAIN_ID, address, { signal });
         return { symbol, price: tokenInfo.priceUSD ? parseFloat(tokenInfo.priceUSD) : null };
       });
 
       const results = await Promise.all(pricePromises);
+
+      // Don't update state if the request was aborted
+      if (signal.aborted) return;
 
       const priceMapData = new Map([
         ['PUSD', 1], // Mocked price for ProtoUSD
@@ -58,7 +75,8 @@ export const TokenPriceLiQuestProvider = ({ children }) => {
 
       setPriceMap(priceMapData);
     } catch (error) {
-      if (error.name !== 'AbortError') {
+      // Handle both native AbortError and LI.FI SDK's wrapped AbortError
+      if (!isAbortError(error)) {
         console.error(error);
         Sentry.captureException(error, { tags: { method: 'TokenPriceLiQuestContext.fetchPrices' } });
       }

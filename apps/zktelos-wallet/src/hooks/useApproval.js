@@ -54,7 +54,7 @@ export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
       updateAllowance();
     } catch (error) {
       Sentry.captureException(error, { tags: { method: 'hooks.useApproval.approve' } });
-      const message = error.message?.includes('user rejected transaction')
+      const message = (error.message?.includes('user rejected transaction') || error.message?.includes('User denied transaction'))
         ? 'User denied transaction signature'
         : error.message;
       setTxError(message || error);
