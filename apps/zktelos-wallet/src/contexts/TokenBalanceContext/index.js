@@ -22,7 +22,12 @@ const pools = Object.entries(config.pools).map(
 export const TokenBalanceContextProvider = ({ children }) => {
   const { address: account, refetchNativeBalance, callContract } = useContext(WalletContext);
   const { currentPool } = useContext(PoolContext);
-  const [balances, setBalances] = useState({});
+  const [balances, setBalances] = useState(
+    pools.reduce((acc, { poolAlias }) => {
+      acc[poolAlias] = ethers.constants.Zero;
+      return acc;
+    }, {})
+  );
   const [nativeBalance, setNativeBalance] = useState(ethers.constants.Zero);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
