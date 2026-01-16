@@ -177,12 +177,12 @@ export default () => {
             const minAmount = formatNumber(minTxAmount, currentPool.tokenDecimals);
             return <Button disabled>{t('buttonText.minAmount', { amount: minAmount, symbol: currentPool.tokenSymbol })}</Button>;
           }
-          else if (amount.gt(usedBalance)) {
+          else if (amount.add(fee).gt(usedBalance)) {
             return <Button disabled>{t('buttonText.insufficientBalance', { symbol: currentPool.tokenSymbol })}</Button>;
           }
-          else if (amount.gt(usedBalance.sub(fee))) {
-            return <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>;
-          }
+          // else if (usedBalance.lt(amount.add(fee))) {
+          //   return <Button disabled>{t('buttonText.reduceAmount', { fee: formatNumber(fee, currentPool.tokenDecimals) })}</Button>;
+          // }
           else if (amount.gt(depositLimit)) {
             return <Button disabled>{t('buttonText.amountExceedsLimit')}</Button>;
           }
