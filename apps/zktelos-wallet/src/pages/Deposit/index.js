@@ -21,7 +21,7 @@ import Button from 'components/Button';
 import ButtonLoading from 'components/ButtonLoading';
 import LatestAction from 'components/LatestAction';
 import Limits from 'components/Limits';
-import DemoCard from 'components/DemoCard';
+// import DemoCard from 'components/DemoCard';
 import IncreasedLimitsBanner from 'components/IncreasedLimitsBanner';
 // import DefaultLink from 'components/Link';
 import PoolSelector from 'components/PoolSelector';
@@ -39,9 +39,8 @@ export default () => {
   const { address: account } = useContext(WalletContext);
   const {
     zkAccount, isLoadingZkAccount, deposit,
-    isLoadingState, isPending, isDemo,
+    isLoadingState, isPending, switchToPool,
     isLoadingLimits, limits, minTxAmount,
-    switchToPool,
   } = useContext(ZkAccountContext);
   const { currentPool, availablePools } = useContext(PoolContext);
   const { balance, nativeBalance, isLoadingBalance } = useContext(TokenBalanceContext);
@@ -118,8 +117,6 @@ export default () => {
   useEffect(() => {
     setDisplayAmount('');
   }, [currentPool.alias]);
-
-  if (isDemo) return <DemoCard />;
 
   return isPending ? <PendingAction /> : (
     <ContentContainer>

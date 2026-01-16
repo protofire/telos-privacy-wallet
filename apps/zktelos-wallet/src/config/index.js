@@ -33,6 +33,7 @@ const config = {
         addressPrefix: '',
         parameters: 'prod',
         isNative: true,
+        minTxAmount: '5000000000' // 5 TLOS in shielded amount
       },
       'tlos_usdce': {
         chainId: 40,
@@ -47,6 +48,7 @@ const config = {
         depositScheme: 'approve',
         addressPrefix: '',
         parameters: 'prod',
+        minTxAmount: '200000' // 0.2 USDC in shielded amount
       }
     },
     chains: {
