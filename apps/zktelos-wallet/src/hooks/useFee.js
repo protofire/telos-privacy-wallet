@@ -8,10 +8,12 @@ const calculateDynamicDepositFee = (amount, relayerFee, tokenDecimals) => {
   if (!relayerFee) return ethers.constants.Zero;
   if (amount.eq(ethers.constants.Zero)) return ethers.constants.Zero;
 
-  const scale = BigInt(10 ** tokenDecimals);
-  let feeApplied = amount.mul(relayerFee).div(scale.mul(100n));
+  const scale = ethers.BigNumber.from(10).pow(tokenDecimals);
+  const denominator = scale.mul(100);
 
-  if (feeApplied < relayerFee) {
+  let feeApplied = amount.mul(relayerFee).div(denominator);
+
+  if (feeApplied.lt(relayerFee)) {
     feeApplied = relayerFee;
   }
 
