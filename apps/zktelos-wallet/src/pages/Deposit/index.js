@@ -92,8 +92,8 @@ export default () => {
     [isNativeTokenUsed, nativeBalance, balance],
   );
 
-  // const { isApproved, approve } = useApproval(currentPool, currentPool.tokenAddress, amount, balance, currentPool.depositScheme);
-  const { isApproved, approve } = useApproval(currentPool, currentPool.tokenAddress, amount.add(fee), balance, currentPool.depositScheme);
+  const { isApproved, approve } = useApproval(currentPool, currentPool.tokenAddress, amount, balance, currentPool.depositScheme);
+  // const { isApproved, approve } = useApproval(currentPool, currentPool.tokenAddress, amount.add(fee), balance, currentPool.depositScheme);
   const depositLimit = useDepositLimit(limits, isNativeTokenUsed);
   const maxAmountExceeded = useMaxAmountExceeded(amount, usedBalance, fee, depositLimit);
 
