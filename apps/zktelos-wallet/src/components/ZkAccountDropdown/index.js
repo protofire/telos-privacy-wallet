@@ -14,7 +14,7 @@ import PrivateAddress from 'components/AdressWithCopy';
 import { ZkAccountContext, ModalContext, PoolContext } from 'contexts';
 
 const Content = ({
-  zkClients, logout, close, isLoadingState, zkAccount,
+  zkClients, logout, close, isLoadingState, zkAccount, generatePaymentLink,
 }) => {
   const { t } = useTranslation();
   const [shieldedAddresses, setShieldedAddresses] = useState({});
@@ -69,10 +69,10 @@ const Content = ({
   //   }
   // }, [initializeGiftCard, close]);
 
-  const handleOptionClick = useCallback(async () => {
+  const handleOptionClick = useCallback(async (action) => {
     close();
-    await logout();
-  }, [close, logout]);
+    await action();
+  }, [close]);
 
   // if (showQRCode) {
   //   return (
@@ -145,17 +145,17 @@ const Content = ({
       <Description>
         {t('zkAccount.addressDescription')}
       </Description>
-      {/* {currentPool.paymentContractAddress && (
-        <OptionButton onClick={() => handleOptionClick(generatePaymentLink)} data-ga-id="zkaccount-payment-link">
-          {t('buttonText.getPaymentLink')}
-        </OptionButton>
-      )} */}
+      {/* {currentPool.paymentContractAddress && ( */}
+      <OptionButton onClick={() => handleOptionClick(generatePaymentLink)} data-ga-id="zkaccount-payment-link">
+        {t('buttonText.getPaymentLink')}
+      </OptionButton>
+      {/* )} */}
       {/* <QRCodeReader onResult={initGiftCard}>
         <OptionButton data-ga-id="zkaccount-gift-card">
           {t('buttonText.redeemGiftCard')}
         </OptionButton>
       </QRCodeReader> */}
-      <OptionButton onClick={() => handleOptionClick()} data-ga-id="zkaccount-logout">
+      <OptionButton onClick={() => handleOptionClick(logout)} data-ga-id="zkaccount-logout">
         {t('buttonText.logout')}
       </OptionButton>
     </Container>
@@ -170,6 +170,7 @@ export default ({ children }) => {
   const {
     openConfirmLogoutModal,
     isZkAccountDropdownOpen, openZkAccountDropdown, closeZkAccountDropdown,
+    openPaymentLinkModal,
   } = useContext(ModalContext);
 
   return (
@@ -184,6 +185,7 @@ export default ({ children }) => {
           zkClients={zkClients}
           logout={openConfirmLogoutModal}
           isLoadingState={isLoadingState}
+          generatePaymentLink={openPaymentLinkModal}
           close={closeZkAccountDropdown}
         />
       )}
