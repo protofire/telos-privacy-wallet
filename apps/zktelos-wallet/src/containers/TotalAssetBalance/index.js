@@ -2,6 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
+import { useRouteMatch } from 'react-router-dom';
 
 import { TokenBalanceContext, ZkAccountContext, WalletContext, PoolContext } from 'contexts';
 
@@ -19,6 +20,7 @@ export default () => {
   const { availablePools } = useContext(PoolContext);
   const { priceMap } = useTokenMapPrices();
   const { t } = useTranslation();
+  const match = useRouteMatch();
 
   const totalUsdValue = useMemo(() => {
     // Early return if priceMap is not ready
@@ -71,6 +73,8 @@ export default () => {
   }, [balances, zkAccountBalances, nativeBalance, priceMap, availablePools]);
 
   if (!account && !zkAccount) return null;
+  if (match.url.includes('/payment')) return null;
+
 
   return (
     <Container>
