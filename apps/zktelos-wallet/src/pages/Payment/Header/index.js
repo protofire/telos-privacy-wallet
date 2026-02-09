@@ -3,21 +3,18 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
 import Button from 'components/Button';
-import WalletDropdown from 'components/WalletDropdown';
 
 import { ReactComponent as Logo } from 'assets/telos-wallet-logo.svg';
 import { ReactComponent as DropdownIconDefault } from 'assets/dropdown.svg';
 
-import { shortAddress } from 'utils';
-
-import { CONNECTORS_ICONS, NETWORKS } from 'constants';
+import { NETWORKS } from 'constants';
 
 import ModalContext from 'contexts/ModalContext';
 import WalletContext from 'contexts/WalletContext';
 
 export default ({ pool }) => {
   const { t } = useTranslation();
-  const { address: account, connector } = useContext(WalletContext);
+  const { address: account } = useContext(WalletContext);
   const { openWalletModal } = useContext(ModalContext);
   return (
     <Header>
@@ -27,21 +24,9 @@ export default ({ pool }) => {
           <NetworkIcon src={NETWORKS[pool.chainId].icon} />
           {NETWORKS[pool.chainId].name}
         </NetworkLabel>
-        {account ? (
-          <WalletDropdown>
-            <AccountDropdownButton>
-              <Row>
-                {connector && <Icon src={CONNECTORS_ICONS[connector.name]} />}
-                <Address>{shortAddress(account)}</Address>
-                <DropdownIcon />
-              </Row>
-            </AccountDropdownButton>
-          </WalletDropdown>
-        ) : (
-          <Button small onClick={openWalletModal} style={{ whiteSpace: 'nowrap' }}>
-            {t('buttonText.connectWallet')}
-          </Button>
-        )}
+        {account ? null : <Button small onClick={openWalletModal} style={{ whiteSpace: 'nowrap' }}>
+          {t('buttonText.connectWallet')}
+        </Button>}
       </Row>
     </Header>
   );
