@@ -25,7 +25,8 @@ export default () => {
   useEffect(() => {
     async function updateAddress() {
       const address = await generateAddress();
-      setAddress(address);
+      const poolSymbol = currentPool.tokenSymbol;
+      setAddress(`${poolSymbol}:${address}`);
     }
     updateAddress();
   }, [generateAddress, currentPool]);
