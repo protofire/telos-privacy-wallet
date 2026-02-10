@@ -299,7 +299,6 @@
       "description": "Acessando sua conta zkAccount com sua carteira conectada."
     }
   },
-
   "password": {
     "placeholder1": "Senha 6+ caracteres",
     "placeholder2": "Verificar senha",
@@ -365,8 +364,10 @@
   },
   "paymentLinkModal": {
     "title": "Obter link de pagamento",
-    "description": "Compartilhe este link para solicitar um pagamento privado.<br />O remetente terá a opção de selecionar e enviar qualquer token. Os tokens serão convertidos para {{symbol}} e depositados em sua conta zkAccount.<br /><br /><strong>Observação:</strong> Links de pagamento privado funcionam na mesma rede em que são gerados.",
+    "description": "Selecione o pool para o qual você gostaria de gerar um link de pagamento",
+    "note": "Compartilhe este link para solicitar um pagamento privado.<br />O remetente deve enviar {{symbol}} para este link e será depositado em sua conta zkAccount.<br /><br /><strong>Observação:</strong> Links de pagamento privado funcionam na mesma rede em que são gerados.",
     "copyAndShare": "Copiar e compartilhar seu link de pagamento",
+    "generateLinkFor": "Gerar link para",
     "getMoreInfo": "Obtenha mais informações sobre links de pagamento"
   },
   "reedeemGifCardModal": {

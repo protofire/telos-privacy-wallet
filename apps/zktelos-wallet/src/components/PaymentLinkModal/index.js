@@ -11,10 +11,11 @@ import { ReactComponent as CopyIconDefault } from 'assets/copy.svg';
 import { ReactComponent as CheckIcon } from 'assets/check.svg';
 
 import { ModalContext, ZkAccountContext, PoolContext } from 'contexts';
+import PoolSelector from '../PoolSelector';
 
 export default () => {
   const { t } = useTranslation();
-  const { currentPool } = useContext(PoolContext);
+  const { currentPool, setCurrentPool, availablePools } = useContext(PoolContext);
   const { isPaymentLinkModalOpen, closePaymentLinkModal } = useContext(ModalContext);
   const { generateAddress } = useContext(ZkAccountContext);
 
@@ -46,7 +47,14 @@ export default () => {
     >
       <Container>
         <Description>
-          <Trans i18nKey="paymentLinkModal.description" values={{ symbol: currentPool.tokenSymbol }} />
+          <Trans i18nKey="paymentLinkModal.description" />
+        </Description>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
+          <InputLabel>{t('paymentLinkModal.generateLinkFor')}</InputLabel>
+          <PoolSelector options={availablePools} selectedAlias={currentPool.alias} onSelect={setCurrentPool} />
+        </div>
+        <Description>
+          <Trans i18nKey="paymentLinkModal.note" values={{ symbol: currentPool.tokenSymbol }} />
         </Description>
         <InputLabel>{t('paymentLinkModal.copyAndShare')}</InputLabel>
         <CopyToClipboard text={link} onCopy={onCopy}>
@@ -85,7 +93,7 @@ const Description = styled.span`
   font-size: 16px;
   color: ${({ theme }) => theme.text.color.secondary};
   line-height: 24px;
-  text-align: center;
+  text-align: justify;
   & > b, & > strong {
     font-weight: ${({ theme }) => theme.text.weight.bold};
   }

@@ -360,8 +360,10 @@
   },
   "paymentLinkModal": {
     "title": "Get payment link",
-    "description": "Share this link to request a private payment.<br />The sender will have the option to select and send any token. Tokens will be converted to {{symbol}} and deposited to your zkAccount.<br /><br /><strong>Note:</strong> Private payment links work on the same network where they are generated.",
+    "description": "Select the pool you would like to generate a payment link for",
+    "note": "Share this link to request a private payment.<br />The sender must send {{symbol}} to this link and it will be deposited to your zkAccount.<br /><br /><strong>Note:</strong> Private payment links work on the same network where they are generated.",
     "copyAndShare": "Copy and share your payment link",
+    "generateLinkFor": "Generate link for",
     "getMoreInfo": "Get more info about payment links"
   },
   "reedeemGifCardModal": {

@@ -360,8 +360,10 @@
   },
   "paymentLinkModal": {
     "title": "生成支付链接",
-    "description": "如需进行私密支付，请分享此链接。<br />发送人可以选择并发送任何代币。代币将转换为 {{symbol}} 并存入您的zk账户。<br /><br /><strong>请注意：</strong>私密支付链接将只在生成它们的区块链网络上生效。",
+    "description": "选择您想要生成支付链接的池",
+    "note": "如需进行私密支付，请分享此链接。<br />发送人必须向此链接发送 {{symbol}}，它将被存入您的zk账户。<br /><br /><strong>请注意：</strong>私密支付链接将只在生成它们的区块链网络上生效。",
     "copyAndShare": "复制并分享您的支付链接",
+    "generateLinkFor": "生成链接",
     "getMoreInfo": "了解更多有关支付链接的资讯"
   },
   "reedeemGifCardModal": {
