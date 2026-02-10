@@ -78,10 +78,10 @@ export function useLimitsAndFees(pool) {
  * Simplified payment hook using ZkBobPay.pay() with same token (no swap/router).
  * The pool token is used directly — no LiFi, no router.
  */
-export function usePayment(amount, fee, pool, zkAddress, currency) {
+export function usePayment(amount, fee, pool, zkAddress, currency, isNativeTokenUsed) {
   const { openTxModal, setTxStatus, setTxHash, setTxError, setCsvLink } = useContext(TransactionModalContext);
   const { t } = useTranslation();
-  const { address: account, chain, signer, switchNetwork } = useContext(WalletContext);
+  const { address: account, chain, switchNetwork, callContract, waitForTransaction } = useContext(WalletContext);
 
   const send = useCallback(async () => {
     openTxModal();
@@ -99,41 +99,50 @@ export function usePayment(amount, fee, pool, zkAddress, currency) {
         }
       }
 
-      // 2. Approve token for ZkBobPay contract
-      setTxStatus(TX_STATUSES.APPROVE_TOKENS);
-      const tokenContract = new ethers.Contract(
-        pool.tokenAddress,
-        ['function approve(address spender, uint256 amount) returns (bool)'],
-        signer,
-      );
-      const approveTx = await tokenContract.approve(pool.paymentContractAddress, amount.add(fee));
-      await approveTx.wait();
+      const depositAmount = amount.add(fee);
+
+      // 2. Approve token for ZkBobPay contract (skip for native)
+      if (!isNativeTokenUsed) {
+        setTxStatus(TX_STATUSES.APPROVE_TOKENS);
+        const approveTx = await callContract(
+          pool.tokenAddress,
+          ['function approve(address spender, uint256 amount) returns (bool)'],
+          'approve',
+          [pool.paymentContractAddress, depositAmount],
+          true // isSend
+        );
+        await waitForTransaction(approveTx);
+      }
 
       // 3. Call ZkBobPay.pay()
       setTxStatus(TX_STATUSES.CONFIRM_TRANSACTION);
       const paymentABI = ['function pay(bytes,address,uint256,uint256,bytes,address,bytes,bytes) external payable'];
-      const paymentContract = new ethers.Contract(pool.paymentContractAddress, paymentABI, signer);
 
       const decodedZkAddress = ethers.utils.hexlify(
         ethers.utils.base58.decode(zkAddress.split(':')[1])
       );
-      const depositAmount = amount.add(fee);
 
-      const tx = await paymentContract.pay(
-        decodedZkAddress,               // _zkAddress
-        pool.tokenAddress,              // _inToken (same as pool token = no swap)
-        depositAmount,                  // _inAmount
-        depositAmount,                  // _depositAmount (same, no swap)
-        '0x',                           // _permit (empty, using approve)
-        ethers.constants.AddressZero,   // _router (not used)
-        '0x',                           // _routerData (not used)
-        '0x',                           // _note (empty)
-        { gasLimit: 2000000 },
+      const txHash = await callContract(
+        pool.paymentContractAddress,
+        paymentABI,
+        'pay',
+        [
+          decodedZkAddress,                                         // _zkAddress
+          isNativeTokenUsed ? ethers.constants.AddressZero : pool.tokenAddress, // _inToken
+          depositAmount,                                            // _inAmount
+          depositAmount,                                            // _depositAmount
+          '0x',                                                     // _permit
+          ethers.constants.AddressZero,                             // _router
+          '0x',                                                     // _routerData
+          '0x'                                                      // _note
+        ],
+        true, // isSend
+        isNativeTokenUsed ? depositAmount : 0 // value
       );
 
       setTxStatus(TX_STATUSES.WAITING_FOR_TRANSACTION);
-      await tx.wait();
-      setTxHash(tx.hash);
+      await waitForTransaction(txHash);
+      setTxHash(txHash);
 
       // 4. Generate CSV receipt
       const rows = [
@@ -149,7 +158,7 @@ export function usePayment(amount, fee, pool, zkAddress, currency) {
           account,
           zkAddress,
           ethers.utils.formatUnits(fee, pool.tokenDecimals),
-          NETWORKS[pool.chainId].blockExplorerUrls.tx.replace('%s', tx.hash),
+          NETWORKS[pool.chainId].blockExplorerUrls.tx.replace('%s', txHash),
         ],
       ];
       const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.join(',')).join('\n');
@@ -167,10 +176,10 @@ export function usePayment(amount, fee, pool, zkAddress, currency) {
       setTxStatus(TX_STATUSES.REJECTED);
     }
   }, [
-    chain, pool, account, signer,
+    chain, pool, account,
     openTxModal, setTxStatus, setTxError, switchNetwork,
     zkAddress, fee, amount, setTxHash, t, setCsvLink,
-    currency,
+    currency, isNativeTokenUsed, callContract, waitForTransaction,
   ]);
 
   return { send };

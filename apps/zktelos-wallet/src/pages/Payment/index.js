@@ -37,15 +37,21 @@ const Payment = ({ pool }) => {
   const { t } = useTranslation();
   const { supportId } = useContext(SupportIdContext);
   const params = useParams();
-  const currency = pool.isNative ? 'WTLOS' : pool.tokenSymbol;
-
   const { address: account, currentChainId, switchNetwork } = useContext(WalletContext);
-  const { isLoadingBalance, balances } = useContext(TokenBalanceContext);
+  const { isLoadingBalance, balances, nativeBalance } = useContext(TokenBalanceContext);
+
+  const [isNativeSelected, setIsNativeSelected] = useState(true);
+  const isNativeTokenUsed = useMemo(
+    () => isNativeSelected && pool.isNative,
+    [isNativeSelected, pool],
+  );
+
+  const currency = isNativeTokenUsed ? 'TLOS' : pool.tokenSymbol;
 
   const balance = useMemo(() => {
     if (!account) return ethers.constants.Zero;
-    return balances[pool.alias];
-  }, [balances, pool.alias, account]);
+    return isNativeTokenUsed ? nativeBalance : balances[pool.alias];
+  }, [balances, nativeBalance, pool.alias, account, isNativeTokenUsed]);
 
   const [displayedAmount, setDisplayedAmount] = useState('');
   const amount = useMemo(
@@ -55,7 +61,7 @@ const Payment = ({ pool }) => {
 
   const { limit, isLoadingLimit, fee, isLoadingFee } = useLimitsAndFees(pool);
   const zkAddress = params.address;
-  const { send } = usePayment(amount, fee, pool, zkAddress, currency);
+  const { send } = usePayment(amount, fee, pool, zkAddress, currency, isNativeTokenUsed);
 
   const { txStatus, isTxModalOpen, closeTxModal, txAmount, txHash, txError, csvLink } = useContext(TransactionModalContext);
   const {
@@ -105,6 +111,7 @@ const Payment = ({ pool }) => {
               amount={displayedAmount}
               onChange={setDisplayedAmount}
               balance={account ? balance : null}
+              nativeBalance={nativeBalance}
               isLoadingBalance={isLoadingBalance}
               fee={fee}
               isLoadingFee={isLoadingFee}
@@ -112,11 +119,11 @@ const Payment = ({ pool }) => {
               setMax={setMax}
               maxAmountExceeded={maxAmountExceeded}
               currentPool={pool}
-              isNativeSelected={false}
-              setIsNativeSelected={() => { }}
-              isNativeTokenUsed={false}
+              isNativeSelected={isNativeSelected}
+              setIsNativeSelected={setIsNativeSelected}
+              isNativeTokenUsed={isNativeTokenUsed}
               gaIdPostfix="payment"
-              disableNativeSelect={true}
+              disableNativeSelect={false}
               tokenSymbolOverride={pool.tokenSymbol}
             />
             {(() => {

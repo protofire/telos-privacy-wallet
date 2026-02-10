@@ -30,9 +30,9 @@ const useEvmWallet = () => {
     return connectors.filter(connector => allowedConnectorId.includes(connector.id));
   }, [connectors]);
 
-  const callContract = useCallback(async (address, abi, method, params = [], isSend = false) => {
+  const callContract = useCallback(async (address, abi, method, params = [], isSend = false, value = 0) => {
     if (isSend) {
-      return await writeContractAsync({ address, abi, functionName: method, args: params });
+      return await writeContractAsync({ address, abi, functionName: method, args: params, value });
     }
 
     const result = await readContract(client, { address, abi, functionName: method, args: params });
