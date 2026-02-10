@@ -156,7 +156,7 @@ export default ({ empty }) => {
         <AccountSection>
           {!isMobile && networkDropdown}
           <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
-            {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
+            LiFi Bridge
           </BridgeButton>
           {/* {!isMobile && walletDropdown} */}
 
