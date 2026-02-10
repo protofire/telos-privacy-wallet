@@ -191,7 +191,7 @@
     }
   },
   "payment": {
-    "title": "Enter {{symbol}} value and choose a token",
+    "title": "Enter {{symbol}} amount you want to send",
     "amountToSend": "The amount you'd like to send",
     "transferAmount": "Transfer amount",
     "recipientReceives": "The recipient receives payment in {{symbol}}",

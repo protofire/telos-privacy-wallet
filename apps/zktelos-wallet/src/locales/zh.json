@@ -191,7 +191,7 @@
     }
   },
   "payment": {
-    "title": "输入 {{symbol}} 金额并选择代币种类",
+    "title": "输入 {{symbol}} 金额",
     "amountToSend": "需要发送的金额",
     "transferAmount": "转账金额",
     "recipientReceives": "收款者将收到{{symbol}付款",

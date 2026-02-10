@@ -191,7 +191,7 @@
     }
   },
   "payment": {
-    "title": "Введите сумму {{symbol}} и выберите токен",
+    "title": "Введите сумму {{symbol}}",
     "amountToSend": "Сумма, которую вы хотите отправить",
     "transferAmount": "Сумма перевода",
     "recipientReceives": "Получатель получит платеж в {{symbol}}",

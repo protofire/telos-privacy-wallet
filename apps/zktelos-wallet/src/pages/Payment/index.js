@@ -1,22 +1,19 @@
-import React, { useState, useContext, useEffect, useMemo } from 'react';
+import React, { useState, useContext, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { useTranslation, Trans } from 'react-i18next';
+import * as Sentry from '@sentry/react';
 
-import Layout from 'components/Layout';
 import Card from 'components/Card';
 import Button from 'components/Button';
 import Limits from 'components/Limits';
-import TokenListModal from 'components/TokenListModal';
-import Skeleton from 'components/Skeleton';
+import TransferInput from 'components/TransferInput';
 import TransactionModal from 'components/TransactionModal';
 
 import WalletModal from 'containers/WalletModal';
 
 import Header from './Header';
-import Input from './Input';
-import PseudoInput from './PseudoInput';
 import ConfirmationModal from './ConfirmationModal';
 
 import ModalContext, { ModalContextProvider } from 'contexts/ModalContext';
@@ -24,14 +21,13 @@ import SupportIdContext, { SupportIdContextProvider } from 'contexts/SupportIdCo
 import TransactionModalContext, { TransactionModalContextProvider } from 'contexts/TransactionModalContext';
 import { LanguageContextProvider } from 'contexts/LanguageContext';
 import WalletContext, { WalletContextProvider } from 'contexts/WalletContext';
+import TokenBalanceContext, { TokenBalanceContextProvider } from 'contexts/TokenBalanceContext';
 import PoolContext from 'contexts/PoolContext';
 
 import config from 'config';
 
-import { formatNumber } from 'utils';
-import { useApproval } from 'hooks';
-import { useTokensWithBalances, useTokenAmount, useLimitsAndFees, usePayment } from './hooks';
-import { getPermitType } from './utils';
+import { formatNumber, minBigNumber } from 'utils';
+import { useLimitsAndFees, usePayment } from './hooks';
 
 const pools = Object.values(config.pools).map((pool, index) =>
   ({ ...pool, alias: Object.keys(config.pools)[index] })
@@ -40,37 +36,55 @@ const pools = Object.values(config.pools).map((pool, index) =>
 const Payment = ({ pool }) => {
   const { t } = useTranslation();
   const { supportId } = useContext(SupportIdContext);
-  const history = useHistory();
   const params = useParams();
-  const currency = ['USDC.e', 'USDC', 'BOB'].includes(pool.tokenSymbol) ? 'USD' : pool.tokenSymbol;
+  const currency = pool.isNative ? 'WTLOS' : pool.tokenSymbol;
 
-  const { address: account } = useContext(WalletContext);
+  const { address: account, currentChainId, switchNetwork } = useContext(WalletContext);
+  const { isLoadingBalance, balances } = useContext(TokenBalanceContext);
+
+  const balance = useMemo(() => {
+    if (!account) return ethers.constants.Zero;
+    return balances[pool.alias];
+  }, [balances, pool.alias, account]);
+
   const [displayedAmount, setDisplayedAmount] = useState('');
-  const amount = useMemo(() => ethers.utils.parseUnits(displayedAmount || '0', pool?.tokenDecimals), [displayedAmount, pool]);
-  const [selectedToken, setSelectedToken] = useState(null);
+  const amount = useMemo(
+    () => ethers.utils.parseUnits(displayedAmount || '0', pool?.tokenDecimals),
+    [displayedAmount, pool],
+  );
 
   const { limit, isLoadingLimit, fee, isLoadingFee } = useLimitsAndFees(pool);
-  const { tokenAmount, liFiRoute, isTokenAmountLoading } = useTokenAmount(pool, selectedToken?.address, amount, fee);
-  const { isApproved, approve } = useApproval(pool, selectedToken?.address, tokenAmount);
-  const permitType = useMemo(() => getPermitType(selectedToken, pool?.chainId), [pool, selectedToken]);
-  const { send } = usePayment(selectedToken, tokenAmount, amount, fee, pool, params.address, liFiRoute, currency);
+  const zkAddress = params.address;
+  const { send } = usePayment(amount, fee, pool, zkAddress, currency);
 
   const { txStatus, isTxModalOpen, closeTxModal, txAmount, txHash, txError, csvLink } = useContext(TransactionModalContext);
   const {
-    isTokenListModalOpen, openTokenListModal,
-    closeTokenListModal, openWalletModal,
+    openWalletModal,
     openPaymentConfirmationModal, closePaymentConfirmationModal,
   } = useContext(ModalContext);
-  const { tokens, isLoadingBalances } = useTokensWithBalances(pool);
 
-  useEffect(() => {
-    if (tokens.length) {
-      const defaultToken =
-        tokens.find(token => token.symbol === pool.tokenSymbol) ||
-        tokens.find(token => token.address === ethers.constants.AddressZero);
-      setSelectedToken(defaultToken);
+  // Max amount exceeded check (same logic as Deposit)
+  const maxAmountExceeded = useMemo(() => {
+    try {
+      return !balance.isZero() && (amount.add(fee).gt(balance) || amount.gt(limit));
+    } catch {
+      return false;
     }
-  }, [tokens, pool]);
+  }, [amount, balance, fee, limit]);
+
+  // Set max amount
+  const setMax = useCallback(() => {
+    try {
+      let max = ethers.constants.Zero;
+      if (balance.gt(fee)) {
+        max = minBigNumber(balance.sub(fee), limit);
+      }
+      setDisplayedAmount(ethers.utils.formatUnits(max, pool.tokenDecimals));
+    } catch (error) {
+      console.error(error);
+      Sentry.captureException(error, { tags: { method: 'Payment.setMax' } });
+    }
+  }, [fee, limit, balance, pool.tokenDecimals]);
 
   const onSend = () => {
     setDisplayedAmount('');
@@ -78,79 +92,70 @@ const Payment = ({ pool }) => {
     closePaymentConfirmationModal();
   };
 
+  const isWrongNetwork = currentChainId !== pool.chainId;
+
   return (
     <>
-      <Layout header={<Header pool={pool} />}>
-        <Title>{t('payment.title', { symbol: currency })}</Title>
-        <Card>
-          <InputLabel>{t('payment.amountToSend')}</InputLabel>
-          <Input placeholder={0} value={displayedAmount} onChange={setDisplayedAmount} currency={currency} />
-          <InputLabel>{t('payment.transferAmount')}</InputLabel>
-          <PseudoInput
-            value={tokenAmount}
-            token={selectedToken}
-            onSelect={openTokenListModal}
-            isLoading={isTokenAmountLoading}
-            isLoadingBalances={isLoadingBalances}
-          />
-          <RowSpaceBetween>
-            <Text style={{ marginRight: 20 }}>
-              {t('payment.recipientReceives', { symbol: pool.tokenSymbol })}
-            </Text>
-            <Row>
-              <Text style={{ marginRight: 4 }}>{t('common.fee')}:</Text>
-              {isLoadingFee
-                ? <Skeleton width={40} />
-                : <Text>{formatNumber(fee, pool.tokenDecimals)} {currency}</Text>
-              }
-            </Row>
-          </RowSpaceBetween>
-          {(() => {
-            if (!account)
-              return <Button onClick={openWalletModal}>{t('buttonText.connectWallet')}</Button>
-            else if (tokenAmount.isZero())
-              return <Button disabled>{t('buttonText.enterAmount')}</Button>
-            else if (tokenAmount.gt(selectedToken?.balance || ethers.constants.Zero))
-              return <Button disabled>{t('buttonText.insufficientBalance', { symbol: selectedToken?.symbol })}</Button>
-            else if (amount.gt(limit))
-              return <Button disabled>{t('buttonText.amountExceedsLimit')}</Button>
-            else if (selectedToken?.address !== ethers.constants.AddressZero && permitType === 'permit2' && !isApproved)
-              return <Button onClick={approve}>{t('buttonText.approveTokens')}</Button>
-            else
+      <Layout>
+        <Header pool={pool} />
+        <PaymentContent>
+          <Title>{t('payment.title', { symbol: currency })}</Title>
+          <Card>
+            <TransferInput
+              amount={displayedAmount}
+              onChange={setDisplayedAmount}
+              balance={account ? balance : null}
+              isLoadingBalance={isLoadingBalance}
+              fee={fee}
+              isLoadingFee={isLoadingFee}
+              shielded={false}
+              setMax={setMax}
+              maxAmountExceeded={maxAmountExceeded}
+              currentPool={pool}
+              isNativeSelected={false}
+              setIsNativeSelected={() => { }}
+              isNativeTokenUsed={false}
+              gaIdPostfix="payment"
+              disableNativeSelect={true}
+              tokenSymbolOverride={pool.tokenSymbol}
+            />
+            {(() => {
+              if (!account)
+                return <Button onClick={openWalletModal}>{t('buttonText.connectWallet')}</Button>;
+
+              if (isWrongNetwork)
+                return <Button onClick={() => switchNetwork(pool.chainId)}>{t('buttonText.switchNetwork')}</Button>;
+
+              if (amount.isZero())
+                return <Button disabled>{t('buttonText.enterAmount')}</Button>;
+
+              if (amount.add(fee).gt(balance || ethers.constants.Zero))
+                return <Button disabled>{t('buttonText.insufficientBalance', { symbol: pool.tokenSymbol })}</Button>;
+
+              if (amount.gt(limit))
+                return <Button disabled>{t('buttonText.amountExceedsLimit')}</Button>;
+
               return <Button onClick={openPaymentConfirmationModal}>{t('buttonText.send')}</Button>;
-          })()}
-        </Card>
-        <Limits
-          loading={isLoadingLimit}
-          limits={[{
-            name: <Trans i18nKey="payment.limit" />,
-            value: limit,
-          }]}
-          currentPool={{ ...pool, tokenSymbol: currency }}
-        />
-        <TryZkBobBannerImage
-          src={require('assets/try-zkbob-banner.webp')}
-          onClick={() => history.push('/')}
-        />
+            })()}
+          </Card>
+          <Limits
+            loading={isLoadingLimit}
+            limits={[{
+              name: <Trans i18nKey="payment.limit" />,
+              value: limit,
+            }]}
+            currentPool={{ ...pool, tokenSymbol: currency }}
+          />
+        </PaymentContent>
       </Layout>
       <WalletModal />
-      <TokenListModal
-        isOpen={isTokenListModalOpen}
-        onClose={closeTokenListModal}
-        tokens={tokens}
-        isLoadingBalances={isLoadingBalances}
-        onSelect={token => {
-          setSelectedToken(token);
-          closeTokenListModal();
-        }}
-      />
       <ConfirmationModal
         onConfirm={onSend}
         amount={displayedAmount}
         symbol={currency}
-        tokenAmount={tokenAmount}
-        token={selectedToken}
-        receiver={params.address}
+        tokenAmount={amount.add(fee)}
+        token={{ symbol: pool.tokenSymbol, decimals: pool.tokenDecimals }}
+        receiver={zkAddress}
         sender={account}
         fee={formatNumber(fee, pool?.tokenDecimals)}
       />
@@ -169,56 +174,62 @@ const Payment = ({ pool }) => {
   );
 }
 
+function extractPoolAndRecipientFromParams(param) {
+  const [poolTokenSymbol, zkAddress] = param.split(':');
+  const pool = Object.values(pools).find(pool => pool.tokenSymbol === poolTokenSymbol);
+  return { pool, zkAddress };
+}
+
 export default () => {
-  const history = useHistory();
   const params = useParams();
-  const addressPrefix = params.address.split(':')[0];
-  const pool = Object.values(pools).find(pool => pool.addressPrefix === addressPrefix);
-  if (!pool.paymentContractAddress) {
-    history.push('/');
+  const { pool } = extractPoolAndRecipientFromParams(params.address);
+
+  if (!pool) {
+    return <div>Invalid payment link or payment not available for this pool.</div>;
   }
+
   return (
     <PoolContext.Provider value={{ currentPool: pool }}>
       <WalletContextProvider>
-        <SupportIdContextProvider>
-          <TransactionModalContextProvider>
-            <ModalContextProvider>
-              <LanguageContextProvider>
-                <Payment pool={pool} />
-              </LanguageContextProvider>
-            </ModalContextProvider>
-          </TransactionModalContextProvider>
-        </SupportIdContextProvider>
+        <TokenBalanceContextProvider>
+          <SupportIdContextProvider>
+            <TransactionModalContextProvider>
+              <ModalContextProvider>
+                <LanguageContextProvider>
+                  <Payment pool={pool} />
+                </LanguageContextProvider>
+              </ModalContextProvider>
+            </TransactionModalContextProvider>
+          </SupportIdContextProvider>
+        </TokenBalanceContextProvider>
       </WalletContextProvider>
     </PoolContext.Provider>
   );
 };
 
-const Row = styled.div`
+const Layout = styled.div`
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-`;
-
-const RowSpaceBetween = styled(Row)`
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 14px 40px 40px;
   justify-content: space-between;
-  padding: 0 12px;
-  flex-wrap: wrap;
+  gap: 40px;
+  @media only screen and (max-width: 560px) {
+    padding: 21px 7px 28px;
+  }
+  @media only screen and (max-width: 800px) {
+    padding-bottom: 80px;
+  }
 `;
 
-const InputLabel = styled.span`
-  font-size: 16px;
-  line-height: 24px;
-  color: ${props => props.theme.text.color.primary};
-  font-weight: ${props => props.theme.text.weight.normal};
-  padding: 0 12px;
-  margin-bottom: 8px;
-`;
-
-const Text = styled.span`
-  font-size: 14px;
-  line-height: 20px;
-  color: ${props => props.theme.text.color.secondary};
-  font-weight: ${props => props.theme.text.weight.normal};
+const PaymentContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin: 0 auto;
 `;
 
 const Title = styled.span`
@@ -231,19 +242,3 @@ const Title = styled.span`
     display: none;
   }
 `;
-
-const TryZkBobBannerImage = styled.img`
-  width: 480px;
-  max-width: 100%;
-  margin-top: 20px;
-  cursor: pointer;
-`;
-
-// const InfoIcon = styled(InfoIconDefault)`
-//   margin-left: 5px;
-//   &:hover {
-//     & > path {
-//       fill: ${props => props.theme.color.purple};
-//     }
-//   }
-// `;

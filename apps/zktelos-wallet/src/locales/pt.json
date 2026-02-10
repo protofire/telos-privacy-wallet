@@ -191,7 +191,7 @@
     }
   },
   "payment": {
-    "title": "Insira o valor em {{symbol}} e escolha um token",
+    "title": "Insira a quantia em {{symbol}} que deseja enviar",
     "amountToSend": "A quantia que você gostaria de enviar",
     "transferAmount": "Quantidade a ser transferida",
     "recipientReceives": "O destinatário recebe o pagamento em {{symbol}}",
