@@ -22,7 +22,7 @@ set -e  # Exit on error
 
 # Configuration
 VERSION="${1:-v0.0.1}"
-EC2_HOST="${EC2_HOST:-ubuntu@3.150.55.197}"
+EC2_HOST="${EC2_HOST:-ubuntu@3.151.150.167}"
 EC2_KEY="${EC2_KEY}"
 REPO="protofire/telos-privacy-wallet"
 GH_USER="${GH_USER}"
