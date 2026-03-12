@@ -6,6 +6,7 @@ import * as Sentry from "@sentry/react";
 import {
   TxDepositDeadlineExpiredError, ClientState,
   HistoryRecordState, HistoryTransactionType,
+  deriveSpendingKeyZkBob,
 } from 'zkbob-client-js';
 import { ProverMode } from 'zkbob-client-js/lib/config';
 import { toast } from 'react-toastify';
@@ -73,6 +74,12 @@ export const ZkAccountContextProvider = ({ children }) => {
 
   // Computed values for the active pool
   const zkClient = useMemo(() => zkClients[currentPool.alias] || null, [zkClients, currentPool.alias]);
+
+  // Expose to window for console/external scripts
+  useEffect(() => {
+    window.zkClient = zkClient;
+    window.deriveSpendingKeyZkBob = deriveSpendingKeyZkBob;
+  }, [zkClient]);
   const balance = useMemo(() => balances[currentPool.alias] || ethers.constants.Zero, [balances, currentPool.alias]);
   const history = useMemo(() => histories[currentPool.alias] || [], [histories, currentPool.alias]);
   const isPendingIncoming = useMemo(() => isPendingIncomingByPool[currentPool.alias] || false, [isPendingIncomingByPool, currentPool.alias]);
