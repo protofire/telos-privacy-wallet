@@ -2,8 +2,8 @@ name: Deploy Web to S3
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -41,7 +41,7 @@ jobs:
         env:
           CI: false
           NODE_OPTIONS: --max-old-space-size=4096
-          REACT_APP_CONFIG: "dev"
+          REACT_APP_CONFIG: "prod"
           REACT_APP_BUILD_TARGET: "web"
           REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}
           REACT_APP_LOCK_TIMEOUT: 300000
