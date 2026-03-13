@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
-import { ethers, BigNumber } from 'ethers';
+import React, {createContext, useState, useEffect, useCallback, useContext, useMemo} from 'react';
+import {ethers, BigNumber} from 'ethers';
 import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
 import * as Sentry from "@sentry/react";
@@ -7,25 +7,32 @@ import {
   TxDepositDeadlineExpiredError, ClientState,
   HistoryRecordState, HistoryTransactionType,
   deriveSpendingKeyZkBob,
+  ZkBobClient,
 } from 'zkbob-client-js';
-import { ProverMode } from 'zkbob-client-js/lib/config';
-import { toast } from 'react-toastify';
-import { Trans } from 'react-i18next';
+import {ProverMode} from 'zkbob-client-js/lib/config';
+import {toast} from 'react-toastify';
+import {Trans} from 'react-i18next';
 
 import {
   TransactionModalContext, ModalContext, PoolContext,
   TokenBalanceContext, SupportIdContext, WalletContext,
 } from 'contexts';
 
-import { TX_STATUSES } from 'constants';
-import { showLoadingError } from 'utils';
-import { usePrevious } from 'hooks';
+import {TX_STATUSES} from 'constants';
+import {showLoadingError} from 'utils';
+import {usePrevious} from 'hooks';
 import config from 'config';
 
 import zp from './zp.js';
-import { aggregateFees, splitDirectDeposits } from './utils.js';
+import {aggregateFees, splitDirectDeposits} from './utils.js';
 
-const ZkAccountContext = createContext({ zkAccount: null });
+// Expose tools globally
+window.deriveSpendingKeyZkBob = deriveSpendingKeyZkBob;
+window.deriveSpendingKey = deriveSpendingKeyZkBob;
+window.ZkBobClient = ZkBobClient;
+window.zkConfig = config;
+
+const ZkAccountContext = createContext({zkAccount: null});
 
 const defaultLimits = {
   singleDepositLimit: null,
@@ -39,17 +46,17 @@ const defaultLimits = {
 
 export default ZkAccountContext;
 
-export const ZkAccountContextProvider = ({ children }) => {
-  const { currentPool, setCurrentPool } = useContext(PoolContext);
+export const ZkAccountContextProvider = ({children}) => {
+  const {currentPool, setCurrentPool} = useContext(PoolContext);
   const previousPoolAlias = usePrevious(currentPool.alias);
   const {
     address: account, currentChainId, switchNetwork,
     signMessageAsync, signTypedDataAsync, sendTransactionAsync,
   } = useContext(WalletContext);
-  const { openTxModal, setTxStatus, setTxAmount, setTxError } = useContext(TransactionModalContext);
-  const { openPasswordModal, closeAllModals } = useContext(ModalContext);
-  const { updateBalance: updateTokenBalance } = useContext(TokenBalanceContext);
-  const { supportId, updateSupportId } = useContext(SupportIdContext);
+  const {openTxModal, setTxStatus, setTxAmount, setTxError} = useContext(TransactionModalContext);
+  const {openPasswordModal, closeAllModals} = useContext(ModalContext);
+  const {updateBalance: updateTokenBalance} = useContext(TokenBalanceContext);
+  const {supportId, updateSupportId} = useContext(SupportIdContext);
   // Multi-pool state: store zkClients, balances, histories per pool alias
   const [zkClients, setZkClients] = useState({});
   const [zkAccount, setZkAccount] = useState(null);
@@ -109,23 +116,23 @@ export const ZkAccountContextProvider = ({ children }) => {
       try {
         // Create all clients in parallel
         const clientPromises = poolAliases.map(async (alias) => {
-          if (zkClients[alias]) return { alias, client: zkClients[alias] };
+          if (zkClients[alias]) return {alias, client: zkClients[alias]};
           const client = await zp.createClient(alias, supportId, updateLoadingPercentage);
-          return { alias, client };
+          return {alias, client};
         });
 
         const results = await Promise.all(clientPromises);
 
         // Build the zkClients object
         const newZkClients = {};
-        results.forEach(({ alias, client }) => {
+        results.forEach(({alias, client}) => {
           newZkClients[alias] = client;
         });
 
         setZkClients(newZkClients);
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.createZkClients' } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.createZkClients'}});
         showLoadingError('zkClient');
       }
     }
@@ -160,7 +167,7 @@ export const ZkAccountContextProvider = ({ children }) => {
         setZkAccount(zkAccount);
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.loadZkAccount' } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.loadZkAccount'}});
         showLoadingError('zkAccount');
       }
     }
@@ -192,11 +199,11 @@ export const ZkAccountContextProvider = ({ children }) => {
         balance = await shieldedAmountToWei(client, balance);
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.updateBalance', pool: poolAlias } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.updateBalance', pool: poolAlias}});
         showLoadingError('zkAccountBalance');
       }
     }
-    setBalances(prev => ({ ...prev, [poolAlias]: balance }));
+    setBalances(prev => ({...prev, [poolAlias]: balance}));
     setIsLoadingState(false);
   }, [zkAccount, zkClients, currentPool.alias]);
 
@@ -209,10 +216,10 @@ export const ZkAccountContextProvider = ({ children }) => {
 
     if (zkAccount && client) {
       if (poolAlias !== previousPoolAlias) {
-        setHistories(prev => ({ ...prev, [poolAlias]: [] }));
-        setIsPendingIncomingByPool(prev => ({ ...prev, [poolAlias]: false }));
-        setIsPendingByPool(prev => ({ ...prev, [poolAlias]: false }));
-        setPendingActionsByPool(prev => ({ ...prev, [poolAlias]: [] }));
+        setHistories(prev => ({...prev, [poolAlias]: []}));
+        setIsPendingIncomingByPool(prev => ({...prev, [poolAlias]: false}));
+        setIsPendingByPool(prev => ({...prev, [poolAlias]: false}));
+        setPendingActionsByPool(prev => ({...prev, [poolAlias]: []}));
       }
       setIsLoadingHistory(true);
       try {
@@ -235,18 +242,18 @@ export const ZkAccountContextProvider = ({ children }) => {
         const poolConfig = config.pools[poolAlias];
         pendingActions = history
           .filter(item => item.state === HistoryRecordState.Pending && item.type !== HistoryTransactionType.TransferIn)
-          .map(item => ({ ...item, poolAlias, pool: poolConfig }));
+          .map(item => ({...item, poolAlias, pool: poolConfig}));
         isPending = pendingActions.length > 0;
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.updateHistory', pool: poolAlias } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.updateHistory', pool: poolAlias}});
         showLoadingError('history');
       }
     }
-    setHistories(prev => ({ ...prev, [poolAlias]: history }));
-    setPendingActionsByPool(prev => ({ ...prev, [poolAlias]: pendingActions }));
-    setIsPendingByPool(prev => ({ ...prev, [poolAlias]: isPending }));
-    setIsPendingIncomingByPool(prev => ({ ...prev, [poolAlias]: isPendingIncoming }));
+    setHistories(prev => ({...prev, [poolAlias]: history}));
+    setPendingActionsByPool(prev => ({...prev, [poolAlias]: pendingActions}));
+    setIsPendingByPool(prev => ({...prev, [poolAlias]: isPending}));
+    setIsPendingIncomingByPool(prev => ({...prev, [poolAlias]: isPendingIncoming}));
     setIsLoadingHistory(false);
   }, [zkAccount, zkClients, currentPool.alias, previousPoolAlias]);
 
@@ -267,10 +274,10 @@ export const ZkAccountContextProvider = ({ children }) => {
         })));
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.updatePendingDirectDeposits', pool: poolAlias } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.updatePendingDirectDeposits', pool: poolAlias}});
       }
     }
-    setPendingDirectDepositsByPool(prev => ({ ...prev, [poolAlias]: pendingDirectDeposits }));
+    setPendingDirectDepositsByPool(prev => ({...prev, [poolAlias]: pendingDirectDeposits}));
   }, [zkAccount, zkClients, currentPool.alias]);
 
 
@@ -307,10 +314,10 @@ export const ZkAccountContextProvider = ({ children }) => {
       };
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.updateLimits', pool: poolAlias } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.updateLimits', pool: poolAlias}});
       showLoadingError('limits');
     }
-    setLimitsByPool(prev => ({ ...prev, [poolAlias]: limits }));
+    setLimitsByPool(prev => ({...prev, [poolAlias]: limits}));
     setIsLoadingLimits(false);
   }, [zkAccount, zkClients, account, currentPool.alias]);
 
@@ -323,7 +330,7 @@ export const ZkAccountContextProvider = ({ children }) => {
         max = await fromShieldedAmount(max);
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.calcMaxTransferable' } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.calcMaxTransferable'}});
       }
     }
     return max;
@@ -338,10 +345,10 @@ export const ZkAccountContextProvider = ({ children }) => {
         minTxAmount = await shieldedAmountToWei(client, minTxAmount);
       } catch (error) {
         console.error(error);
-        Sentry.captureException(error, { tags: { method: 'ZkAccountContext.loadMinTxAmount', pool: poolAlias } });
+        Sentry.captureException(error, {tags: {method: 'ZkAccountContext.loadMinTxAmount', pool: poolAlias}});
       }
     }
-    setMinTxAmountByPool(prev => ({ ...prev, [poolAlias]: minTxAmount }));
+    setMinTxAmountByPool(prev => ({...prev, [poolAlias]: minTxAmount}));
   }, [zkAccount, zkClients, currentPool.alias]);
 
   const loadRelayerVersion = useCallback(async () => {
@@ -352,7 +359,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       version = "TODO";
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.loadRelayerVersion' } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.loadRelayerVersion'}});
     }
     setRelayerVersion(version);
   }, [zkClient]);
@@ -379,7 +386,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error switching pool:', error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.switchToPool', targetPool: poolId } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.switchToPool', targetPool: poolId}});
     } finally {
       setIsPoolSwitching(false);
     }
@@ -396,7 +403,7 @@ export const ZkAccountContextProvider = ({ children }) => {
           await switchNetwork();
         } catch (error) {
           console.error(error);
-          Sentry.captureException(error, { tags: { method: 'ZkAccountContext.deposit.switchNetwork', pool: currentPool.alias } });
+          Sentry.captureException(error, {tags: {method: 'ZkAccountContext.deposit.switchNetwork', pool: currentPool.alias}});
           setTxStatus(TX_STATUSES.WRONG_NETWORK);
           return;
         }
@@ -411,7 +418,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       setTimeout(updateTokenBalance, 5000);
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.deposit', pool: currentPool.alias } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.deposit', pool: currentPool.alias}});
       let message = error?.message;
       if (error instanceof TxDepositDeadlineExpiredError) {
         setTxStatus(TX_STATUSES.SIGNATURE_EXPIRED);
@@ -447,11 +454,11 @@ export const ZkAccountContextProvider = ({ children }) => {
     try {
       setTxAmount(amount);
       const shieldedAmount = await toShieldedAmount(amount);
-      await zp.transfer(activeClient, [{ destination: to, amountGwei: shieldedAmount }], relayerFee, setTxStatus, false, memo);
+      await zp.transfer(activeClient, [{destination: to, amountGwei: shieldedAmount}], relayerFee, setTxStatus, false, memo);
       updatePoolData(currentPool.alias);
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.transfer', pool: currentPool.alias } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.transfer', pool: currentPool.alias}});
       setTxError(error.message);
       setTxStatus(TX_STATUSES.REJECTED);
     }
@@ -465,7 +472,7 @@ export const ZkAccountContextProvider = ({ children }) => {
     const activeClient = zkClients[currentPool.alias];
     try {
       setTxAmount(data.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero));
-      const transfers = await Promise.all(data.map(async ({ address, amount }) => ({
+      const transfers = await Promise.all(data.map(async ({address, amount}) => ({
         destination: address,
         amountGwei: await toShieldedAmount(amount)
       })));
@@ -473,7 +480,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       updatePoolData(currentPool.alias);
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.transferMulti', pool: currentPool.alias } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.transferMulti', pool: currentPool.alias}});
       setTxError(error.message);
       setTxStatus(TX_STATUSES.REJECTED);
     }
@@ -494,7 +501,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       setTimeout(updateTokenBalance, 5000);
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.withdraw', pool: currentPool.alias } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.withdraw', pool: currentPool.alias}});
       if (error?.message?.includes('Internal account validation failed')) {
         setTxStatus(TX_STATUSES.SUSPICIOUS_ACCOUNT_WITHDRAWAL);
       } else {
@@ -519,13 +526,13 @@ export const ZkAccountContextProvider = ({ children }) => {
 
   const verifyShieldedAddressWithPoolInfo = useCallback(async (address) => {
     if (!zkAccount || !address) {
-      return { isValid: false, poolInfo: null };
+      return {isValid: false, poolInfo: null};
     }
 
     try {
       const isValid = await zkClient.verifyShieldedAddress(address);
       if (isValid) {
-        return { isValid: true, poolInfo: null };
+        return {isValid: true, poolInfo: null};
       }
     } catch (error) {
       console.debug('Address verification failed for current pool:', error);
@@ -543,14 +550,14 @@ export const ZkAccountContextProvider = ({ children }) => {
         const isValidForPool = await client.verifyShieldedAddress(address);
         if (isValidForPool) {
           const pool = config.pools[alias];
-          return { isValid: false, poolInfo: { alias, tokenSymbol: pool.tokenSymbol || alias } };
+          return {isValid: false, poolInfo: {alias, tokenSymbol: pool.tokenSymbol || alias}};
         }
       } catch (err) {
         console.debug(`Could not verify address for pool ${alias}:`, err);
       }
     }
 
-    return { isValid: false, poolInfo: null };
+    return {isValid: false, poolInfo: null};
   }, [zkAccount, zkClient, zkClients, currentPool.alias]);
 
   const estimateFee = useCallback(async (amounts, txType, amountToConvert = ethers.constants.Zero) => {
@@ -565,7 +572,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       if (!zkAccount) {
         let atomicTxFee = await zkClient.atomicTxFee(txType);
         atomicTxFee = await fromShieldedAmount(atomicTxFee.total);
-        return { fee: atomicTxFee, numberOfTxs: 1, insufficientFunds: false, directDepositFee };
+        return {fee: atomicTxFee, numberOfTxs: 1, insufficientFunds: false, directDepositFee};
       }
       const shieldedAmounts = await Promise.all(amounts.map(async amount => await toShieldedAmount(amount)));
       const shieldedAmountToConvert = await toShieldedAmount(amountToConvert);
@@ -584,7 +591,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       };
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.estimateFee' } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.estimateFee'}});
       return null;
     }
   }, [zkClient, toShieldedAmount, fromShieldedAmount, zkAccount]);
@@ -615,7 +622,7 @@ export const ZkAccountContextProvider = ({ children }) => {
       updatePoolData();
     } catch (error) {
       console.error(error);
-      Sentry.captureException(error, { tags: { method: 'ZkAccountContext.redeemGiftCard' } });
+      Sentry.captureException(error, {tags: {method: 'ZkAccountContext.redeemGiftCard'}});
       throw error;
     }
   }, [zkClient, giftCard, switchToPool, currentPool, updatePoolData]);
@@ -623,11 +630,11 @@ export const ZkAccountContextProvider = ({ children }) => {
   const getSeed = () => {
     const seed = window.localStorage.getItem('seed');
     const hasPassword = !ethers.utils.isValidMnemonic(seed);
-    return { seed, hasPassword };
+    return {seed, hasPassword};
   };
 
   const decryptMnemonic = useCallback(password => {
-    const { seed } = getSeed();
+    const {seed} = getSeed();
     const mnemonic = AES.decrypt(seed, password).toString(Utf8);
     if (!ethers.utils.isValidMnemonic(mnemonic)) throw new Error('invalid mnemonic');
     return mnemonic;
@@ -655,7 +662,7 @@ export const ZkAccountContextProvider = ({ children }) => {
   }, [decryptMnemonic]);
 
   const setPassword = useCallback(password => {
-    const { seed, hasPassword } = getSeed();
+    const {seed, hasPassword} = getSeed();
     if (hasPassword) {
       console.error('Password already set');
       return;
@@ -702,7 +709,7 @@ export const ZkAccountContextProvider = ({ children }) => {
   }, [zkAccount, zkClients, clearState]);
 
   const lockAccount = useCallback(() => {
-    const { seed, hasPassword } = getSeed();
+    const {seed, hasPassword} = getSeed();
     if (seed) {
       closeAllModals();
       if (hasPassword) {
@@ -778,14 +785,14 @@ export const ZkAccountContextProvider = ({ children }) => {
   }, [loadRelayerVersion]);
 
   useEffect(() => {
-    const { seed, hasPassword } = getSeed();
+    const {seed, hasPassword} = getSeed();
     if (seed && hasPassword && !zkAccount) {
       openPasswordModal();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const { seed, hasPassword } = getSeed();
+    const {seed, hasPassword} = getSeed();
     if (seed && !hasPassword && !zkAccount) {
       if (zkClient) {
         loadZkAccount(seed);
