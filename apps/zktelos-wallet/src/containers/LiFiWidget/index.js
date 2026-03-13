@@ -1,23 +1,23 @@
-import React, { useContext, useMemo } from 'react';
-import { LiFiWidget } from '@lifi/widget';
+import React, {useContext, useMemo} from 'react';
+import {LiFiWidget} from '@lifi/widget';
 
-import { PoolContext } from 'contexts';
-import { useWindowDimensions } from 'hooks';
+import {PoolContext} from 'contexts';
+import {useWindowDimensions} from 'hooks';
 import ThemeContext from 'contexts/ThemeContext';
-import { useTheme } from 'styled-components';
+import {useTheme} from 'styled-components';
 
 export default () => {
-  const { currentPool } = useContext(PoolContext);
-  const { theme: themeName } = useContext(ThemeContext);
+  const {currentPool} = useContext(PoolContext);
+  const {theme: themeName} = useContext(ThemeContext);
 
-  const { card, color, input } = useTheme();
+  const {card, color, input} = useTheme();
 
 
-  const { width } = useWindowDimensions();
+  const {width} = useWindowDimensions();
 
   const widgetConfig = useMemo(() => {
     return {
-      integrator: 'zkTelos',
+      integrator: 'Telos-wallet',
       fee: 0.00075,
       variant: 'compact',
       appearance: themeName,
@@ -32,8 +32,8 @@ export default () => {
           fontFamily: 'Gilroy'
         },
         palette: {
-          primary: { main: color.blue },
-          secondary: { main: color.purple },
+          primary: {main: color.blue},
+          secondary: {main: color.purple},
           background: {
             default: card.background,
             paper: input.background.primary,
@@ -42,7 +42,7 @@ export default () => {
         components: {
           MuiAvatar: {
             defaultProps: {
-              imgProps: { crossOrigin: 'anonymous' },
+              imgProps: {crossOrigin: 'anonymous'},
             },
           },
         },
