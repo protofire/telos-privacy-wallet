@@ -1,5 +1,5 @@
 import { http, createConfig, WagmiProvider } from 'wagmi';
-import { telos, telosTestnet } from 'wagmi/chains';
+import { telos, telosTestnet, mainnet, polygon, optimism, arbitrum, base, bsc, avalanche } from 'wagmi/chains';
 import { injected, walletConnect } from 'wagmi/connectors'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -9,7 +9,8 @@ if (!process.env.REACT_APP_WALLETCONNECT_PROJECT_ID) {
   throw new Error('REACT_APP_WALLETCONNECT_PROJECT_ID is not set');
 }
 
-const supportedChains = [telos, telosTestnet];
+// Telos chains first (primary), followed by common LI.FI bridge source chains
+const supportedChains = [telos, telosTestnet, mainnet, polygon, optimism, arbitrum, base, bsc, avalanche];
 
 const connectors = [
   walletConnect({
@@ -38,6 +39,13 @@ const wagmiConfig = createConfig({
   transports: {
     [telos.id]: http('https://rpc.telos.net'),
     [telosTestnet.id]: http('https://rpc.testnet.telos.net'),
+    [mainnet.id]: http(),
+    [polygon.id]: http(),
+    [optimism.id]: http(),
+    [arbitrum.id]: http(),
+    [base.id]: http(),
+    [bsc.id]: http(),
+    [avalanche.id]: http(),
   },
   connectors,
 });
