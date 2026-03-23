@@ -20,7 +20,7 @@ const pools = Object.entries(config.pools).map(
 );
 
 export const TokenBalanceContextProvider = ({ children }) => {
-  const { address: account, refetchNativeBalance, callContract } = useContext(WalletContext);
+  const { address: account, currentChainId, refetchNativeBalance, callContract } = useContext(WalletContext);
   const { currentPool } = useContext(PoolContext);
   const [balances, setBalances] = useState(
     pools.reduce((acc, { poolAlias }) => {
@@ -36,6 +36,10 @@ export const TokenBalanceContextProvider = ({ children }) => {
 
   const updateBalance = useCallback(async () => {
     if (!account) return;
+    // Don't attempt contract reads when the wallet is on a different chain —
+    // pool token contracts only exist on their own chain (Telos EVM).
+    const poolChainIds = new Set(pools.map(p => config.pools[p.poolAlias].chainId));
+    if (currentChainId && !poolChainIds.has(currentChainId)) return;
 
     setIsLoadingBalance(true);
     try {
@@ -75,7 +79,7 @@ export const TokenBalanceContextProvider = ({ children }) => {
     } finally {
       setIsLoadingBalance(false);
     }
-  }, [account, refetchNativeBalance, callContract]);
+  }, [account, currentChainId, refetchNativeBalance, callContract]);
 
   // Update balances when account changes
   useEffect(() => {

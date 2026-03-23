@@ -24,9 +24,15 @@ export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
       setAllowance(ethers.constants.Zero);
       return;
     }
+    // Don't read contract state when the wallet is on the wrong chain —
+    // the token contract doesn't exist at this address on other networks.
+    if (currentChainId !== pool.chainId) {
+      setAllowance(ethers.constants.Zero);
+      return;
+    }
     const allowance = await callContract(tokenAddress, tokenAbi, 'allowance', [account, contractForApproval]);
     setAllowance(allowance);
-  }, [account, callContract, tokenAddress, contractForApproval]);
+  }, [account, callContract, tokenAddress, contractForApproval, currentChainId, pool.chainId]);
 
   useEffect(() => {
     updateAllowance();
@@ -38,7 +44,7 @@ export default (pool, tokenAddress, amount, balance, type = 'permit2') => {
       if (currentChainId !== pool.chainId) {
         setTxStatus(TX_STATUSES.SWITCH_NETWORK);
         try {
-          await switchNetwork();
+          await switchNetwork({ chainId: pool.chainId });
         } catch (error) {
           console.error(error);
           Sentry.captureException(error, { tags: { method: 'hooks.useApproval.approve.switchNetwork' } });

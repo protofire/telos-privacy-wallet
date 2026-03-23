@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!--
+      Suppress unhandled-rejection overlay for EIP-1193 user-cancellation errors
+      (code 4001) that leak from the LI.FI bridge widget. The widget already shows
+      these errors in its own UI, so there is no need to propagate them further.
+      This script MUST stay as the very first script in <head> so it registers its
+      unhandledrejection listener before the webpack-dev-server bundle does, allowing
+      stopImmediatePropagation() to prevent the CRA dev-overlay from appearing.
+    -->
+    <script>
+      window.addEventListener('unhandledrejection', function(event) {
+        var err = event.reason;
+        if (err && (
+          err.code === 4001 ||
+          (err.cause && err.cause.code === 4001) ||
+          (typeof err.message === 'string' && err.message.toLowerCase().indexOf('user rejected') !== -1)
+        )) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      });
+    </script>
     <!-- Google Tag Manager -->
     <!-- <script>
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
