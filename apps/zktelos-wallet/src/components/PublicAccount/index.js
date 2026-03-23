@@ -124,7 +124,7 @@ export default () => {
   return (
     <Container>
       <HeaderContainer>
-        {connector && <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} />}
+        {connector && <WalletConnectorIcon src={connector.icon || CONNECTORS_ICONS[connector.name]} />}
         <HeaderContent>
           <HeaderTitle>
             <AccountName>{connector?.name}</AccountName>
