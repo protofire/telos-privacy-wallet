@@ -400,7 +400,7 @@ export const ZkAccountContextProvider = ({children}) => {
       if (currentChainId !== currentPool.chainId) {
         setTxStatus(TX_STATUSES.SWITCH_NETWORK);
         try {
-          await switchNetwork();
+          await switchNetwork({ chainId: currentPool.chainId });
         } catch (error) {
           console.error(error);
           Sentry.captureException(error, {tags: {method: 'ZkAccountContext.deposit.switchNetwork', pool: currentPool.alias}});
