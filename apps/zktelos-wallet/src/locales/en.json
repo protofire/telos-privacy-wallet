@@ -397,8 +397,8 @@
     }
   },
   "restrictionModal": {
-    "title": "zkBob is not supported in this country or region",
-    "description": "zkBob is not supported in your country. You will be able to use the application from supported country or region."
+    "title": "zkTelos is not supported in this country or region",
+    "description": "zkTelos is not supported in your country. You will be able to use the application from supported country or region."
   },
   "secretPhraseModal": {
     "title": "Show secret phrase",
@@ -448,7 +448,7 @@
   "connectWalletModal": {
     "title": "Connect web3 wallet",
     "description": "Connect your wallet to deposit {{symbol}} into your zkAccount. If you are creating a new zkAccount, your wallet is used to derive a private encryption key for the zkTelos application.",
-    "note": "By connecting a wallet, you agree to zkBob<br /><1>Terms of Service</1>",
+    "note": "By connecting a wallet, you agree to zkTelos<br /><1>Terms of Service</1>",
     "noWalletTitle": "{{wallet}} wallet is not found",
     "noWalletDescription": "Ensure that the {{wallet}} wallet extension is installed.",
     "noWalletDescriptionWithDeposit": "Ensure that the {{wallet}} wallet extension is installed. Connect a Web3 wallet to deposit {{symbol}} into your zkAccount.",
