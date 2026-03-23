@@ -40,7 +40,7 @@ export default ({ nextStep, gaIdPrefix = '', descriptions = {} }) => {
               </WalletConnectorDescription>
             )}
           </WalletConnectorContent>
-          <WalletConnectorIcon src={CONNECTORS_ICONS[connector.name]} />
+          <WalletConnectorIcon src={connector.icon || CONNECTORS_ICONS[connector.name]} />
         </WalletConnector>
       )}
     </>

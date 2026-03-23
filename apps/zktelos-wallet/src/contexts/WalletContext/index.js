@@ -10,8 +10,6 @@ import { isAddress } from 'viem'
 import { readContract, waitForTransactionReceipt } from 'viem/actions'
 import { useCallback, createContext, useMemo } from 'react';
 
-const allowedConnectorId = ['io.metamask', 'walletConnect']
-
 const useEvmWallet = () => {
   const { address, connector } = useConnection();
   const currentChainId = useChainId();
@@ -27,7 +25,18 @@ const useEvmWallet = () => {
   const client = useClient();
 
   const filteredConnectors = useMemo(() => {
-    return connectors.filter(connector => allowedConnectorId.includes(connector.id));
+    // Wallets that don't support Telos EVM are excluded from the list.
+    const excludedConnectorIds = ['app.phantom'];
+    // If specific EIP-6963 wallet connectors are available, hide the generic
+    // 'injected' catch-all to avoid a duplicate entry in the list.
+    const hasSpecificInjected = connectors.some(
+      c => c.type === 'injected' && c.id !== 'injected'
+    );
+    return connectors.filter(c => {
+      if (excludedConnectorIds.includes(c.id)) return false;
+      if (c.id === 'injected' && hasSpecificInjected) return false;
+      return true;
+    });
   }, [connectors]);
 
   const callContract = useCallback(async (address, abi, method, params = [], isSend = false) => {
