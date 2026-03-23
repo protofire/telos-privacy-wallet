@@ -20,5 +20,9 @@
     "build:zkbob": "yarn workspace zkbob-client-js build",
     "watch:zkbob": "yarn workspace zkbob-client-js watch",
     "dev": "concurrently \"yarn watch:zkbob\" \"yarn start\" --names \"zkbob,app\" --prefix-colors \"blue,green\""
-  } 
+  },
+  "volta": {
+    "node": "20.20.1",
+    "yarn": "1.22.22"
+  }
 }

@@ -35,7 +35,7 @@ if (process.env.REACT_APP_BUILD_TARGET === 'web') {
 const wagmiConfig = createConfig({
   chains: supportedChains,
   ssr: false,
-  syncConnectedChain: false,
+  syncConnectedChain: true,
   transports: {
     [telos.id]: http('https://rpc.telos.net'),
     [telosTestnet.id]: http('https://rpc.testnet.telos.net'),
