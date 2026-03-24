@@ -34,7 +34,7 @@ const config = {
         parameters: 'prod',
         isNative: true,
         minTxAmount: '5000000000', // 5 TLOS in shielded amount
-        depositFeeBps: 20, // 0.2% deposit fee (matches directDepositFeeBps in contract)
+        depositFeeBps: 20,
       },
       'tlos_usdce': {
         chainId: 40,
@@ -98,7 +98,7 @@ const config = {
         addressPrefix: '',
         parameters: 'staging',
         isNative: true,
-        depositFeeBps: 20, // 0.2% deposit fee (matches directDepositFeeBps in contract)
+        depositFeeBps: 20,
       }
     },
     "snarkParamsSet": {

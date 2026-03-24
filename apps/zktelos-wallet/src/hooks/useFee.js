@@ -8,11 +8,26 @@ const calculateDynamicDepositFee = (amount, directDepositFee, depositFeeBps) => 
   if (!directDepositFee || directDepositFee.isZero()) return ethers.constants.Zero;
   if (amount.eq(ethers.constants.Zero)) return ethers.constants.Zero;
 
-  // Mirror the contract formula: fee = max(amount * feeBps / 10000, directDepositFee)
   let feeApplied = amount.mul(depositFeeBps).div(10000);
 
   if (feeApplied.lt(directDepositFee)) {
     feeApplied = directDepositFee;
+  }
+
+  return feeApplied;
+}
+
+const calculateFlatDepositFee = (amount, relayerFee, tokenDecimals) => {
+  if (!relayerFee) return ethers.constants.Zero;
+  if (amount.eq(ethers.constants.Zero)) return ethers.constants.Zero;
+
+  const scale = ethers.BigNumber.from(10).pow(tokenDecimals);
+  const denominator = scale.mul(100);
+
+  let feeApplied = amount.mul(relayerFee).div(denominator);
+
+  if (feeApplied.lt(relayerFee)) {
+    feeApplied = relayerFee;
   }
 
   return feeApplied;
@@ -37,9 +52,12 @@ export default (amount, txType, amountToConvert) => {
       );
 
       let fee = ethers.constants.Zero;
-      // Dynamic fee only for deposits
       if (txType === TxType.Deposit || txType === TxType.BridgeDeposit) {
-        fee = calculateDynamicDepositFee(amount, data?.directDepositFee, currentPool.depositFeeBps);
+        if (currentPool.depositFeeBps) {
+          fee = calculateDynamicDepositFee(amount, data?.directDepositFee, currentPool.depositFeeBps);
+        } else {
+          fee = calculateFlatDepositFee(amount, data?.fee, currentPool.tokenDecimals);
+        }
       } else {
         fee = data?.fee;
       }
