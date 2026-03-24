@@ -4,17 +4,15 @@ import { ethers } from 'ethers';
 import { ZkAccountContext, PoolContext } from 'contexts';
 import { TxType } from 'zkbob-client-js';
 
-const calculateDynamicDepositFee = (amount, relayerFee, tokenDecimals) => {
-  if (!relayerFee) return ethers.constants.Zero;
+const calculateDynamicDepositFee = (amount, directDepositFee, depositFeeBps) => {
+  if (!directDepositFee || directDepositFee.isZero()) return ethers.constants.Zero;
   if (amount.eq(ethers.constants.Zero)) return ethers.constants.Zero;
 
-  const scale = ethers.BigNumber.from(10).pow(tokenDecimals);
-  const denominator = scale.mul(100);
+  // Mirror the contract formula: fee = max(amount * feeBps / 10000, directDepositFee)
+  let feeApplied = amount.mul(depositFeeBps).div(10000);
 
-  let feeApplied = amount.mul(relayerFee).div(denominator);
-
-  if (feeApplied.lt(relayerFee)) {
-    feeApplied = relayerFee;
+  if (feeApplied.lt(directDepositFee)) {
+    feeApplied = directDepositFee;
   }
 
   return feeApplied;
@@ -41,7 +39,7 @@ export default (amount, txType, amountToConvert) => {
       let fee = ethers.constants.Zero;
       // Dynamic fee only for deposits
       if (txType === TxType.Deposit || txType === TxType.BridgeDeposit) {
-        fee = calculateDynamicDepositFee(amount, data?.fee, currentPool.tokenDecimals);
+        fee = calculateDynamicDepositFee(amount, data?.directDepositFee, currentPool.depositFeeBps);
       } else {
         fee = data?.fee;
       }
