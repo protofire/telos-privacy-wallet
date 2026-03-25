@@ -8,7 +8,10 @@
 #   1. Enable 2-Step Verification on your Google account
 #   2. Go to https://myaccount.google.com/apppasswords
 #   3. Generate an App Password for "Mail"
-#   4. Paste it into $GmailAppPassword below
+#   4. Set the following environment variables before running:
+#        $env:GMAIL_FROM        = "your-sender@gmail.com"
+#        $env:GMAIL_TO          = "your-recipient@example.com"
+#        $env:GMAIL_APP_PASSWORD = "your-app-password"
 #
 # SCHEDULE (run once in an elevated PowerShell to register):
 #   $scriptPath = "C:\Users\jpkap\Desktop\Claude\Telos zkWallet\scripts\check-relayer-balance.ps1"
@@ -26,8 +29,8 @@ $Relayers = @(
     @{ Name = "USDC.e Pool"; Address = "0x0b7c4c35fe2a7623896CE3560554698F8b5fe609"; Explorer = "https://www.teloscan.io/address/0x0b7c4c35fe2a7623896CE3560554698F8b5fe609" }
 )
 
-$GmailFrom       = "jpkapinha@gmail.com"
-$GmailTo         = "joao.capinha@protofire.io"
+$GmailFrom        = $env:GMAIL_FROM
+$GmailTo          = $env:GMAIL_TO
 $GmailAppPassword = $env:GMAIL_APP_PASSWORD
 # ---- END CONFIG --------------------------------------------
 
