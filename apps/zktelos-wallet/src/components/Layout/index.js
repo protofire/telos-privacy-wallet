@@ -45,7 +45,6 @@ const PageContainer = styled.div`
   align-items: center;
   justify-content: center;
   flex: 1;
-  margin: 0 auto;
 `;
 
 const MenuAndPageContainer = styled.div`
@@ -60,8 +59,9 @@ const MenuAndPageContainer = styled.div`
   @media only screen and (max-width: 560px) {
     gap: 0;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
+    width: 100%;
   }
 `;
 

@@ -175,8 +175,9 @@ const ExportButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 5px;
+  padding: 5px 16px 0;
   margin-bottom: 25px;
+  align-self: stretch;
 `;
 
 const ContentContainer = styled.div`
@@ -186,13 +187,9 @@ const ContentContainer = styled.div`
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
   border: 2px solid ${props => props.theme.color.black};
+  padding-bottom: 16px;
 
   @media only screen and (max-width: 560px) {
     margin: 15px 0;
-    min-width: 350px;
-  }
-
-  @media only screen and (max-width: 350px) {
-    min-width: 280px;
   }
 `;
