@@ -129,9 +129,11 @@ export default () => {
         )}
         {!isHistoryEmpty && (
           <>
-            {items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item, index) =>
-              <HistoryItem key={index} item={item} zkAccount={zkAccount} isMobile={isMobile} />
-            )}
+            <ScrollableItems>
+              {items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item, index) =>
+                <HistoryItem key={index} item={item} zkAccount={zkAccount} isMobile={isMobile} />
+              )}
+            </ScrollableItems>
             {items.length > pageSize && (
               <Pagination
                 currentPage={currentPage}
@@ -164,6 +166,12 @@ const Description = styled.span`
   line-height: 22px;
   color: ${({ theme }) => theme.text.color.secondary};
   text-align: center;
+`;
+
+const ScrollableItems = styled.div`
+  overflow-y: auto;
+  height: 440px;
+  width: 100%;
 `;
 
 const ExportButton = styled(Button)`

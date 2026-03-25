@@ -207,6 +207,7 @@ const DropdownOptionButton = styled(OptionButtonDefault)`
   height: 48px;
   padding: 0 16px;
   margin-bottom: 0;
+  justify-content: center;
 `;
 
 const DotsIcon = styled(EllipsisIcon)`

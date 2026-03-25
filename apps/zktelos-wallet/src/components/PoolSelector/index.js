@@ -23,7 +23,7 @@ const PoolSelector = ({ options = [], selectedAlias, onSelect }) => {
 
   return (
     <Dropdown
-      width={200}
+      width={220}
       placement="bottomRight"
       fullscreen={false}
       isOpen={isOpen}
@@ -59,6 +59,7 @@ const PoolSelector = ({ options = [], selectedAlias, onSelect }) => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 8px;
   & > :last-child {
     margin-bottom: 0;
   }
