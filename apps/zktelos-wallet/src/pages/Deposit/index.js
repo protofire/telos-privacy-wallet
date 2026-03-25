@@ -208,6 +208,7 @@ export default () => {
           kycUrls={currentPool.kycUrls}
         />
       }
+      {/* Limits temporarily hidden
       <Limits
         loading={isLoadingLimits}
         limits={[
@@ -224,6 +225,7 @@ export default () => {
         ]}
         currentPool={currentPool}
       />
+      */}
       {latestAction && (
         <LatestAction
           type="deposit"

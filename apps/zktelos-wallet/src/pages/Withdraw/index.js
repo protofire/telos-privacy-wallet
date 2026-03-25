@@ -202,6 +202,7 @@ export default () => {
           currentPool={currentPool}
         />
       </Card>
+      {/* Limits temporarily hidden
       <Limits
         loading={isLoadingLimits}
         limits={[{
@@ -210,6 +211,7 @@ export default () => {
         }]}
         currentPool={currentPool}
       />
+      */}
       {latestAction && (
         <LatestAction
           type="withdraw"
