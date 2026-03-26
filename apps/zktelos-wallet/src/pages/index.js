@@ -26,7 +26,7 @@ import Footer from 'components/Footer';
 import Layout from 'components/Layout';
 import PaymentLinkModal from 'components/PaymentLinkModal';
 
-import Welcome from 'pages/Welcome';
+import WelcomeModal from 'containers/WelcomeModal';
 import Deposit from 'pages/Deposit';
 import Transfer from 'pages/Transfer';
 import Withdraw from 'pages/Withdraw';
@@ -76,13 +76,8 @@ Sentry.init({
   }
 });
 
-const Routes = ({ showWelcome, params }) => (
+const Routes = ({ params }) => (
   <Switch>
-    {showWelcome && (
-      <SentryRoute exact strict path="/">
-        <Welcome />
-      </SentryRoute>
-    )}
     <SentryRoute exact strict path="/home">
       <Home />
     </SentryRoute>
@@ -106,14 +101,14 @@ const Routes = ({ showWelcome, params }) => (
 );
 
 const MainApp = () => {
-  const { zkAccount, isLoadingZkAccount } = useContext(ZkAccountContext);
   const location = useLocation();
-  const showWelcome = (!zkAccount && !isLoadingZkAccount && !window.localStorage.getItem('seed'));
+  const [welcomeOpen, setWelcomeOpen] = React.useState(
+    () => !localStorage.getItem('welcomeSeen') && !localStorage.getItem('seed')
+  );
   // useIdleTimer({
   //   timeout: Number(process.env.REACT_APP_LOCK_TIMEOUT) || (1000 * 60 * 15),
   //   onIdle: () => lockAccount(),
   // });
-
 
   return (
     <>
@@ -121,8 +116,9 @@ const MainApp = () => {
       {/* <BannerWithCountdown /> */}
       <Layout header={<Header />} footer={<Footer />}>
         <Tabs />
-        <Routes showWelcome={showWelcome} params={location.search} />
+        <Routes params={location.search} />
       </Layout>
+      <WelcomeModal isOpen={welcomeOpen} onClose={() => setWelcomeOpen(false)} />
       <TransactionModal />
       <WalletModal />
       <AccountSetUpModal />
