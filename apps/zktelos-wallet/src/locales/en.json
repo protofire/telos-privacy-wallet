@@ -560,6 +560,7 @@
     }
   },
   "lifi": {
-    "publicNotice": "This is a public transaction — funds go to your connected wallet, not your Private Account. Deposit them into your Private Account afterwards to shield them."
+    "publicNotice": "This is a public transaction — funds go to your connected wallet, not your Private Account. Deposit them into your Private Account afterwards to shield them.",
+    "publicNoticeAck": "I acknowledge"
   }
 }

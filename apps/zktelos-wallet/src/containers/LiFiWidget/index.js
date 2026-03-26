@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useRef} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import styled from 'styled-components';
 import {LiFiWidget} from '@lifi/widget';
 import {EVM} from '@lifi/sdk';
@@ -36,6 +36,7 @@ export default () => {
   const {theme: themeName, setThemePreference} = useContext(ThemeContext);
   const {t} = useTranslation();
   const wagmiConfig = useWagmiConfig();
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
 
   const {width} = useWindowDimensions();
 
@@ -189,10 +190,17 @@ export default () => {
 
   return (
     <WidgetWrapper>
-      <PublicNotice>
-        <EyeOffIcon size={14} />
-        <NoticeText>{t('lifi.publicNotice')}</NoticeText>
-      </PublicNotice>
+      {!noticeDismissed && (
+        <PublicNotice>
+          <NoticeBody>
+            <EyeOffIcon size={14} style={{flexShrink: 0, marginTop: 2}} />
+            <NoticeText>{t('lifi.publicNotice')}</NoticeText>
+          </NoticeBody>
+          <AcknowledgeButton onClick={() => setNoticeDismissed(true)}>
+            {t('lifi.publicNoticeAck')}
+          </AcknowledgeButton>
+        </PublicNotice>
+      )}
       <LiFiWidget config={widgetConfig} />
     </WidgetWrapper>
   );
@@ -207,13 +215,19 @@ const WidgetWrapper = styled.div`
 
 const PublicNotice = styled.div`
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 10px 14px;
-  margin: 0 16px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 8px 16px 4px;
   border-radius: 10px;
   background: ${props => props.theme.networkLabel.background};
   border: 1px solid ${props => props.theme.color.darkGrey};
+`;
+
+const NoticeBody = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   color: ${props => props.theme.icon.color.default};
 `;
 
@@ -221,4 +235,19 @@ const NoticeText = styled.span`
   font-size: 13px;
   color: ${props => props.theme.text.color.secondary};
   line-height: 1.5;
+`;
+
+const AcknowledgeButton = styled.button`
+  align-self: flex-end;
+  background: none;
+  border: 1px solid ${props => props.theme.color.darkGrey};
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.primary};
+  cursor: pointer;
+  &:hover {
+    background: ${props => props.theme.color.darkGrey}44;
+  }
 `;
