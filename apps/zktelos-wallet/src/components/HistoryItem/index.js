@@ -124,14 +124,14 @@ const AddressLink = ({ action, isMobile, currentChainId }) => {
   );
 };
 
-const Fee = ({ fee, highFee, isMobile, tokenSymbol, tokenDecimals }) => {
+const Fee = ({ fee, highFee, isMobile, tokenSymbol, tokenDecimals, isVisible }) => {
   const { t } = useTranslation();
   return (
     <>
       {!fee.isZero() && (
         <FeeText>
           {t('history.fee', {
-            amount: formatNumber(fee, tokenDecimals),
+            amount: isVisible ? formatNumber(fee, tokenDecimals) : '••••',
             symbol: tokenSymbol,
           })}
         </FeeText>
@@ -227,6 +227,7 @@ export default ({ item, zkAccount, isMobile }) => {
                   highFee={item.highFee}
                   tokenSymbol={tokenSymbol}
                   tokenDecimals={itemPool.tokenDecimals}
+                  isVisible={isVisible}
                 />
               </FeeDesktop>
             )}
@@ -251,6 +252,7 @@ export default ({ item, zkAccount, isMobile }) => {
               highFee={item.highFee}
               tokenSymbol={tokenSymbol}
               tokenDecimals={itemPool.tokenDecimals}
+              isVisible={isVisible}
               isMobile
             />
           </FeeMobile>
