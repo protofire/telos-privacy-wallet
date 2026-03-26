@@ -18,7 +18,7 @@ const Settings = () => {
   } = useContext(ModalContext);
 
   const { i18n } = useTranslation();
-  const currentLang = i18n.language;
+  const currentLang = (i18n.language || 'en').split('-')[0];
 
   const languages = [
     { code: 'en', label: 'English' },
