@@ -210,6 +210,7 @@ const PublicNotice = styled.div`
   align-items: flex-start;
   gap: 8px;
   padding: 10px 14px;
+  margin: 0 16px;
   border-radius: 10px;
   background: ${props => props.theme.networkLabel.background};
   border: 1px solid ${props => props.theme.color.darkGrey};
