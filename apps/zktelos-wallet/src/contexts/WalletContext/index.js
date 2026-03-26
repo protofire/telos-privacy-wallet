@@ -35,6 +35,8 @@ const useEvmWallet = () => {
     return connectors.filter(c => {
       if (excludedConnectorIds.includes(c.id)) return false;
       if (c.id === 'injected' && hasSpecificInjected) return false;
+      // Hide the generic injected connector when no browser extension wallet is present
+      if (c.id === 'injected' && !window.ethereum) return false;
       return true;
     });
   }, [connectors]);
