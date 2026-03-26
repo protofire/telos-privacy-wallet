@@ -160,7 +160,11 @@ export default ({ empty }) => {
           </BridgeButton>
           {/* {!isMobile && walletDropdown} */}
 
-          {!isMobile && zkAccountDropdown}
+          {/* Show private account button/dropdown when:
+              - Account is unlocked (zkAccount truthy), OR
+              - A stored seed exists (returning user whose account is locked).
+              Brand-new users (no seed) use the home page card instead. */}
+          {!isMobile && (zkAccount || window.localStorage.getItem('seed')) && zkAccountDropdown}
           <RefreshButtonContainer onClick={toggleTheme} >
             {theme === 'light' ? <MoonIcon /> : <SunIcon />}
           </RefreshButtonContainer>
@@ -174,7 +178,7 @@ export default ({ empty }) => {
           )}
         </AccountSection>
       </Row>
-      {isMobile && (
+      {isMobile && (zkAccount || window.localStorage.getItem('seed')) && (
         <OnlyMobile>
           {/* networkDropdown hidden — single chain only: {networkDropdown} */}
           {/* {walletDropdown} */}

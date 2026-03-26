@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ethers } from 'ethers';
 
-import { RefreshCcwIcon } from 'lucide-react'
+import { RefreshCcwIcon, ShieldCheckIcon, EyeOffIcon, ZapIcon } from 'lucide-react'
 import { ZkAccountContext, PoolContext, ModalContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
@@ -129,13 +129,43 @@ export default () => {
 
   if (!zkAccount) {
     return (
-      <EmptyState>
-        <EmptyStateDescription>{t('home.description')}</EmptyStateDescription>
-        <Button onClick={openCreateAccountModal} small>
-          {t('common.createPrivateAccount')}
-        </Button>
-      </EmptyState>
-    )
+      <LandingContainer>
+        <LandingHero>
+          <LandingHeadline>{t('home.landing.headline')}</LandingHeadline>
+          <LandingSubtitle>{t('home.landing.subtitle')}</LandingSubtitle>
+        </LandingHero>
+
+        <FeatureList>
+          <FeatureItem>
+            <FeatureIconWrapper><ShieldCheckIcon size={18} /></FeatureIconWrapper>
+            <FeatureText>
+              <FeatureTitle>{t('home.landing.feature1Title')}</FeatureTitle>
+              <FeatureDesc>{t('home.landing.feature1Desc')}</FeatureDesc>
+            </FeatureText>
+          </FeatureItem>
+          <FeatureItem>
+            <FeatureIconWrapper><EyeOffIcon size={18} /></FeatureIconWrapper>
+            <FeatureText>
+              <FeatureTitle>{t('home.landing.feature2Title')}</FeatureTitle>
+              <FeatureDesc>{t('home.landing.feature2Desc')}</FeatureDesc>
+            </FeatureText>
+          </FeatureItem>
+          <FeatureItem>
+            <FeatureIconWrapper><ZapIcon size={18} /></FeatureIconWrapper>
+            <FeatureText>
+              <FeatureTitle>{t('home.landing.feature3Title')}</FeatureTitle>
+              <FeatureDesc>{t('home.landing.feature3Desc')}</FeatureDesc>
+            </FeatureText>
+          </FeatureItem>
+        </FeatureList>
+
+        <LandingCTA>
+          <Button onClick={openCreateAccountModal}>
+            {t('common.createPrivateAccount')}
+          </Button>
+        </LandingCTA>
+      </LandingContainer>
+    );
   };
 
   return (
@@ -275,4 +305,84 @@ const EmptyStateTitle = styled.span`
 const EmptyStateDescription = styled.span`
   font-size: 14px;
   color: ${props => props.theme.text.color.secondary};
+`;
+
+/* ── Landing / welcome state ─────────────────────────────────────────────── */
+
+const LandingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 8px 0 4px;
+`;
+
+const LandingHero = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const LandingHeadline = styled.h2`
+  margin: 0;
+  font-size: 22px;
+  font-weight: ${props => props.theme.text.weight.extraBold};
+  color: ${props => props.theme.text.color.primary};
+  line-height: 1.2;
+`;
+
+const LandingSubtitle = styled.p`
+  margin: 0;
+  font-size: 14px;
+  color: ${props => props.theme.text.color.secondary};
+  line-height: 1.6;
+`;
+
+const FeatureList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const FeatureItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+`;
+
+const FeatureIconWrapper = styled.div`
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: ${props => props.theme.networkLabel.background};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${props => props.theme.icon.color.default};
+`;
+
+const FeatureText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+`;
+
+const FeatureTitle = styled.span`
+  font-size: 14px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.primary};
+`;
+
+const FeatureDesc = styled.span`
+  font-size: 13px;
+  color: ${props => props.theme.text.color.secondary};
+  line-height: 1.5;
+`;
+
+const LandingCTA = styled.div`
+  display: flex;
+
+  & > * {
+    width: 100%;
+  }
 `;
