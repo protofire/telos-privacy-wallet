@@ -174,23 +174,25 @@ export default () => {
       return (
         <AddressRow key={pool.alias}>
           <TokenLabel>{pool.tokenSymbol}:</TokenLabel>
-          {address ? (
-            <AddressWithCopy
-              prefixIcon={<RefreshCcwIcon width={16} height={16} />}
-              onPrefixClick={generateAndStoreAddresses}
-              $noBorder
-              $fontSize="13px"
-              $height="auto"
-              $borderRadius="0"
-              $maxWidth="210px"
-              $padding="0"
-              $background="transparent"
-            >
-              {address}
-            </AddressWithCopy>
-          ) : (
-            <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
-          )}
+          <AddressWrapper>
+            {address ? (
+              <AddressWithCopy
+                prefixIcon={<RefreshCcwIcon width={16} height={16} />}
+                onPrefixClick={generateAndStoreAddresses}
+                $noBorder
+                $fontSize="13px"
+                $height="auto"
+                $borderRadius="0"
+                $maxWidth="100%"
+                $padding="0"
+                $background="transparent"
+              >
+                {address}
+              </AddressWithCopy>
+            ) : (
+              <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
+            )}
+          </AddressWrapper>
         </AddressRow>
       );
     })
@@ -288,6 +290,12 @@ const AddressRow = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 8px;
+  width: 100%;
+`;
+
+const AddressWrapper = styled.div`
+  flex: 1;
+  min-width: 0;
 `;
 
 const TokenLabel = styled.span`
