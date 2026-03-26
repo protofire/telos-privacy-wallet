@@ -222,6 +222,9 @@
   "history": {
     "title": "Histórico",
     "empty": "Faça seu primeiro depósito, transferência ou retirada<br/>para criar seu histórico.",
+    "emptyTitle": "Nenhuma transação ainda",
+    "emptyDesc": "Suas transações privadas são protegidas por provas de conhecimento zero — elas aparecerão aqui assim que você fizer uma.",
+    "emptyDescNoAccount": "Configure uma conta privada para começar a realizar transações protegidas na Telos.",
     "fee": "(taxa {{amount}} {{symbol}})",
     "highFee": "Essa transação exigiu operações adicionais, resultando em taxas mais altas.",
     "failed": "falhou",
@@ -571,5 +574,12 @@
   "lifi": {
     "publicNotice": "Esta é uma transação pública — os fundos vão para sua carteira conectada, não para sua Conta Privada. Deposite-os em sua Conta Privada depois para protegê-los.",
     "publicNoticeAck": "Eu entendo"
+  },
+  "tooltips": {
+    "privateAccount": "Uma conta protegida onde seu saldo e transações são invisíveis na blockchain pública — protegidos por provas de conhecimento zero.",
+    "connectedWallet": "Sua carteira pública compatível com Ethereum. Use-a para depositar tokens em sua conta privada ou retirar fundos.",
+    "deposit": "Mova tokens da sua carteira pública para sua conta privada para protegê-los.",
+    "withdraw": "Envie tokens da sua conta privada para qualquer endereço de carteira pública.",
+    "transfer": "Envie tokens de forma privada para outro usuário zkTelos usando seu endereço privado."
   }
 }

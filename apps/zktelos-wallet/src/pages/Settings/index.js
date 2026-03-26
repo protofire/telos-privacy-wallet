@@ -18,7 +18,7 @@ const Settings = () => {
   } = useContext(ModalContext);
 
   const { i18n } = useTranslation();
-  const currentLang = i18n.language;
+  const currentLang = (i18n.language || 'en').split('-')[0];
 
   const languages = [
     { code: 'en', label: 'English' },
@@ -92,7 +92,7 @@ const CardContainer = styled.div`
   align-items: center;
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
-  border: 2px solid ${props => props.theme.color.black};
+  border: 2px solid ${props => props.theme.border.card};
 
   @media only screen and (max-width: 560px) {
     margin: 15px 0;

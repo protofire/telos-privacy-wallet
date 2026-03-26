@@ -21,9 +21,7 @@ export const LanguageContextProvider = ({ children }) => {
     if (!language) {
       language = window.localStorage.getItem('language');
     }
-    if (language) {
-      changeLanguage(language);
-    }
+    changeLanguage(language || 'en');
   }, [changeLanguage, location.search]);
 
   return (

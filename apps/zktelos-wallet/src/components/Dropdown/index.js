@@ -10,6 +10,7 @@ const GlobalDropdownStyle = createGlobalStyle`
   }
   .dropdown-fullscreen {
     @media only screen and (max-width: 560px) {
+      position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       right: 0 !important;

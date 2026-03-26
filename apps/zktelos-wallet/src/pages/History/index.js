@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation, Trans } from 'react-i18next';
+import { ShieldCheckIcon } from 'lucide-react';
 
 import Card from 'components/Card';
 import Spinner from 'components/Spinner';
@@ -119,13 +120,24 @@ export default () => {
         {(isLoading && isHistoryEmpty) && (
           <Spinner size={60} />
         )}
-        {(!isLoading && isHistoryEmpty) && (
-          <Description>
-            <Trans i18nKey="history.empty" />
-          </Description>
+        {(!isLoading && isHistoryEmpty && zkAccount) && (
+          <EmptyState>
+            <EmptyStateIcon>
+              <ShieldCheckIcon size={40} />
+            </EmptyStateIcon>
+            <EmptyStateTitle>{t('history.emptyTitle')}</EmptyStateTitle>
+            <EmptyStateDesc>{t('history.emptyDesc')}</EmptyStateDesc>
+          </EmptyState>
         )}
         {(!isLoading && !zkAccount) && (
-          <AccountSetUpButton />
+          <EmptyState>
+            <EmptyStateIcon>
+              <ShieldCheckIcon size={40} />
+            </EmptyStateIcon>
+            <EmptyStateTitle>{t('history.emptyTitle')}</EmptyStateTitle>
+            <EmptyStateDesc>{t('history.emptyDescNoAccount')}</EmptyStateDesc>
+            <AccountSetUpButton />
+          </EmptyState>
         )}
         {!isHistoryEmpty && (
           <>
@@ -161,11 +173,38 @@ const Title = styled.span`
   text-align: center;
 `;
 
-const Description = styled.span`
+const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+
+  button {
+    width: 100%;
+  }
+`;
+
+const EmptyStateIcon = styled.div`
+  color: ${({ theme }) => theme.button.primary.background.default};
+  opacity: 0.4;
+  margin-bottom: 4px;
+`;
+
+const EmptyStateTitle = styled.span`
+  font-size: 16px;
+  font-weight: ${({ theme }) => theme.text.weight.bold};
+  color: ${({ theme }) => theme.text.color.primary};
+`;
+
+const EmptyStateDesc = styled.span`
   font-size: 14px;
   line-height: 22px;
   color: ${({ theme }) => theme.text.color.secondary};
-  text-align: center;
+  max-width: 340px;
 `;
 
 const ScrollableItems = styled.div`
@@ -194,7 +233,7 @@ const ContentContainer = styled.div`
   align-items: center;
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
-  border: 2px solid ${props => props.theme.color.black};
+  border: 2px solid ${props => props.theme.border.card};
   padding-bottom: 16px;
 
   @media only screen and (max-width: 560px) {

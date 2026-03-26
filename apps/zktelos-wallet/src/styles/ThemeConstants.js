@@ -184,6 +184,9 @@ export const light = {
     },
   },
   background: telosGradientSoft,
+  border: {
+    card: black,
+  },
   dropdown: {
     background: dropdownBackgroundLight,
   },
@@ -329,7 +332,17 @@ export const dark = {
       },
     },
   },
-  background: telosGradientSoft,
+  warning: {
+    background: 'rgba(239, 135, 38, 0.18)',
+    border: orange,
+    text: {
+      color: '#F5A623',
+    },
+  },
+  background: 'linear-gradient(135deg, rgba(0, 242, 243, 0.04) 0%, rgba(79, 172, 254, 0.04) 33%, rgba(196, 113, 245, 0.04) 66%)',
+  border: {
+    card: darkBorder,
+  },
   dropdown: {
     background: dropdownBackgroundDark,
   },

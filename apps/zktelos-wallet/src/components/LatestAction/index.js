@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ethers } from 'ethers';
@@ -11,12 +11,14 @@ import Tooltip from 'components/Tooltip';
 import { shortAddress, formatNumber } from 'utils';
 import { NETWORKS, TOKENS_ICONS } from 'constants';
 import { useHistoricalTokenSymbol } from 'hooks';
+import { BalanceVisibilityContext } from 'contexts';
 
 export default ({ type, data, currentPool }) => {
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
   const tokenSymbol = useHistoricalTokenSymbol(currentPool, data);
+  const { isVisible } = useContext(BalanceVisibilityContext);
 
   return (
     <Row>
@@ -24,14 +26,14 @@ export default ({ type, data, currentPool }) => {
         <Action>{t(`latestAction.${type}`)}:</Action>
         <TokenIcon src={TOKENS_ICONS[tokenSymbol]} />
         <Amount>
-          {(() => {
+          {isVisible ? (() => {
             const total = data.actions.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero);
             return (
               <Tooltip content={formatNumber(total, currentPool.tokenDecimals, 18)} placement="top">
                 <span>{formatNumber(total, currentPool.tokenDecimals, 2)}</span>
               </Tooltip>
             );
-          })()}
+          })() : '••••'}
           {' '}{tokenSymbol}
         </Amount>
         <TxLink size={16} href={NETWORKS[currentPool.chainId].blockExplorerUrls.tx.replace('%s', data.txHash)}>

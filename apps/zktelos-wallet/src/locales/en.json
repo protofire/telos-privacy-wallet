@@ -222,6 +222,9 @@
   "history": {
     "title": "Activity",
     "empty": "Make your first Deposit, Transfer or Withdrawal<br/>to create your History.",
+    "emptyTitle": "No transactions yet",
+    "emptyDesc": "Your private transactions are shielded by zero-knowledge proofs — they'll appear here once you make one.",
+    "emptyDescNoAccount": "Set up a private account to start making shielded transactions on Telos.",
     "fee": "(fee {{amount}} {{symbol}})",
     "highFee": "This transaction required additional operations, resulting in higher fees.",
     "failed": "failed",
@@ -566,5 +569,12 @@
   "lifi": {
     "publicNotice": "This is a public transaction — funds go to your connected wallet, not your Private Account. Deposit them into your Private Account afterwards to shield them.",
     "publicNoticeAck": "I acknowledge"
+  },
+  "tooltips": {
+    "privateAccount": "A shielded account where your balance and transactions are invisible on the public blockchain — protected by zero-knowledge proofs.",
+    "connectedWallet": "Your public Ethereum-compatible wallet. Use it to deposit tokens into your private account or withdraw funds.",
+    "deposit": "Move tokens from your public wallet into your private account to shield them.",
+    "withdraw": "Send tokens from your private account to any public wallet address.",
+    "transfer": "Send tokens privately to another zkTelos user using their private address."
   }
 }

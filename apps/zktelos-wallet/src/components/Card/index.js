@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useWindowDimensions } from 'hooks';
+import InfoTooltip from 'components/InfoTooltip';
 
-export default ({ title, icon, note, children, style, titleStyle }) => {
+export default ({ title, icon, note, children, style, titleStyle, titleTooltip }) => {
   const { width } = useWindowDimensions();
   const isMobile = width <= 800;
   return (
@@ -11,6 +12,7 @@ export default ({ title, icon, note, children, style, titleStyle }) => {
         <Header>
           {icon && <IconWrapper>{icon}</IconWrapper>}
           {title && <Title style={titleStyle}>{title}</Title>}
+          {titleTooltip && <InfoTooltip text={titleTooltip} />}
         </Header>
       )}
       {children}

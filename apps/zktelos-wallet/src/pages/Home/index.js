@@ -10,6 +10,7 @@ import PrivateAccount from 'components/PrivateAccount';
 import Link from 'components/Link';
 import Skeleton from 'components/Skeleton';
 import Button from 'components/Button';
+import InfoTooltip from 'components/InfoTooltip';
 
 import { ZkAccountContext, PoolContext, WalletContext, ModalContext } from 'contexts';
 
@@ -77,6 +78,7 @@ export default () => {
           title={t('home.privateAccount')}
           icon={<ShieldCheckIcon />}
           titleStyle={{ fontSize: '16px', fontWeight: 'bold' }}
+          titleTooltip={t('tooltips.privateAccount')}
         >
           <PrivateAccount />
 
@@ -103,6 +105,7 @@ export default () => {
         <WalletCardHeader>
           <WalletCardIcon><WalletIcon size={15} /></WalletCardIcon>
           <WalletCardTitle>{t('home.connectedWallet')}</WalletCardTitle>
+          <InfoTooltip text={t('tooltips.connectedWallet')} />
         </WalletCardHeader>
         {account ? (
           <PublicAccount />
@@ -141,7 +144,7 @@ const CardsContainer = styled.div`
   align-items: center;
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
-  border: 2px solid ${props => props.theme.color.black};
+  border: 2px solid ${props => props.theme.border.card};
 
   @media only screen and (max-width: 560px) {
     margin: 15px 0;
