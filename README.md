@@ -233,8 +233,8 @@ yarn workspace zktelos-wallet test
     ### Supported Networks
 
 - **Telos Testnet** (chainId: 41) - Development environment
-- **Telos Mainnet** (chainId: 40) - Production (coming soon)
-- 
+- **Telos Mainnet** (chainId: 40) - Production
+  
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
