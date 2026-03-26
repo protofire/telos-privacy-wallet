@@ -45,6 +45,9 @@ const PageContainer = styled.div`
   align-items: center;
   justify-content: center;
   flex: 1;
+  @media only screen and (max-width: 800px) {
+    justify-content: flex-start;
+  }
 `;
 
 const MenuAndPageContainer = styled.div`

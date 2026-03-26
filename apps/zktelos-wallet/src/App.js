@@ -48,7 +48,6 @@ const GlobalStyle = createGlobalStyle`
   #root {
     position: relative;
     overflow-x: hidden;
-    overflow-y: auto;
     min-height: 100vh;
     box-sizing: border-box;
     display: flex;
