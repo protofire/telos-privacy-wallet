@@ -1,4 +1,4 @@
-import React, {useContext, useMemo} from 'react';
+import React, {useContext, useEffect, useMemo, useRef} from 'react';
 import {LiFiWidget} from '@lifi/widget';
 import {EVM} from '@lifi/sdk';
 import {useConfig as useWagmiConfig} from 'wagmi';
@@ -8,7 +8,7 @@ import {createWalletClient, custom} from 'viem';
 import {PoolContext} from 'contexts';
 import {useWindowDimensions} from 'hooks';
 import ThemeContext from 'contexts/ThemeContext';
-import {useTheme} from 'styled-components';
+import {light as lightTheme, dark as darkTheme} from 'styles/ThemeConstants';
 
 // Wraps a viem wallet client so that wallet_getCapabilities always returns {}
 // (no capabilities). This disables EIP-5792 atomic-batch detection in the
@@ -25,24 +25,69 @@ const wrapClientNoBatching = (client) => ({
   },
 });
 
+// The key MUI uses to persist the widget's color scheme in localStorage.
+const LIFI_MODE_KEY = 'li.fi-widget-mode';
+
 export default () => {
   const {currentPool} = useContext(PoolContext);
-  const {theme: themeName} = useContext(ThemeContext);
-
-  const {card, color, input} = useTheme();
+  const {theme: themeName, setThemePreference} = useContext(ThemeContext);
   const wagmiConfig = useWagmiConfig();
 
   const {width} = useWindowDimensions();
 
+  // Pre-set the widget's localStorage mode synchronously in the render body so
+  // that MUI's CssVarsProvider reads the correct value on initialization.
+  // MUI reads localStorage during render (before any useEffect runs), so this
+  // must be outside a hook to guarantee ordering.
+  localStorage.setItem(LIFI_MODE_KEY, themeName);
+
+  // Ref so MutationObserver / storage callbacks always see the current themeName
+  // without re-subscribing on every render.
+  const themeNameRef = useRef(themeName);
+  useEffect(() => { themeNameRef.current = themeName; }, [themeName]);
+
+  // App → widget: when themeName changes while the widget is already mounted,
+  // dispatch a StorageEvent so MUI's localStorageManager.subscribe handler fires
+  // and calls setMode() from inside its own CssVarsProvider context.
+  // (The widget's internal ThemeProvider calls setMode() *outside* MuiThemeProvider,
+  // making it a no-op. The StorageEvent path is the one that actually works.)
+  useEffect(() => {
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: LIFI_MODE_KEY,
+      newValue: themeName,
+      oldValue: null,
+      storageArea: window.localStorage,
+      url: window.location.href,
+    }));
+  }, [themeName]);
+
+  // Widget → app: MUI applies the active color scheme as a CSS class ('light' or
+  // 'dark') on <html> (document.documentElement). Observe class mutations to detect
+  // when the user changes appearance inside the widget and sync back to the app.
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const html = document.documentElement;
+      const mode = html.classList.contains('dark') ? 'dark'
+        : html.classList.contains('light') ? 'light'
+        : null;
+      if (mode && mode !== themeNameRef.current) {
+        setThemePreference(mode);
+      }
+    });
+
+    observer.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
+    return () => observer.disconnect();
+  }, [setThemePreference]);
+
   const widgetConfig = useMemo(() => {
+    const activeTheme = themeName === 'dark' ? darkTheme : lightTheme;
     return {
       integrator: 'Telos-wallet',
       fee: 0.00075,
       variant: 'compact',
       appearance: themeName,
-      disableAppearance: true,
       containerStyle: {
-        backgroundColor: card.background,
+        backgroundColor: activeTheme.card.background,
         width: width > 500 ? 480 : '100%',
         maxWidth: width > 500 ? 480 : '100%',
       },
@@ -50,13 +95,30 @@ export default () => {
         typography: {
           fontFamily: 'Gilroy'
         },
-        palette: {
-          primary: {main: color.blue},
-          secondary: {main: color.purple},
-          background: {
-            default: card.background,
-            paper: input.background.primary,
-          }
+        // Use colorSchemes so the widget has correct palette values for both
+        // light and dark independently. The `appearance` prop + StorageEvent
+        // mechanism controls which scheme is active.
+        colorSchemes: {
+          light: {
+            palette: {
+              primary: {main: lightTheme.color.blue},
+              secondary: {main: lightTheme.color.purple},
+              background: {
+                default: lightTheme.card.background,
+                paper: lightTheme.input.background.primary,
+              },
+            },
+          },
+          dark: {
+            palette: {
+              primary: {main: darkTheme.color.blue},
+              secondary: {main: darkTheme.color.purple},
+              background: {
+                default: darkTheme.card.background,
+                paper: darkTheme.input.background.primary,
+              },
+            },
+          },
         },
         components: {
           MuiAvatar: {
@@ -119,7 +181,7 @@ export default () => {
         ],
       },
     };
-  }, [currentPool.chainId, currentPool.tokenAddress, themeName, width, card.background, color.blue, color.purple, input.background.primary, wagmiConfig]);
+  }, [currentPool.chainId, currentPool.tokenAddress, themeName, width, wagmiConfig]);
 
   return (
     <LiFiWidget config={widgetConfig} />
