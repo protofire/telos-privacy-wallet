@@ -34,7 +34,11 @@
       "title": "Sem fundos ainda",
       "description": "Faça seu primeiro depósito para começar a usar o zkTelos.",
       "fundEvm": "Financie sua conta EVM para começar a usar o zkTelos.",
-      "buy": "Comprar TLOS"
+      "buy": "Comprar TLOS",
+      "depositTitle": "Depositar",
+      "depositDesc": "Adicione tokens da sua carteira conectada à sua conta privada.",
+      "receiveTitle": "Receber",
+      "receiveDesc": "Compartilhe seu endereço privado com outro usuário zkWallet para receber tokens diretamente."
     }
   },
   "buttonText": {
@@ -86,7 +90,8 @@
     "restoreAccount": "Restaurar conta",
     "signIn": "Entrar",
     "signingIn": "Entrando...",
-    "getToken": "Obter {{symbol}}"
+    "getToken": "Obter {{symbol}}",
+    "disconnectWallet": "Desconectar carteira"
   },
   "home": {
     "title": "Início",
@@ -95,7 +100,19 @@
     "latestTransactions": "Últimas transações",
     "privateAccount": "Conta Privada",
     "publicAccount": "Conta Pública",
-    "description": "Gere uma conta privada segura e desbloqueie transferências com preservação de privacidade."
+    "description": "Gere uma conta privada segura e desbloqueie transferências com preservação de privacidade.",
+    "connectedWallet": "Carteira Conectada",
+    "connectWalletHint": "Conecte uma carteira para depositar tokens ou retirar fundos para um endereço público.",
+    "landing": {
+      "headline": "A carteira de privacidade para o Telos",
+      "subtitle": "Envie e receba ativos com total privacidade — seu saldo e transações são visíveis apenas para você.",
+      "feature1Title": "Privacidade de conhecimento zero",
+      "feature1Desc": "Cada transação é protegida por provas de conhecimento zero, ocultando valores e participantes do público.",
+      "feature2Title": "Transferências privadas",
+      "feature2Desc": "Envie ativos para qualquer endereço privado sem revelar sua identidade ou histórico de transações.",
+      "feature3Title": "Com a tecnologia Telos",
+      "feature3Desc": "Transações privadas rápidas e de baixo custo na blockchain Telos EVM."
+    }
   },
   "portfolio": {
     "asset": "Ativo",
@@ -264,7 +281,9 @@
       "walletConnectDescription": "Use qualquer carteira compatível para criar sua conta privada.",
       "dividerText": "Ou criar uma Conta Instantânea:",
       "instantTitle": "Conta Instantânea (frase secreta)",
-      "instantDescription": "Gere uma nova frase secreta. Você precisará guardá-la com segurança."
+      "instantDescription": "Gere uma nova frase secreta. Você precisará guardá-la com segurança.",
+      "restoreTitle": "Restaurar Conta Existente",
+      "restoreDescription": "Já tem uma frase secreta de conta privada? Digite-a para restaurar o acesso."
     },
     "signToAccess": {
       "title": "Assinar para Acessar"
@@ -544,5 +563,13 @@
       "back": "Voltar",
       "finishTour": "Finalizar Tour 🎉"
     }
+  },
+  "footer": {
+    "reportBug": "Reportar um bug",
+    "suggestFeature": "Sugerir uma funcionalidade"
+  },
+  "lifi": {
+    "publicNotice": "Esta é uma transação pública — os fundos vão para sua carteira conectada, não para sua Conta Privada. Deposite-os em sua Conta Privada depois para protegê-los.",
+    "publicNoticeAck": "Eu entendo"
   }
 }
