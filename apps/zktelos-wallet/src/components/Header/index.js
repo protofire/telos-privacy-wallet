@@ -154,7 +154,7 @@ export default ({ empty }) => {
           <img src={theme === 'dark' ? logoDark : logo} alt="wallet logo" onClick={() => history.push('/')} />
         </LogoSection>
         <AccountSection>
-          {!isMobile && networkDropdown}
+          {/* networkDropdown hidden — single chain only: {!isMobile && networkDropdown} */}
           <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
             {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
           </BridgeButton>
@@ -176,7 +176,7 @@ export default ({ empty }) => {
       </Row>
       {isMobile && (
         <OnlyMobile>
-          {networkDropdown}
+          {/* networkDropdown hidden — single chain only: {networkDropdown} */}
           {/* {walletDropdown} */}
           {zkAccountDropdown}
         </OnlyMobile>
