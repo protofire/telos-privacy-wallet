@@ -180,6 +180,12 @@ const EmptyState = styled.div`
   gap: 10px;
   padding: 32px 16px;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+
+  button {
+    width: 100%;
+  }
 `;
 
 const EmptyStateIcon = styled.div`
