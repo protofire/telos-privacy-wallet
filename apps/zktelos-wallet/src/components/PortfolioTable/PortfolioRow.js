@@ -171,13 +171,13 @@ const ValueCell = styled.td`
 
 const PlainDepositButton = styled.button`
   background: ${props => props.theme.color.telosGradientSoft};
-  border: 1px solid ${props => props.theme.color.black};
+  border: 1px solid ${props => props.theme.border.card};
   font-weight: ${props => props.theme.text.weight.bold};
   padding: 8px;
   border-radius: 8px;
   font-size: 14px;
   color: ${props => props.theme.text.color.black};
-  box-shadow: ${props => props.theme.color.black} 2px 2px 0 0;
+  box-shadow: ${props => props.theme.border.card} 2px 2px 0 0;
   cursor: pointer;
   opacity: ${props => props.disabled ? 0.5 : 1};
   pointer-events: ${props => props.disabled ? 'none' : 'auto'};
@@ -185,13 +185,13 @@ const PlainDepositButton = styled.button`
 
 const ActionButton = styled.button`
   background: ${props => props.theme.button.background};
-  border: 1px solid ${props => props.theme.color.black};
+  border: 1px solid ${props => props.theme.border.card};
   font-weight: ${props => props.theme.text.weight.bold};
   padding: 8px;
   border-radius: 8px;
   font-size: 14px;
   color: ${props => props.theme.text.color.black};
-  box-shadow: ${props => props.theme.color.black} 2px 2px 0 0;
+  box-shadow: ${props => props.theme.border.card} 2px 2px 0 0;
   cursor: pointer;
   display: flex;
   align-items: center;
