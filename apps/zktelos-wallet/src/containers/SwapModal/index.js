@@ -139,38 +139,38 @@ const PublicNotice = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: ${props => props.theme.networkLabel.background};
-  border: 1px solid ${props => props.theme.color.darkGrey};
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: ${props => props.theme.warning.background};
+  border: 1px solid ${props => props.theme.warning.border};
 `;
 
 const NoticeBody = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  color: ${props => props.theme.icon.color.default};
+  color: ${props => props.theme.warning.text.color};
 `;
 
 const NoticeText = styled.span`
-  font-size: 13px;
-  color: ${props => props.theme.text.color.secondary};
-  line-height: 1.5;
+  font-size: 14px;
+  color: ${props => props.theme.warning.text.color};
+  line-height: 20px;
 `;
 
 const AcknowledgeButton = styled.button`
   align-self: flex-end;
   background: none;
-  border: 1px solid ${props => props.theme.color.darkGrey};
+  border: 1px solid ${props => props.theme.warning.border};
   border-radius: 8px;
   padding: 5px 12px;
   font-size: 12px;
   font-weight: ${props => props.theme.text.weight.bold};
-  color: ${props => props.theme.text.color.primary};
+  color: ${props => props.theme.warning.text.color};
   cursor: pointer;
   font-family: inherit;
   &:hover {
-    background: ${props => props.theme.color.darkGrey}44;
+    background: ${props => props.theme.warning.border}44;
   }
 `;
 
