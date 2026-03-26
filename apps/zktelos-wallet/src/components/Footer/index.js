@@ -7,7 +7,7 @@ import { ReactComponent as TwitterIcon } from 'assets/twitter.svg';
 import { ReactComponent as TelegramIcon } from 'assets/telegram.svg';
 import { ReactComponent as MirrorIcon } from 'assets/mirror.svg';
 import { ReactComponent as GithubIcon } from 'assets/github.svg';
-import { ReactComponent as TelosIcon } from 'assets/telos.svg';
+import { ReactComponent as TelosIcon } from 'assets/telos-icon.svg';
 import { SupportIdContext } from '../../contexts';
 import { useTranslation } from 'react-i18next';
 
