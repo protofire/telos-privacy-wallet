@@ -116,7 +116,7 @@ const AddressLink = ({ action, isMobile, currentChainId }) => {
   const address = action.type === Deposit ? action.actions[0].from : action.actions[0].to;
   return (
     <Link
-      size={16}
+      size={13}
       href={NETWORKS[currentChainId].blockExplorerUrls.address.replace('%s', address)}
     >
       {shortAddress(address, isMobile ? 10 : 22)}
@@ -350,7 +350,7 @@ export default ({ item, zkAccount, isMobile }) => {
               </DirectDepositLabel>
             )}
             {(item.txHash && item.txHash !== '0') ? (
-              <Link size={16} href={NETWORKS[currentChainId].blockExplorerUrls.tx.replace('%s', item.txHash)}>
+              <Link size={13} href={NETWORKS[currentChainId].blockExplorerUrls.tx.replace('%s', item.txHash)}>
                 {t('history.viewTx')}
               </Link>
             ) : (
@@ -389,7 +389,7 @@ const RowSpaceBetween = styled(Row)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 34px;
+  min-height: 24px;
 `;
 
 const Column = styled.div`
@@ -400,7 +400,7 @@ const Column = styled.div`
 
 const Container = styled(Row)`
   align-items: flex-start;
-  padding: 14px 0;
+  padding: 10px 0;
   border-bottom: 1px solid ${props => props.theme.color.darkGrey};
 
   &:first-child {
@@ -418,12 +418,13 @@ const ActionLabel = styled.div`
   justify-content: center;
   align-items: center;
   border: 1px solid ${props => props.theme.input.border.color[props.$error ? 'error' : 'default']};
-  border-radius: 12px;
-  width: 34px;
-  height: 34px;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
   box-sizing: border-box;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 8px;
+  flex-shrink: 0;
   background-color: ${props => props.theme.color.white};
   ${props => props.$error && `
     & path {
@@ -433,18 +434,18 @@ const ActionLabel = styled.div`
 `;
 
 const TokenIcon = styled.img`
-  margin-right: 8px;
-  width: 24px;
-  height: 24px;
+  margin-right: 6px;
+  width: 20px;
+  height: 20px;
 `;
 
 const Text = styled.span`
-  font-size: 16px;
+  font-size: 14px;
   color: ${props => props.theme.text.color[props.$error ? 'error' : 'primary']};
 `;
 
 const DateText = styled.span`
-  font-size: 16px;
+  font-size: 13px;
   color: ${({ theme }) => theme.text.color.secondary};
   opacity: 60%;
 `;
