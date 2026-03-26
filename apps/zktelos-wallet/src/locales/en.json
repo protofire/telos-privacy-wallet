@@ -91,8 +91,7 @@
     "restoreAccount": "Restore account",
     "signIn": "Unlock",
     "signingIn": "Unlocking...",
-    "getToken": "Get {{symbol}}",
-    "getTokenBadge": "Public wallet"
+    "getToken": "Get {{symbol}}"
   },
   "home": {
     "title": "Home",
