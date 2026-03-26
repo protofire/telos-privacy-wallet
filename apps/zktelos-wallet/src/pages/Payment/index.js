@@ -37,6 +37,8 @@ const pools = Object.values(config.pools).map((pool, index) =>
   ({ ...pool, alias: Object.keys(config.pools)[index] })
 );
 
+const defaultPool = pools.find(p => p.alias === config.defaultPool) || pools[0];
+
 const Payment = ({ pool }) => {
   const { t } = useTranslation();
   const { supportId } = useContext(SupportIdContext);
@@ -173,10 +175,20 @@ export default () => {
   const history = useHistory();
   const params = useParams();
   const addressPrefix = params.address.split(':')[0];
-  const pool = Object.values(pools).find(pool => pool.addressPrefix === addressPrefix);
+  // Fall back to default pool when no prefix match (e.g. all pools have empty addressPrefix)
+  const pool = Object.values(pools).find(p => p.addressPrefix && p.addressPrefix === addressPrefix)
+    || defaultPool;
+
+  if (!pool) {
+    history.push('/');
+    return null;
+  }
+
   if (!pool.paymentContractAddress) {
     history.push('/');
+    return null;
   }
+
   return (
     <PoolContext.Provider value={{ currentPool: pool }}>
       <WalletContextProvider>
