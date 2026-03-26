@@ -1,9 +1,12 @@
 import React, {useContext, useEffect, useMemo, useRef} from 'react';
+import styled from 'styled-components';
 import {LiFiWidget} from '@lifi/widget';
 import {EVM} from '@lifi/sdk';
 import {useConfig as useWagmiConfig} from 'wagmi';
 import {getConnectorClient} from 'wagmi/actions';
 import {createWalletClient, custom} from 'viem';
+import {useTranslation} from 'react-i18next';
+import {EyeOffIcon} from 'lucide-react';
 
 import {PoolContext} from 'contexts';
 import {useWindowDimensions} from 'hooks';
@@ -31,6 +34,7 @@ const LIFI_MODE_KEY = 'li.fi-widget-mode';
 export default () => {
   const {currentPool} = useContext(PoolContext);
   const {theme: themeName, setThemePreference} = useContext(ThemeContext);
+  const {t} = useTranslation();
   const wagmiConfig = useWagmiConfig();
 
   const {width} = useWindowDimensions();
@@ -184,6 +188,36 @@ export default () => {
   }, [currentPool.chainId, currentPool.tokenAddress, themeName, width, wagmiConfig]);
 
   return (
-    <LiFiWidget config={widgetConfig} />
+    <WidgetWrapper>
+      <PublicNotice>
+        <EyeOffIcon size={14} />
+        <NoticeText>{t('lifi.publicNotice')}</NoticeText>
+      </PublicNotice>
+      <LiFiWidget config={widgetConfig} />
+    </WidgetWrapper>
   );
 };
+
+const WidgetWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+`;
+
+const PublicNotice = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: ${props => props.theme.networkLabel.background};
+  border: 1px solid ${props => props.theme.color.darkGrey};
+  color: ${props => props.theme.icon.color.default};
+`;
+
+const NoticeText = styled.span`
+  font-size: 13px;
+  color: ${props => props.theme.text.color.secondary};
+  line-height: 1.5;
+`;

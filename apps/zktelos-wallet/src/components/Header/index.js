@@ -156,7 +156,10 @@ export default ({ empty }) => {
         <AccountSection>
           {/* networkDropdown hidden — single chain only: {!isMobile && networkDropdown} */}
           <BridgeButton small onClick={openSwapModal} data-ga-id="get-token-header">
-            {t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}
+            <BridgeButtonContent>
+              <span>{t('buttonText.getToken', { symbol: currentPool.tokenSymbol })}</span>
+              <BridgeButtonBadge>{t('buttonText.getTokenBadge')}</BridgeButtonBadge>
+            </BridgeButtonContent>
           </BridgeButton>
           {/* {!isMobile && walletDropdown} */}
 
@@ -377,6 +380,21 @@ const BridgeButton = styled(Button)`
   @media only screen and (max-width: 800px) {
     padding: 8px 12px;
   }
+`;
+
+const BridgeButtonContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+`;
+
+const BridgeButtonBadge = styled.span`
+  font-size: 9px;
+  font-weight: ${props => props.theme.text.weight.normal};
+  opacity: 0.7;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 `;
 
 const NetworkIcon = styled.img`

@@ -91,7 +91,8 @@
     "restoreAccount": "Restore account",
     "signIn": "Unlock",
     "signingIn": "Unlocking...",
-    "getToken": "Get {{symbol}}"
+    "getToken": "Get {{symbol}}",
+    "getTokenBadge": "Public wallet"
   },
   "home": {
     "title": "Home",
@@ -558,5 +559,8 @@
       "back": "Back",
       "finishTour": "Finish Tour 🎉"
     }
+  },
+  "lifi": {
+    "publicNotice": "This is a public transaction — funds go to your connected wallet, not your Private Account. Deposit them into your Private Account afterwards to shield them."
   }
 }
