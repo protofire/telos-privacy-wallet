@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HistoryTransactionType } from 'zkbob-client-js';
 import { useTranslation } from 'react-i18next';
+import { BalanceVisibilityContext } from 'contexts';
 
 import Link from 'components/Link';
 import Spinner from 'components/Spinner';
@@ -163,6 +164,7 @@ const Date = ({ timestamp }) => {
 
 export default ({ item, zkAccount, isMobile }) => {
   const { t } = useTranslation();
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const itemPool = item.pool;
@@ -200,16 +202,22 @@ export default ({ item, zkAccount, isMobile }) => {
             <Row>
               <TokenIcon src={TOKENS_ICONS[tokenSymbol]} />
               <Text $error={item.failed}>
-                {getSign(item)}{' '}
-                {(() => {
-                  const total = item.actions.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero);
-                  return (
-                    <Tooltip content={formatNumber(total, itemPool.tokenDecimals, 18)} placement="top">
-                      <span>{formatNumber(total, itemPool.tokenDecimals, 4)}</span>
-                    </Tooltip>
-                  );
-                })()}
-                {' '}{tokenSymbol}
+                {isVisible ? (
+                  <>
+                    {getSign(item)}{' '}
+                    {(() => {
+                      const total = item.actions.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero);
+                      return (
+                        <Tooltip content={formatNumber(total, itemPool.tokenDecimals, 18)} placement="top">
+                          <span>{formatNumber(total, itemPool.tokenDecimals, 4)}</span>
+                        </Tooltip>
+                      );
+                    })()}
+                    {' '}{tokenSymbol}
+                  </>
+                ) : (
+                  <HiddenAmount>•••• {tokenSymbol}</HiddenAmount>
+                )}
               </Text>
             </Row>
             {item.fee && (
@@ -432,6 +440,10 @@ const DateText = styled.span`
 `;
 
 const FeeText = styled(DateText)``;
+
+const HiddenAmount = styled.span`
+  letter-spacing: 2px;
+`;
 
 const SpinnerSmall = styled(Spinner)`
   margin-left: 10px;

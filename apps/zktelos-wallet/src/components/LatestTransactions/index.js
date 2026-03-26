@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -13,6 +13,7 @@ import { shortAddress, formatNumber } from 'utils';
 import { NETWORKS, TOKENS_ICONS } from 'constants';
 import { useDateFromNow, useHistoricalTokenSymbol } from 'hooks';
 import { actions, getSign } from 'components/HistoryItem';
+import { BalanceVisibilityContext } from 'contexts';
 
 import { ReactComponent as Shield } from 'assets/shield.svg';
 
@@ -25,6 +26,7 @@ const {
 
 const TransactionItem = ({ transaction, zkAccount }) => {
   const { t } = useTranslation();
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const [isCopied, setIsCopied] = useState(false);
   // Use pool from transaction metadata (added in Home/History pages)
   const txPool = transaction.pool;
@@ -70,21 +72,27 @@ const TransactionItem = ({ transaction, zkAccount }) => {
           <LeftSection>
             <TokenIcon src={TOKENS_ICONS[tokenSymbol]} />
             <Amount $error={transaction.failed}>
-              {sign}{' '}
-              <Tooltip
-                content={formatNumber(total, txPool.tokenDecimals, 18)}
-                placement="top"
-              >
-                <span>{formatNumber(total, txPool.tokenDecimals, 2)}</span>
-              </Tooltip>
-              {' '}{tokenSymbol}
-              {transaction.fee && !transaction.fee.isZero() && (
-                <FeeText>
-                  {' '}{t('history.fee', {
-                    amount: formatNumber(transaction.fee, txPool.tokenDecimals),
-                    symbol: tokenSymbol,
-                  })}
-                </FeeText>
+              {isVisible ? (
+                <>
+                  {sign}{' '}
+                  <Tooltip
+                    content={formatNumber(total, txPool.tokenDecimals, 18)}
+                    placement="top"
+                  >
+                    <span>{formatNumber(total, txPool.tokenDecimals, 2)}</span>
+                  </Tooltip>
+                  {' '}{tokenSymbol}
+                  {transaction.fee && !transaction.fee.isZero() && (
+                    <FeeText>
+                      {' '}{t('history.fee', {
+                        amount: formatNumber(transaction.fee, txPool.tokenDecimals),
+                        symbol: tokenSymbol,
+                      })}
+                    </FeeText>
+                  )}
+                </>
+              ) : (
+                <HiddenAmount>•••• {tokenSymbol}</HiddenAmount>
               )}
             </Amount>
           </LeftSection>
@@ -248,6 +256,10 @@ const FeeText = styled.span`
   font-size: 13px;
   color: ${props => props.theme.text.color.secondary};
   opacity: 0.6;
+`;
+
+const HiddenAmount = styled.span`
+  letter-spacing: 2px;
 `;
 
 const DateText = styled.span`
