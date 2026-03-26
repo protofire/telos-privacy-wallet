@@ -319,6 +319,8 @@ const EmptyStateGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
   @media only screen and (max-width: 560px) {
     grid-template-columns: 1fr;
   }
@@ -332,6 +334,8 @@ const EmptyCard = styled.div`
   border-radius: 12px;
   border: 1px solid ${props => props.theme.color.darkGrey};
   background: ${props => props.theme.modal.background};
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const EmptyCardIconWrapper = styled.div`
