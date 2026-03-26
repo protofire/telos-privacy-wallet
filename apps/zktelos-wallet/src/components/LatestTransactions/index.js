@@ -180,10 +180,16 @@ const Container = styled.div`
 const TransactionRow = styled.div`
   display: flex;
   align-items: flex-start;
-  margin-bottom: 10px;
-  
+  padding: 10px 0;
+  border-bottom: 1px solid ${props => props.theme.color.darkGrey};
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+
   &:last-of-type {
-    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
   }
 `;
 

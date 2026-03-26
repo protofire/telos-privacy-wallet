@@ -400,7 +400,17 @@ const Column = styled.div`
 
 const Container = styled(Row)`
   align-items: flex-start;
-  border-radius: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid ${props => props.theme.color.darkGrey};
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
 `;
 
 const ActionLabel = styled.div`
