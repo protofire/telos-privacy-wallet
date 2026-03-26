@@ -321,7 +321,7 @@ const EmptyCard = styled.div`
   gap: 10px;
   padding: 16px;
   border-radius: 12px;
-  border: 1px solid ${props => props.theme.color.darkGrey}33;
+  border: 1px solid ${props => props.theme.color.darkGrey};
   background: ${props => props.theme.modal.background};
 `;
 
@@ -358,7 +358,7 @@ const ReceiveSection = styled.div`
   gap: 8px;
   padding: 14px 16px;
   border-radius: 12px;
-  border: 1px solid ${props => props.theme.color.darkGrey}33;
+  border: 1px solid ${props => props.theme.color.darkGrey};
   background: ${props => props.theme.modal.background};
   margin-top: 8px;
 `;
