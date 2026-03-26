@@ -70,7 +70,7 @@ export default () => {
     });
   }, [balances, zkAccountBalances, nativeBalance, priceMap, availablePools]);
 
-  if (!account && !zkAccount) return null;
+  if (!zkAccount) return null;
 
   return (
     <Container>

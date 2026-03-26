@@ -334,7 +334,7 @@
   },
   "confirmLogoutModal": {
     "title": "Log out and clear browsing data",
-    "description": "When you log out your zkAccount information is erased from the data cache and is no longer accessible with your password. Restore the account and balance using your secret phrase and a new password."
+    "description": "When you log out your zkAccount information is erased from the data cache and is no longer accessible with your password. You can restore access at any time: if you created your account with a wallet, simply reconnect that wallet and sign again; if you used a seed phrase, restore it using your saved words and set a new password."
   },
   "disablePasswordModal": {
     "title": "Disable password",
