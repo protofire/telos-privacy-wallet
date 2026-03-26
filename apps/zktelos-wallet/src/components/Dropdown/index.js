@@ -40,9 +40,6 @@ const GlobalDropdownStyle = createGlobalStyle`
 const GlobalBodyFullscreenStyle = createGlobalStyle`
   body {
     overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
   }
 `;
 

@@ -129,7 +129,7 @@ export default () => {
           <HeaderTitle>
             <AccountName>{connector?.name}</AccountName>
             <OptionButton onClick={handleLogout}>
-              {t('buttonText.logout')}
+              {t('buttonText.disconnectWallet')}
             </OptionButton>
           </HeaderTitle>
           <AddressWithCopy

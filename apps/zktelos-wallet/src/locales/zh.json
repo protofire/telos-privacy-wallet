@@ -34,7 +34,11 @@
       "title": "暂无资金",
       "description": "进行第一笔存款以开始使用zkTelos。",
       "fundEvm": "为您的EVM账户充值以开始使用zkTelos。",
-      "buy": "购买TLOS"
+      "buy": "购买TLOS",
+      "depositTitle": "存入",
+      "depositDesc": "将代币从您连接的钱包添加到您的私人账户。",
+      "receiveTitle": "接收",
+      "receiveDesc": "与其他 zkWallet 用户分享您的私人地址，以直接接收代币。"
     }
   },
   "buttonText": {
@@ -86,7 +90,8 @@
     "restoreAccount": "恢复账号",
     "signIn": "登入",
     "signingIn": "正在登入……",
-    "getToken": "获取{{symbol}}"
+    "getToken": "获取{{symbol}}",
+    "disconnectWallet": "断开钱包"
   },
   "home": {
     "title": "首页",
@@ -95,7 +100,19 @@
     "latestTransactions": "最新交易",
     "privateAccount": "私密账户",
     "publicAccount": "公共账户",
-    "description": "生成安全的私密账户并开启隐私保护转账。"
+    "description": "生成安全的私密账户并开启隐私保护转账。",
+    "connectedWallet": "已连接钱包",
+    "connectWalletHint": "连接钱包以存入代币或将资金提取到公共地址。",
+    "landing": {
+      "headline": "Telos 的隐私钱包",
+      "subtitle": "以完全隐私发送和接收资产——您的余额和交易仅对您可见。",
+      "feature1Title": "零知识隐私",
+      "feature1Desc": "每笔交易均由零知识证明保护，对公众隐藏金额和参与者。",
+      "feature2Title": "私密转账",
+      "feature2Desc": "向任何私人地址发送资产，无需透露您的身份或交易历史。",
+      "feature3Title": "由 Telos 驱动",
+      "feature3Desc": "在 Telos EVM 区块链上进行快速低成本的私密交易。"
+    }
   },
   "portfolio": {
     "asset": "资产",
@@ -264,7 +281,9 @@
       "walletConnectDescription": "使用任何兼容的钱包创建您的私密账户。",
       "dividerText": "或创建即时账户：",
       "instantTitle": "即时账户（助记词）",
-      "instantDescription": "生成新的助记词。您需要安全地保存它。"
+      "instantDescription": "生成新的助记词。您需要安全地保存它。",
+      "restoreTitle": "恢复现有账户",
+      "restoreDescription": "已有私人账户助记词？输入以恢复访问权限。"
     },
     "signToAccess": {
       "title": "签名以访问"
@@ -539,5 +558,13 @@
       "back": "返回",
       "finishTour": "完成导览 🎉"
     }
+  },
+  "footer": {
+    "reportBug": "报告错误",
+    "suggestFeature": "建议功能"
+  },
+  "lifi": {
+    "publicNotice": "这是一笔公开交易——资金将进入您连接的钱包，而非您的私人账户。之后请将其存入私人账户以进行保护。",
+    "publicNoticeAck": "我已确认"
   }
 }

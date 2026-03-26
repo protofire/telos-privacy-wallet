@@ -28,13 +28,17 @@
     "shieldedAddress": "Shielded address: ",
     "shieldedBalance": "Shielded balance: ",
     "generatingAddress": "Generating address...",
-    "accessPrivateAccount": "Connect wallet",
-    "createPrivateAccount": "Create Private Account",
+    "accessPrivateAccount": "Private Account",
+    "createPrivateAccount": "Set up or connect account",
     "emptyState": {
       "title": "No funds yet",
       "description": "Make your first Deposit to start using zkTelos.",
       "fundEvm": "Fund your EVM account to start using zkTelos.",
-      "buy": "Buy TLOS"
+      "buy": "Buy TLOS",
+      "depositTitle": "Deposit",
+      "depositDesc": "Add tokens from your connected wallet into your private account.",
+      "receiveTitle": "Receive",
+      "receiveDesc": "Share your private address with another zkWallet user to receive tokens directly."
     }
   },
   "buttonText": {
@@ -79,6 +83,7 @@
     "getPaymentLink": "Get payment link",
     "redeemGiftCard": "Redeem gift card",
     "logout": "Log out",
+    "disconnectWallet": "Disconnect wallet",
     "continue": "Continue",
     "signMessage": "Sign the message",
     "skip": "Skip",
@@ -95,7 +100,19 @@
     "latestTransactions": "Recent activity",
     "privateAccount": "Private Account",
     "publicAccount": "Public Account",
-    "description": "Generate a secure private account and unlock privacy-preserving transfers."
+    "connectedWallet": "Connected Wallet",
+    "connectWalletHint": "Connect a wallet to deposit tokens or withdraw funds to a public address.",
+    "description": "Generate a secure private account and unlock privacy-preserving transfers.",
+    "landing": {
+      "headline": "The privacy wallet for Telos",
+      "subtitle": "Send and receive assets with complete privacy — your balance and transactions are visible only to you.",
+      "feature1Title": "Zero-knowledge privacy",
+      "feature1Desc": "Every transaction is shielded by zero-knowledge proofs, hiding amounts and participants from public view.",
+      "feature2Title": "Private transfers",
+      "feature2Desc": "Send assets to any private address without revealing your identity or transaction history.",
+      "feature3Title": "Powered by Telos",
+      "feature3Desc": "Fast and low-cost private transactions on the Telos EVM blockchain."
+    }
   },
   "portfolio": {
     "asset": "Asset",
@@ -258,13 +275,15 @@
       "seedphraseDescription": "Restore an existing Private Account."
     },
     "create": {
-      "title": "Create Private Account",
-      "sectionTitle": "Choose how you want to generate your private account:",
-      "metaMaskDescription": "Use a simple wallet signature to create your private account.",
-      "walletConnectDescription": "Use any compatible wallet to create your private account.",
-      "dividerText": "Or create an Instant Account:",
-      "instantTitle": "Instant Account (seed phrase)",
-      "instantDescription": "Generate a new seed phrase. You'll need to store it safely."
+      "title": "Set Up or Connect Account",
+      "sectionTitle": "Link your private account to an existing wallet:",
+      "metaMaskDescription": "Use a wallet signature to create or connect your private account.",
+      "walletConnectDescription": "Use any compatible wallet to create or connect your private account.",
+      "dividerText": "Or use a seed phrase:",
+      "instantTitle": "Standalone Account (seed phrase)",
+      "instantDescription": "Creates an independent private account with its own seed phrase, not linked to any wallet.",
+      "restoreTitle": "Restore Existing Account",
+      "restoreDescription": "Already have a private account seed phrase? Enter it to restore access."
     },
     "signToAccess": {
       "title": "Sign to Access"
@@ -319,7 +338,7 @@
   },
   "confirmLogoutModal": {
     "title": "Log out and clear browsing data",
-    "description": "When you log out your zkAccount information is erased from the data cache and is no longer accessible with your password. Restore the account and balance using your secret phrase and a new password."
+    "description": "When you log out your zkAccount information is erased from the data cache and is no longer accessible with your password. You can restore access at any time: if you created your account with a wallet, simply reconnect that wallet and sign again; if you used a seed phrase, restore it using your saved words and set a new password."
   },
   "disablePasswordModal": {
     "title": "Disable password",
@@ -539,5 +558,13 @@
       "back": "Back",
       "finishTour": "Finish Tour 🎉"
     }
+  },
+  "footer": {
+    "reportBug": "Report a bug",
+    "suggestFeature": "Suggest a feature"
+  },
+  "lifi": {
+    "publicNotice": "This is a public transaction — funds go to your connected wallet, not your Private Account. Deposit them into your Private Account afterwards to shield them.",
+    "publicNoticeAck": "I acknowledge"
   }
 }

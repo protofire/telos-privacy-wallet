@@ -1,8 +1,9 @@
-import { useContext, useCallback, useEffect, useState } from 'react';
+import { useContext, useCallback, useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useWidgetEvents, WidgetEvent } from '@lifi/widget';
 import { useTranslation } from 'react-i18next';
 import { useSwitchChain } from 'wagmi';
+import { EyeOffIcon } from 'lucide-react';
 
 import { ModalContext, PoolContext } from 'contexts';
 import LiFiWidget from 'containers/LiFiWidget';
@@ -12,6 +13,8 @@ import Button from 'components/Button';
 export default () => {
   const { t } = useTranslation();
   const { isSwapModalOpen, closeSwapModal } = useContext(ModalContext);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+  const widgetRef = useRef(null);
   const { currentPool } = useContext(PoolContext);
   const { switchChain } = useSwitchChain();
   const widgetEvents = useWidgetEvents();
@@ -60,6 +63,10 @@ export default () => {
   // to prevent the CRA dev overlay (and any production error boundaries) from
   // treating it as a crash.
   useEffect(() => {
+    if (isSwapModalOpen) setNoticeDismissed(false);
+  }, [isSwapModalOpen]);
+
+  useEffect(() => {
     if (!isSwapModalOpen) return;
 
     const handleUnhandledRejection = (event) => {
@@ -94,7 +101,20 @@ export default () => {
           </Row>
         </ConfirmationContainer>
       )}
-      <WidgetContainer $hidden={isConfirmationShown}>
+      <WidgetContainer $hidden={isConfirmationShown} ref={widgetRef}>
+        {!noticeDismissed && (
+          <NoticeWrapper>
+            <PublicNotice>
+              <NoticeBody>
+                <EyeOffIcon size={14} style={{flexShrink: 0, marginTop: 2}} />
+                <NoticeText>{t('lifi.publicNotice')}</NoticeText>
+              </NoticeBody>
+              <AcknowledgeButton onClick={() => setNoticeDismissed(true)}>
+                {t('lifi.publicNoticeAck')}
+              </AcknowledgeButton>
+            </PublicNotice>
+          </NoticeWrapper>
+        )}
         <LiFiWidget />
       </WidgetContainer>
     </Modal>
@@ -107,6 +127,51 @@ const WidgetContainer = styled.div`
   width: 100%;
   visibility: ${props => props.$hidden ? 'hidden' : 'visible' };
   height: ${props => props.$hidden ? '0px' : 'auto' };
+`;
+
+const NoticeWrapper = styled.div`
+  padding: 8px 24px 4px;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const PublicNotice = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: ${props => props.theme.warning.background};
+  border: 1px solid ${props => props.theme.warning.border};
+`;
+
+const NoticeBody = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: ${props => props.theme.warning.text.color};
+`;
+
+const NoticeText = styled.span`
+  font-size: 14px;
+  color: ${props => props.theme.warning.text.color};
+  line-height: 20px;
+`;
+
+const AcknowledgeButton = styled.button`
+  align-self: flex-end;
+  background: none;
+  border: 1px solid ${props => props.theme.warning.border};
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.warning.text.color};
+  cursor: pointer;
+  font-family: inherit;
+  &:hover {
+    background: ${props => props.theme.warning.border}44;
+  }
 `;
 
 const ConfirmationContainer = styled.div`

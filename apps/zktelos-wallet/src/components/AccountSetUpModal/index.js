@@ -28,10 +28,7 @@ const STEP = {
 const AccessAccount = ({ setStep }) => {
   const { t } = useTranslation();
 
-  const walletDescriptions = {
-    'MetaMask': t('accountSetupModal.access.metaMaskDescription'),
-    'WalletConnect': t('accountSetupModal.access.walletConnectDescription'),
-  };
+  const walletDescriptions = {};
 
   return (
     <Container>
@@ -64,10 +61,7 @@ const AccessAccount = ({ setStep }) => {
 const CreateAccount = ({ setStep }) => {
   const { t } = useTranslation();
 
-  const walletDescriptions = {
-    'MetaMask': t('accountSetupModal.create.metaMaskDescription'),
-    'WalletConnect': t('accountSetupModal.create.walletConnectDescription'),
-  };
+  const walletDescriptions = {};
 
   return (
     <Container>
@@ -90,6 +84,15 @@ const CreateAccount = ({ setStep }) => {
           <OptionTitle>{t('accountSetupModal.create.instantTitle')}</OptionTitle>
           <OptionDescription>
             {t('accountSetupModal.create.instantDescription')}
+          </OptionDescription>
+        </OptionContent>
+      </OptionCard>
+
+      <OptionCard onClick={() => setStep(STEP.ENTER_SEEDPHRASE)}>
+        <OptionContent>
+          <OptionTitle>{t('accountSetupModal.create.restoreTitle')}</OptionTitle>
+          <OptionDescription>
+            {t('accountSetupModal.create.restoreDescription')}
           </OptionDescription>
         </OptionContent>
       </OptionCard>
@@ -186,7 +189,7 @@ export default ({ isOpen, onClose, saveZkAccountMnemonic, mode = 'access' }) => 
     case STEP.ENTER_SEEDPHRASE:
       title = t('accountSetupModal.restoreWithSecret.title');
       component = <Restore restore={restore} />;
-      prevStep = STEP.ACCESS_ACCOUNT;
+      prevStep = mode === 'create' ? STEP.CREATE_ACCOUNT : STEP.ACCESS_ACCOUNT;
       break;
     case STEP.CREATE_INSTANT:
       title = t('accountSetupModal.createWithSecret.title');

@@ -187,3 +187,4 @@ export default () => {
     <LiFiWidget config={widgetConfig} />
   );
 };
+

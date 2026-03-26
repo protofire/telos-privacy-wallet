@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HistoryTransactionType } from 'zkbob-client-js';
 import { useTranslation } from 'react-i18next';
+import { BalanceVisibilityContext } from 'contexts';
 
 import Link from 'components/Link';
 import Spinner from 'components/Spinner';
@@ -115,7 +116,7 @@ const AddressLink = ({ action, isMobile, currentChainId }) => {
   const address = action.type === Deposit ? action.actions[0].from : action.actions[0].to;
   return (
     <Link
-      size={16}
+      size={13}
       href={NETWORKS[currentChainId].blockExplorerUrls.address.replace('%s', address)}
     >
       {shortAddress(address, isMobile ? 10 : 22)}
@@ -163,6 +164,7 @@ const Date = ({ timestamp }) => {
 
 export default ({ item, zkAccount, isMobile }) => {
   const { t } = useTranslation();
+  const { isVisible } = useContext(BalanceVisibilityContext);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const itemPool = item.pool;
@@ -200,16 +202,22 @@ export default ({ item, zkAccount, isMobile }) => {
             <Row>
               <TokenIcon src={TOKENS_ICONS[tokenSymbol]} />
               <Text $error={item.failed}>
-                {getSign(item)}{' '}
-                {(() => {
-                  const total = item.actions.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero);
-                  return (
-                    <Tooltip content={formatNumber(total, itemPool.tokenDecimals, 18)} placement="top">
-                      <span>{formatNumber(total, itemPool.tokenDecimals, 4)}</span>
-                    </Tooltip>
-                  );
-                })()}
-                {' '}{tokenSymbol}
+                {isVisible ? (
+                  <>
+                    {getSign(item)}{' '}
+                    {(() => {
+                      const total = item.actions.reduce((acc, curr) => acc.add(curr.amount), ethers.constants.Zero);
+                      return (
+                        <Tooltip content={formatNumber(total, itemPool.tokenDecimals, 18)} placement="top">
+                          <span>{formatNumber(total, itemPool.tokenDecimals, 4)}</span>
+                        </Tooltip>
+                      );
+                    })()}
+                    {' '}{tokenSymbol}
+                  </>
+                ) : (
+                  <HiddenAmount>•••• {tokenSymbol}</HiddenAmount>
+                )}
               </Text>
             </Row>
             {item.fee && (
@@ -342,7 +350,7 @@ export default ({ item, zkAccount, isMobile }) => {
               </DirectDepositLabel>
             )}
             {(item.txHash && item.txHash !== '0') ? (
-              <Link size={16} href={NETWORKS[currentChainId].blockExplorerUrls.tx.replace('%s', item.txHash)}>
+              <Link size={13} href={NETWORKS[currentChainId].blockExplorerUrls.tx.replace('%s', item.txHash)}>
                 {t('history.viewTx')}
               </Link>
             ) : (
@@ -381,7 +389,7 @@ const RowSpaceBetween = styled(Row)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 34px;
+  min-height: 24px;
 `;
 
 const Column = styled.div`
@@ -392,7 +400,17 @@ const Column = styled.div`
 
 const Container = styled(Row)`
   align-items: flex-start;
-  border-radius: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid ${props => props.theme.color.darkGrey};
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
 `;
 
 const ActionLabel = styled.div`
@@ -400,12 +418,13 @@ const ActionLabel = styled.div`
   justify-content: center;
   align-items: center;
   border: 1px solid ${props => props.theme.input.border.color[props.$error ? 'error' : 'default']};
-  border-radius: 12px;
-  width: 34px;
-  height: 34px;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
   box-sizing: border-box;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 8px;
+  flex-shrink: 0;
   background-color: ${props => props.theme.color.white};
   ${props => props.$error && `
     & path {
@@ -415,23 +434,27 @@ const ActionLabel = styled.div`
 `;
 
 const TokenIcon = styled.img`
-  margin-right: 8px;
-  width: 24px;
-  height: 24px;
+  margin-right: 6px;
+  width: 20px;
+  height: 20px;
 `;
 
 const Text = styled.span`
-  font-size: 16px;
+  font-size: 14px;
   color: ${props => props.theme.text.color[props.$error ? 'error' : 'primary']};
 `;
 
 const DateText = styled.span`
-  font-size: 16px;
+  font-size: 13px;
   color: ${({ theme }) => theme.text.color.secondary};
   opacity: 60%;
 `;
 
 const FeeText = styled(DateText)``;
+
+const HiddenAmount = styled.span`
+  letter-spacing: 2px;
+`;
 
 const SpinnerSmall = styled(Spinner)`
   margin-left: 10px;

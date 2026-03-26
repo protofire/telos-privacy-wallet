@@ -47,12 +47,12 @@ const GlobalStyle = createGlobalStyle`
   }
   #root {
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
     min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background: ${props => props.theme.background}; 
+    background: ${props => props.theme.background};
   }
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {

@@ -30,9 +30,6 @@ const GlobalStyle = createGlobalStyle`
   }
   .ReactModal__Body--open {
     overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
   }
 `;
 
