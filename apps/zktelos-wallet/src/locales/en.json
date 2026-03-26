@@ -559,6 +559,10 @@
       "finishTour": "Finish Tour 🎉"
     }
   },
+  "footer": {
+    "reportBug": "Report a bug",
+    "suggestFeature": "Suggest a feature"
+  },
   "lifi": {
     "publicNotice": "This is a public transaction — funds go to your connected wallet, not your Private Account. Deposit them into your Private Account afterwards to shield them.",
     "publicNoticeAck": "I acknowledge"

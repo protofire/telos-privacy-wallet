@@ -10,6 +10,9 @@ import { ReactComponent as GithubIcon } from 'assets/github.svg';
 import { SupportIdContext } from '../../contexts';
 import { useTranslation } from 'react-i18next';
 
+const SUPPORT_EMAIL = 'joao.capinha+teloszkwallet@protofire.io';
+const GITHUB_REPO = 'https://github.com/protofire/telos-privacy-wallet';
+
 export default () => {
   const { supportId } = useContext(SupportIdContext);
   const { t } = useTranslation();
@@ -19,6 +22,16 @@ export default () => {
     { icon: MirrorIcon, href: 'https://www.telos.net/blog' },
     { icon: GithubIcon, href: 'https://github.com/telosnetwork' },
   ];
+
+  const bugReportUrl = `${GITHUB_REPO}/issues/new?title=${encodeURIComponent(`[Bug] `)}&body=${encodeURIComponent(
+    `**Version:** v${appPackage.version}\n**Support ID:** ${supportId}\n**Browser:** ${navigator.userAgent}\n\n**Describe the bug:**\n\n**Steps to reproduce:**\n1. \n2. \n\n**Expected behavior:**\n`
+  )}`;
+
+  const featureSuggestUrl = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
+    `[zkWallet v${appPackage.version}] Feature suggestion`
+  )}&body=${encodeURIComponent(
+    `Version: v${appPackage.version}\nSupport ID: ${supportId}\n\nFeature request:\n\n`
+  )}`;
 
   return (
     <Column>
@@ -38,6 +51,13 @@ export default () => {
             <Text style={{ marginRight: 4 }}>{t('common.supportId')}:</Text>
             <Text>{supportId}</Text>
           </TextRow>
+        </InnerRow>
+      </Row>
+      <Row>
+        <InnerRow>
+          <FeedbackLink href={bugReportUrl} target="">{t('footer.reportBug')}</FeedbackLink>
+          <Separator>·</Separator>
+          <FeedbackLink href={featureSuggestUrl} target="">{t('footer.suggestFeature')}</FeedbackLink>
         </InnerRow>
       </Row>
     </Column>
@@ -86,4 +106,21 @@ const TextRow = styled.div`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+`;
+
+const FeedbackLink = styled(Link)`
+  font-size: 13px;
+  color: #A7A2B8;
+  font-weight: ${props => props.theme.text.weight.normal};
+  opacity: 0.8;
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+`;
+
+const Separator = styled.span`
+  font-size: 13px;
+  color: #A7A2B8;
+  opacity: 0.5;
 `;
