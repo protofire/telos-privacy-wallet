@@ -21,7 +21,7 @@ export default () => {
   const history = useHistory();
   const location = useLocation();
   const { setCurrentPool, availablePools } = useContext(PoolContext);
-  const { openCreateAccountModal, openPaymentLinkModal } = useContext(ModalContext);
+  const { openCreateAccountModal } = useContext(ModalContext);
 
   const {
     zkAccount,
@@ -222,9 +222,6 @@ export default () => {
             </ReceiveSectionHeader>
             <ReceiveSectionDesc>{t('common.emptyState.receiveDesc')}</ReceiveSectionDesc>
             <AddressesContainer>{addressRows}</AddressesContainer>
-            <Button small onClick={openPaymentLinkModal} style={{ marginTop: 8 }}>
-              {t('buttonText.getPaymentLink')}
-            </Button>
           </ReceiveSection>
         </>
       ) : (
@@ -242,9 +239,6 @@ export default () => {
             <EmptyCardTitle>{t('common.emptyState.receiveTitle')}</EmptyCardTitle>
             <EmptyCardDesc>{t('common.emptyState.receiveDesc')}</EmptyCardDesc>
             <AddressesContainer>{addressRows}</AddressesContainer>
-            <Button small onClick={openPaymentLinkModal}>
-              {t('buttonText.getPaymentLink')}
-            </Button>
           </EmptyCard>
         </EmptyStateGrid>
       )}

@@ -16,7 +16,7 @@ import SingleTransfer from './SingleTransfer';
 import MultiTransfer from './MultiTransfer';
 import PoolSelector from 'components/PoolSelector';
 
-import { ZkAccountContext, PoolContext, ModalContext } from 'contexts';
+import { ZkAccountContext, PoolContext } from 'contexts';
 
 import { useLatestAction } from 'hooks';
 
@@ -24,7 +24,6 @@ import { useLatestAction } from 'hooks';
 export default () => {
   const { t } = useTranslation();
   const { isPending, switchToPool } = useContext(ZkAccountContext);
-  const { openPaymentLinkModal } = useContext(ModalContext);
   const latestAction = useLatestAction(HistoryTransactionType.TransferOut);
   const [isMulti, setIsMulti] = useState(false);
   const multitransferRef = useRef(null);
@@ -102,11 +101,6 @@ export default () => {
           currentPool={currentPool}
         />
       )}
-      <RequestPaymentRow>
-        <Button type="link" onClick={openPaymentLinkModal}>
-          {t('buttonText.getPaymentLink')}
-        </Button>
-      </RequestPaymentRow>
     </ContentContainer>
   );
 };
@@ -208,8 +202,4 @@ const ContentContainer = styled.div`
   @media only screen and (max-width: 560px) {
     margin: 15px 0;
   }
-`;
-
-const RequestPaymentRow = styled.div`
-  padding: 8px 0 16px;
 `;
