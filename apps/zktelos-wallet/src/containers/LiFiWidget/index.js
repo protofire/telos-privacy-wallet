@@ -188,10 +188,12 @@ export default () => {
     };
   }, [currentPool.chainId, currentPool.tokenAddress, themeName, width, wagmiConfig]);
 
+  const widgetWidth = width > 500 ? 480 : '100%';
+
   return (
     <WidgetWrapper>
       {!noticeDismissed && (
-        <PublicNotice>
+        <PublicNotice $width={widgetWidth}>
           <NoticeBody>
             <EyeOffIcon size={14} style={{flexShrink: 0, marginTop: 2}} />
             <NoticeText>{t('lifi.publicNotice')}</NoticeText>
@@ -209,6 +211,7 @@ export default () => {
 const WidgetWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
   width: 100%;
 `;
@@ -218,10 +221,13 @@ const PublicNotice = styled.div`
   flex-direction: column;
   gap: 12px;
   padding: 12px 14px;
-  margin: 8px 32px 4px;
+  margin-top: 8px;
   border-radius: 10px;
   background: ${props => props.theme.networkLabel.background};
   border: 1px solid ${props => props.theme.color.darkGrey};
+  width: ${props => typeof props.$width === 'number' ? `${props.$width}px` : props.$width};
+  max-width: 100%;
+  box-sizing: border-box;
 `;
 
 const NoticeBody = styled.div`
