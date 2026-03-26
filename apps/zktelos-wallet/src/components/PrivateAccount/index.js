@@ -179,6 +179,7 @@ export default () => {
               <AddressWithCopy
                 prefixIcon={<RefreshCcwIcon width={16} height={16} />}
                 onPrefixClick={generateAndStoreAddresses}
+                formatType="full"
                 $noBorder
                 $fontSize="13px"
                 $height="auto"
