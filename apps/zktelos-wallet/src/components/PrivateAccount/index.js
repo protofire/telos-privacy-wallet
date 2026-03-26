@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ethers } from 'ethers';
 
-import { RefreshCcwIcon, ShieldCheckIcon, EyeOffIcon, ZapIcon } from 'lucide-react'
+import { RefreshCcwIcon, ShieldCheckIcon, EyeOffIcon, ZapIcon, DownloadIcon, InboxIcon } from 'lucide-react'
 import { ZkAccountContext, PoolContext, ModalContext } from 'contexts';
 import { useTokenMapPrices } from 'hooks';
 import { TOKENS_ICONS } from 'constants';
@@ -168,6 +168,34 @@ export default () => {
     );
   };
 
+  const addressRows = (
+    availablePools.map(pool => {
+      const address = shieldedAddresses[pool.alias];
+      return (
+        <AddressRow key={pool.alias}>
+          <TokenLabel>{pool.tokenSymbol}:</TokenLabel>
+          {address ? (
+            <AddressWithCopy
+              prefixIcon={<RefreshCcwIcon width={16} height={16} />}
+              onPrefixClick={generateAndStoreAddresses}
+              $noBorder
+              $fontSize="13px"
+              $height="auto"
+              $borderRadius="0"
+              $maxWidth="210px"
+              $padding="0"
+              $background="transparent"
+            >
+              {address}
+            </AddressWithCopy>
+          ) : (
+            <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
+          )}
+        </AddressRow>
+      );
+    })
+  );
+
   return (
     <Container>
       <HeaderContainer>
@@ -178,49 +206,38 @@ export default () => {
               <ZkName seed={zkAccount} />
             </AccountName>
           </HeaderTitle>
-          <AddressesContainer>
-            {availablePools.map(pool => {
-              const poolAlias = pool.alias;
-              const address = shieldedAddresses[poolAlias];
-              const tokenSymbol = pool.tokenSymbol;
-
-              return (
-                <AddressRow key={poolAlias}>
-                  <TokenLabel>{tokenSymbol}:</TokenLabel>
-                  {address ? (
-                    <AddressWithCopy
-                      prefixIcon={<RefreshCcwIcon width={16} height={16} />}
-                      onPrefixClick={generateAndStoreAddresses}
-                      $noBorder
-                      $fontSize="13px"
-                      $height="auto"
-                      $borderRadius="0"
-                      $maxWidth="210px"
-                      $padding="0"
-                      $background="transparent"
-                    >
-                      {address}
-                    </AddressWithCopy>
-                  ) : (
-                    <ShieldedAddress>{t('common.generatingAddress')}</ShieldedAddress>
-                  )}
-                </AddressRow>
-              );
-            })}
-          </AddressesContainer>
         </HeaderContent>
       </HeaderContainer>
 
       {hasAnyBalance ? (
-        <PortfolioTable rows={tableRows} isLoading={isLoading} />
+        <>
+          <PortfolioTable rows={tableRows} isLoading={isLoading} />
+          <ReceiveSection>
+            <ReceiveSectionHeader>
+              <InboxIcon size={15} />
+              <ReceiveSectionTitle>{t('common.emptyState.receiveTitle')}</ReceiveSectionTitle>
+            </ReceiveSectionHeader>
+            <ReceiveSectionDesc>{t('common.emptyState.receiveDesc')}</ReceiveSectionDesc>
+            <AddressesContainer>{addressRows}</AddressesContainer>
+          </ReceiveSection>
+        </>
       ) : (
-        <EmptyState>
-          <EmptyStateTitle>{t('common.emptyState.title')}</EmptyStateTitle>
-          <EmptyStateDescription>{t('common.emptyState.description')}</EmptyStateDescription>
-          <Button onClick={() => history.push('/deposit')} small>
-            {t('buttonText.deposit')}
-          </Button>
-        </EmptyState>
+        <EmptyStateGrid>
+          <EmptyCard>
+            <EmptyCardIconWrapper><DownloadIcon size={20} /></EmptyCardIconWrapper>
+            <EmptyCardTitle>{t('common.emptyState.depositTitle')}</EmptyCardTitle>
+            <EmptyCardDesc>{t('common.emptyState.depositDesc')}</EmptyCardDesc>
+            <Button onClick={() => history.push('/deposit')} small>
+              {t('buttonText.deposit')}
+            </Button>
+          </EmptyCard>
+          <EmptyCard>
+            <EmptyCardIconWrapper><InboxIcon size={20} /></EmptyCardIconWrapper>
+            <EmptyCardTitle>{t('common.emptyState.receiveTitle')}</EmptyCardTitle>
+            <EmptyCardDesc>{t('common.emptyState.receiveDesc')}</EmptyCardDesc>
+            <AddressesContainer>{addressRows}</AddressesContainer>
+          </EmptyCard>
+        </EmptyStateGrid>
       )}
     </Container>
   );
@@ -287,24 +304,82 @@ const ShieldedAddress = styled.span`
   line-height: 16px;
 `;
 
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: ${props => props.theme.modal.background};
-  padding: 8px;
-  gap: 8px;
+/* ── Empty state — two-card grid ─────────────────────────────────────────── */
+
+const EmptyStateGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  @media only screen and (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-const EmptyStateTitle = styled.span`
-  font-size: 16px;
+const EmptyCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid ${props => props.theme.color.darkGrey}33;
+  background: ${props => props.theme.modal.background};
+`;
+
+const EmptyCardIconWrapper = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: ${props => props.theme.networkLabel.background};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${props => props.theme.icon.color.default};
+  flex-shrink: 0;
+`;
+
+const EmptyCardTitle = styled.span`
+  font-size: 14px;
   font-weight: ${props => props.theme.text.weight.bold};
   color: ${props => props.theme.text.color.primary};
 `;
 
-const EmptyStateDescription = styled.span`
-  font-size: 14px;
+const EmptyCardDesc = styled.span`
+  font-size: 13px;
   color: ${props => props.theme.text.color.secondary};
+  line-height: 1.5;
+  flex: 1;
+`;
+
+/* ── Receive section (funded state) ─────────────────────────────────────── */
+
+const ReceiveSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid ${props => props.theme.color.darkGrey}33;
+  background: ${props => props.theme.modal.background};
+  margin-top: 8px;
+`;
+
+const ReceiveSectionHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: ${props => props.theme.icon.color.default};
+`;
+
+const ReceiveSectionTitle = styled.span`
+  font-size: 13px;
+  font-weight: ${props => props.theme.text.weight.bold};
+  color: ${props => props.theme.text.color.primary};
+`;
+
+const ReceiveSectionDesc = styled.span`
+  font-size: 12px;
+  color: ${props => props.theme.text.color.secondary};
+  line-height: 1.5;
 `;
 
 /* ── Landing / welcome state ─────────────────────────────────────────────── */
