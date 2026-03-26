@@ -218,7 +218,7 @@ const PublicNotice = styled.div`
   flex-direction: column;
   gap: 12px;
   padding: 12px 14px;
-  margin: 8px 24px 4px;
+  margin: 8px 32px 4px;
   border-radius: 10px;
   background: ${props => props.theme.networkLabel.background};
   border: 1px solid ${props => props.theme.color.darkGrey};
