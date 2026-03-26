@@ -10,7 +10,7 @@ import { ReactComponent as GithubIcon } from 'assets/github.svg';
 import { SupportIdContext } from '../../contexts';
 import { useTranslation } from 'react-i18next';
 
-const SUPPORT_EMAIL = 'joao.capinha+teloszkwallet@protofire.io';
+const FEATURE_FORM_URL = 'https://forms.gle/4FvP87CAFr5dWjqC7';
 const GITHUB_REPO = 'https://github.com/protofire/telos-privacy-wallet';
 
 export default () => {
@@ -27,11 +27,7 @@ export default () => {
     `**Version:** v${appPackage.version}\n**Support ID:** ${supportId}\n**Browser:** ${navigator.userAgent}\n\n**Describe the bug:**\n\n**Steps to reproduce:**\n1. \n2. \n\n**Expected behavior:**\n`
   )}`;
 
-  const featureSuggestUrl = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-    `[zkWallet v${appPackage.version}] Feature suggestion`
-  )}&body=${encodeURIComponent(
-    `Version: v${appPackage.version}\nSupport ID: ${supportId}\n\nFeature request:\n\n`
-  )}`;
+  const featureSuggestUrl = FEATURE_FORM_URL;
 
   return (
     <Column>
