@@ -43,11 +43,8 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex: 1;
-  @media only screen and (max-width: 800px) {
-    justify-content: flex-start;
-  }
 `;
 
 const MenuAndPageContainer = styled.div`
@@ -63,7 +60,7 @@ const MenuAndPageContainer = styled.div`
     gap: 0;
     flex-direction: column;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
   }
 `;
