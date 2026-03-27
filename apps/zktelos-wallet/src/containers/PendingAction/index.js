@@ -68,7 +68,7 @@ const ContentContainer = styled.div`
   align-items: center;
   background-color: ${props => props.theme.color.white};
   border-radius: 8px;
-  border: 2px solid ${props => props.theme.color.black};
+  border: 2px solid ${props => props.theme.border.card};
   padding: 16px 12px;
 
   @media only screen and (max-width: 560px) {
