@@ -131,7 +131,7 @@ export default () => {
       fromChain: 1,
       fromToken: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT Ethereum
       toChain: currentPool.chainId,
-      toToken: '0x0000000000000000000000000000000000000000', // native TLOS
+      toToken: currentPool.isNative ? '0x0000000000000000000000000000000000000000' : currentPool.tokenAddress,
       disableTelemetry: true,
       // Custom EVM provider: bypasses wagmi's chain registry validation so
       // LI.FI can switch to any chain without it being pre-configured in wagmi.
@@ -181,7 +181,7 @@ export default () => {
         ],
       },
     };
-  }, [currentPool.chainId, themeName, width, wagmiConfig]);
+  }, [currentPool.chainId, currentPool.isNative, currentPool.tokenAddress, themeName, width, wagmiConfig]);
 
   return (
     <LiFiWidget config={widgetConfig} />
