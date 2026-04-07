@@ -16,7 +16,7 @@ env:
 jobs:
   deploy:
     name: Build and Deploy to S3
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
