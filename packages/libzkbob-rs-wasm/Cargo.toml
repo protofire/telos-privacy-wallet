@@ -65,7 +65,7 @@ features = ["wasm", "serde_support"]
 [dev-dependencies]
 wasm-bindgen-test = "0.3.40"
 test-case = "1.2.0"
-rand = "0.8.4"
+rand = "0.8.6"
 serde_json = "1.0.111"
 wasm-bindgen = { version = "0.2.90", features = ["serde-serialize"] }
 
